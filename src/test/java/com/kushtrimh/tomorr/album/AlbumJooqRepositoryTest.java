@@ -56,7 +56,7 @@ public class AlbumJooqRepositoryTest {
         expectedRecord.setName("Album 1 Name");
         expectedRecord.setTotalTracks(8);
         expectedRecord.setImageHref("album-one-image");
-        expectedRecord.setType("album");
+        expectedRecord.setType("ALBUM");
         expectedRecord.setReleaseDate("2021-01-15");
         var returnedRecord = albumRepository.findById(id);
         assertEquals(expectedRecord, returnedRecord);
@@ -136,7 +136,7 @@ public class AlbumJooqRepositoryTest {
         album.setName("album-name-" + id);
         album.setReleaseDate("2012-03-05");
         album.setImageHref("album-image-href-" + id);
-        album.setType("album");
+        album.setType("ALBUM");
         album.setTotalTracks(10);
         return album;
     }

@@ -66,7 +66,7 @@ public class DefaultAlbumService implements AlbumService {
         AlbumRecord albumRecord = new AlbumRecord();
         albumRecord.setId(album.id());
         albumRecord.setName(album.name());
-        albumRecord.setType(album.albumType().getApiType());
+        albumRecord.setType(album.albumType().name());
         albumRecord.setTotalTracks(album.totalTracks());
         albumRecord.setReleaseDate(album.releasedDate());
         albumRecord.setImageHref(album.imageHref());

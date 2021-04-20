@@ -47,9 +47,9 @@ INSERT INTO artist_app_user (artist_id, app_user_id) VALUES ('artist1', 'user1')
 INSERT INTO artist_app_user (artist_id, app_user_id) VALUES ('artist3', 'user1');
 INSERT INTO artist_app_user (artist_id, app_user_id) VALUES ('artist1', 'user2');
 
-INSERT INTO album (id, name, total_tracks, image_href, type, release_date) VALUES ('album1', 'Album 1 Name', 8, 'album-one-image', 'album', '2021-01-15');
-INSERT INTO album (id, name, total_tracks, image_href, type, release_date) VALUES ('album2', 'Album 2 Name', 5, 'album-two-image', 'album', '2020-05-21');
-INSERT INTO album (id, name, total_tracks, image_href, type, release_date) VALUES ('album3', 'Album 3 Name', 12, 'album-three-image', 'album', '2015-03-05');
+INSERT INTO album (id, name, total_tracks, image_href, type, release_date) VALUES ('album1', 'Album 1 Name', 8, 'album-one-image', 'ALBUM', '2021-01-15');
+INSERT INTO album (id, name, total_tracks, image_href, type, release_date) VALUES ('album2', 'Album 2 Name', 5, 'album-two-image', 'ALBUM', '2020-05-21');
+INSERT INTO album (id, name, total_tracks, image_href, type, release_date) VALUES ('album3', 'Album 3 Name', 12, 'album-three-image', 'ALBUM', '2015-03-05');
 
 INSERT INTO artist_album (artist_id, album_id) VALUES ('artist1', 'album1');
 INSERT INTO artist_album (artist_id, album_id) VALUES ('artist2', 'album1');
