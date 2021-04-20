@@ -5,7 +5,6 @@ import static com.kushtrimh.tomorr.dal.Tables.*;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,21 +24,16 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     }
 
     @Override
-    @Transactional
     public int count() {
         return create.selectCount().from(ALBUM).fetchOne(0, int.class);
     }
 
     @Override
-    @Transactional
     public AlbumRecord findById(String id) {
-        return create.selectFrom(ALBUM)
-                .where(ALBUM.ID.eq(id))
-                .fetchOne();
+        return create.fetchOne(ALBUM, ALBUM.ID.eq(id));
     }
 
     @Override
-    @Transactional
     public List<AlbumRecord> findByArtist(String artistId) {
         return create.select().from(ALBUM)
                 .innerJoin(ARTIST_ALBUM)
@@ -51,14 +45,13 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     }
 
     @Override
-    @Transactional
     public void save(AlbumRecord album) {
         Objects.requireNonNull(album);
-        album.store();
+        var record = create.newRecord(ALBUM, album);
+        record.store();
     }
 
     @Override
-    @Transactional
     public void deleteById(String id) {
         create.delete(ALBUM)
                 .where(ALBUM.ID.eq(id))

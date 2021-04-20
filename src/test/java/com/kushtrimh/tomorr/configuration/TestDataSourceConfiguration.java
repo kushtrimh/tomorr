@@ -17,7 +17,6 @@ import org.springframework.boot.autoconfigure.jooq.JooqExceptionTranslator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
-import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.GenericContainer;
 
 import javax.sql.DataSource;
@@ -26,7 +25,6 @@ import javax.sql.DataSource;
  * @author Kushtrim Hajrizi
  */
 @Configuration
-@ContextConfiguration(classes = TestDataSourceConfiguration.class)
 public class TestDataSourceConfiguration {
     private final DataSourceProperties dataSourceProperties;
 

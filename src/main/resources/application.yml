@@ -4,6 +4,6 @@ spring:
   application:
     name: tomorr
 datasource:
-  url: jdbc:postgresql://localhost:5432/tomorr
+  url: ${TOMORR_DB_URL}
   username: ${TOMORR_DB_USERNAME}
   password: ${TOMORR_DB_PASSWORD}
