@@ -6,6 +6,8 @@ package com.kushtrimh.tomorr.dal.tables.records;
 
 import com.kushtrimh.tomorr.dal.tables.AppUser;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,8 +16,8 @@ import javax.persistence.UniqueConstraint;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record4;
-import org.jooq.Row4;
+import org.jooq.Record5;
+import org.jooq.Row5;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -31,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
         @UniqueConstraint(name = "app_user_pkey", columnNames = { "id" })
     }
 )
-public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements Record4<String, String, String, String> {
+public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements Record5<String, String, String, String, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -96,6 +98,21 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
         return (String) get(3);
     }
 
+    /**
+     * Setter for <code>public.app_user.created_at</code>.
+     */
+    public void setCreatedAt(LocalDateTime value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>public.app_user.created_at</code>.
+     */
+    @Column(name = "created_at", nullable = false, precision = 6)
+    public LocalDateTime getCreatedAt() {
+        return (LocalDateTime) get(4);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -106,17 +123,17 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     // -------------------------------------------------------------------------
-    // Record4 type implementation
+    // Record5 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<String, String, String, String> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row5<String, String, String, String, LocalDateTime> fieldsRow() {
+        return (Row5) super.fieldsRow();
     }
 
     @Override
-    public Row4<String, String, String, String> valuesRow() {
-        return (Row4) super.valuesRow();
+    public Row5<String, String, String, String, LocalDateTime> valuesRow() {
+        return (Row5) super.valuesRow();
     }
 
     @Override
@@ -140,6 +157,11 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     @Override
+    public Field<LocalDateTime> field5() {
+        return AppUser.APP_USER.CREATED_AT;
+    }
+
+    @Override
     public String component1() {
         return getId();
     }
@@ -160,6 +182,11 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     @Override
+    public LocalDateTime component5() {
+        return getCreatedAt();
+    }
+
+    @Override
     public String value1() {
         return getId();
     }
@@ -177,6 +204,11 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     @Override
     public String value4() {
         return getType();
+    }
+
+    @Override
+    public LocalDateTime value5() {
+        return getCreatedAt();
     }
 
     @Override
@@ -204,11 +236,18 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     }
 
     @Override
-    public AppUserRecord values(String value1, String value2, String value3, String value4) {
+    public AppUserRecord value5(LocalDateTime value) {
+        setCreatedAt(value);
+        return this;
+    }
+
+    @Override
+    public AppUserRecord values(String value1, String value2, String value3, String value4, LocalDateTime value5) {
         value1(value1);
         value2(value2);
         value3(value3);
         value4(value4);
+        value5(value5);
         return this;
     }
 
@@ -226,12 +265,13 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     /**
      * Create a detached, initialised AppUserRecord
      */
-    public AppUserRecord(String id, String address, String addressHash, String type) {
+    public AppUserRecord(String id, String address, String addressHash, String type, LocalDateTime createdAt) {
         super(AppUser.APP_USER);
 
         setId(id);
         setAddress(address);
         setAddressHash(addressHash);
         setType(type);
+        setCreatedAt(createdAt);
     }
 }

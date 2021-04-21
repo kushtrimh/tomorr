@@ -6,6 +6,8 @@ package com.kushtrimh.tomorr.dal.tables.records;
 
 import com.kushtrimh.tomorr.dal.tables.Album;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,8 +16,8 @@ import javax.persistence.UniqueConstraint;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record6;
-import org.jooq.Row6;
+import org.jooq.Record7;
+import org.jooq.Row7;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -31,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
         @UniqueConstraint(name = "album_pkey", columnNames = { "id" })
     }
 )
-public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Record6<String, String, Integer, String, String, String> {
+public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Record7<String, String, Integer, String, String, String, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -126,6 +128,21 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
         return (String) get(5);
     }
 
+    /**
+     * Setter for <code>public.album.created_at</code>.
+     */
+    public void setCreatedAt(LocalDateTime value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.album.created_at</code>.
+     */
+    @Column(name = "created_at", nullable = false, precision = 6)
+    public LocalDateTime getCreatedAt() {
+        return (LocalDateTime) get(6);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -136,17 +153,17 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
     }
 
     // -------------------------------------------------------------------------
-    // Record6 type implementation
+    // Record7 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<String, String, Integer, String, String, String> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<String, String, Integer, String, String, String, LocalDateTime> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 
     @Override
-    public Row6<String, String, Integer, String, String, String> valuesRow() {
-        return (Row6) super.valuesRow();
+    public Row7<String, String, Integer, String, String, String, LocalDateTime> valuesRow() {
+        return (Row7) super.valuesRow();
     }
 
     @Override
@@ -180,6 +197,11 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
     }
 
     @Override
+    public Field<LocalDateTime> field7() {
+        return Album.ALBUM.CREATED_AT;
+    }
+
+    @Override
     public String component1() {
         return getId();
     }
@@ -210,6 +232,11 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
     }
 
     @Override
+    public LocalDateTime component7() {
+        return getCreatedAt();
+    }
+
+    @Override
     public String value1() {
         return getId();
     }
@@ -237,6 +264,11 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
     @Override
     public String value6() {
         return getReleaseDate();
+    }
+
+    @Override
+    public LocalDateTime value7() {
+        return getCreatedAt();
     }
 
     @Override
@@ -276,13 +308,20 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
     }
 
     @Override
-    public AlbumRecord values(String value1, String value2, Integer value3, String value4, String value5, String value6) {
+    public AlbumRecord value7(LocalDateTime value) {
+        setCreatedAt(value);
+        return this;
+    }
+
+    @Override
+    public AlbumRecord values(String value1, String value2, Integer value3, String value4, String value5, String value6, LocalDateTime value7) {
         value1(value1);
         value2(value2);
         value3(value3);
         value4(value4);
         value5(value5);
         value6(value6);
+        value7(value7);
         return this;
     }
 
@@ -300,7 +339,7 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
     /**
      * Create a detached, initialised AlbumRecord
      */
-    public AlbumRecord(String id, String name, Integer totalTracks, String imageHref, String type, String releaseDate) {
+    public AlbumRecord(String id, String name, Integer totalTracks, String imageHref, String type, String releaseDate, LocalDateTime createdAt) {
         super(Album.ALBUM);
 
         setId(id);
@@ -309,5 +348,6 @@ public class AlbumRecord extends UpdatableRecordImpl<AlbumRecord> implements Rec
         setImageHref(imageHref);
         setType(type);
         setReleaseDate(releaseDate);
+        setCreatedAt(createdAt);
     }
 }

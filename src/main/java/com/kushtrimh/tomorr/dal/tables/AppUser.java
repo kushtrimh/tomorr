@@ -8,6 +8,7 @@ import com.kushtrimh.tomorr.dal.Keys;
 import com.kushtrimh.tomorr.dal.Public;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row4;
+import org.jooq.Row5;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -66,6 +67,11 @@ public class AppUser extends TableImpl<AppUserRecord> {
      * The column <code>public.app_user.type</code>.
      */
     public final TableField<AppUserRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(64).nullable(false), this, "");
+
+    /**
+     * The column <code>public.app_user.created_at</code>.
+     */
+    public final TableField<AppUserRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("now()", SQLDataType.LOCALDATETIME)), this, "");
 
     private AppUser(Name alias, Table<AppUserRecord> aliased) {
         this(alias, aliased, null);
@@ -142,11 +148,11 @@ public class AppUser extends TableImpl<AppUserRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row4 type methods
+    // Row5 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<String, String, String, String> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row5<String, String, String, String, LocalDateTime> fieldsRow() {
+        return (Row5) super.fieldsRow();
     }
 }

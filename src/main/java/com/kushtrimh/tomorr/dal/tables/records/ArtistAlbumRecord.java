@@ -6,13 +6,15 @@ package com.kushtrimh.tomorr.dal.tables.records;
 
 import com.kushtrimh.tomorr.dal.tables.ArtistAlbum;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jooq.Field;
-import org.jooq.Record2;
-import org.jooq.Row2;
+import org.jooq.Record3;
+import org.jooq.Row3;
 import org.jooq.impl.TableRecordImpl;
 
 
@@ -25,7 +27,7 @@ import org.jooq.impl.TableRecordImpl;
     name = "artist_album",
     schema = "public"
 )
-public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implements Record2<String, String> {
+public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implements Record3<String, String, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,18 +61,33 @@ public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implem
         return (String) get(1);
     }
 
+    /**
+     * Setter for <code>public.artist_album.created_at</code>.
+     */
+    public void setCreatedAt(LocalDateTime value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.artist_album.created_at</code>.
+     */
+    @Column(name = "created_at", nullable = false, precision = 6)
+    public LocalDateTime getCreatedAt() {
+        return (LocalDateTime) get(2);
+    }
+
     // -------------------------------------------------------------------------
-    // Record2 type implementation
+    // Record3 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<String, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row3<String, String, LocalDateTime> fieldsRow() {
+        return (Row3) super.fieldsRow();
     }
 
     @Override
-    public Row2<String, String> valuesRow() {
-        return (Row2) super.valuesRow();
+    public Row3<String, String, LocalDateTime> valuesRow() {
+        return (Row3) super.valuesRow();
     }
 
     @Override
@@ -84,6 +101,11 @@ public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implem
     }
 
     @Override
+    public Field<LocalDateTime> field3() {
+        return ArtistAlbum.ARTIST_ALBUM.CREATED_AT;
+    }
+
+    @Override
     public String component1() {
         return getArtistId();
     }
@@ -94,6 +116,11 @@ public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implem
     }
 
     @Override
+    public LocalDateTime component3() {
+        return getCreatedAt();
+    }
+
+    @Override
     public String value1() {
         return getArtistId();
     }
@@ -101,6 +128,11 @@ public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implem
     @Override
     public String value2() {
         return getAlbumId();
+    }
+
+    @Override
+    public LocalDateTime value3() {
+        return getCreatedAt();
     }
 
     @Override
@@ -116,9 +148,16 @@ public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implem
     }
 
     @Override
-    public ArtistAlbumRecord values(String value1, String value2) {
+    public ArtistAlbumRecord value3(LocalDateTime value) {
+        setCreatedAt(value);
+        return this;
+    }
+
+    @Override
+    public ArtistAlbumRecord values(String value1, String value2, LocalDateTime value3) {
         value1(value1);
         value2(value2);
+        value3(value3);
         return this;
     }
 
@@ -136,10 +175,11 @@ public class ArtistAlbumRecord extends TableRecordImpl<ArtistAlbumRecord> implem
     /**
      * Create a detached, initialised ArtistAlbumRecord
      */
-    public ArtistAlbumRecord(String artistId, String albumId) {
+    public ArtistAlbumRecord(String artistId, String albumId, LocalDateTime createdAt) {
         super(ArtistAlbum.ARTIST_ALBUM);
 
         setArtistId(artistId);
         setAlbumId(albumId);
+        setCreatedAt(createdAt);
     }
 }

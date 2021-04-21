@@ -8,6 +8,7 @@ import com.kushtrimh.tomorr.dal.Keys;
 import com.kushtrimh.tomorr.dal.Public;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -76,6 +77,11 @@ public class Album extends TableImpl<AlbumRecord> {
      * The column <code>public.album.release_date</code>.
      */
     public final TableField<AlbumRecord, String> RELEASE_DATE = createField(DSL.name("release_date"), SQLDataType.VARCHAR(64).nullable(false), this, "");
+
+    /**
+     * The column <code>public.album.created_at</code>.
+     */
+    public final TableField<AlbumRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("now()", SQLDataType.LOCALDATETIME)), this, "");
 
     private Album(Name alias, Table<AlbumRecord> aliased) {
         this(alias, aliased, null);
@@ -152,11 +158,11 @@ public class Album extends TableImpl<AlbumRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<String, String, Integer, String, String, String> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<String, String, Integer, String, String, String, LocalDateTime> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

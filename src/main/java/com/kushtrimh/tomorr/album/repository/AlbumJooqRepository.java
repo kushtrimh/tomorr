@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Objects;
 
-import static com.kushtrimh.tomorr.dal.Tables.ALBUM;
-
 /**
  * @author Kushtrim Hajrizi
  */

@@ -4,14 +4,16 @@ CREATE TABLE artist (
 	id varchar(32) PRIMARY KEY,
 	name varchar(256) NOT NULL,
 	image_href varchar(256),
-	popularity integer NOT NULL
+	popularity integer NOT NULL,
+	created_at timestamp NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE app_user (
 	id varchar(32) PRIMARY KEY,
 	address varchar(1024) NOT NULL,
 	address_hash varchar(512) NOT NULL,
-	type varchar(64) NOT NULL
+	type varchar(64) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE artist_app_user (
@@ -26,12 +28,14 @@ CREATE TABLE album (
 	total_tracks integer NOT NULL,
 	image_href varchar(256) NOT NULL,
 	type varchar(32) NOT NULL,
-	release_date varchar(64) NOT NULL
+	release_date varchar(64) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE artist_album (
 	artist_id varchar(32) NOT NULL,
-	album_id varchar(32) NOT NULL
+	album_id varchar(32) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT NOW()
 );
 
 -- Seed

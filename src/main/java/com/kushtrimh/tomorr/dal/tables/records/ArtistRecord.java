@@ -6,6 +6,8 @@ package com.kushtrimh.tomorr.dal.tables.records;
 
 import com.kushtrimh.tomorr.dal.tables.Artist;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,8 +16,8 @@ import javax.persistence.UniqueConstraint;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record4;
-import org.jooq.Row4;
+import org.jooq.Record5;
+import org.jooq.Row5;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -31,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
         @UniqueConstraint(name = "artist_pkey", columnNames = { "id" })
     }
 )
-public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements Record4<String, String, String, Integer> {
+public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements Record5<String, String, String, Integer, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -96,6 +98,21 @@ public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements R
         return (Integer) get(3);
     }
 
+    /**
+     * Setter for <code>public.artist.created_at</code>.
+     */
+    public void setCreatedAt(LocalDateTime value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>public.artist.created_at</code>.
+     */
+    @Column(name = "created_at", nullable = false, precision = 6)
+    public LocalDateTime getCreatedAt() {
+        return (LocalDateTime) get(4);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -106,17 +123,17 @@ public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements R
     }
 
     // -------------------------------------------------------------------------
-    // Record4 type implementation
+    // Record5 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<String, String, String, Integer> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row5<String, String, String, Integer, LocalDateTime> fieldsRow() {
+        return (Row5) super.fieldsRow();
     }
 
     @Override
-    public Row4<String, String, String, Integer> valuesRow() {
-        return (Row4) super.valuesRow();
+    public Row5<String, String, String, Integer, LocalDateTime> valuesRow() {
+        return (Row5) super.valuesRow();
     }
 
     @Override
@@ -140,6 +157,11 @@ public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements R
     }
 
     @Override
+    public Field<LocalDateTime> field5() {
+        return Artist.ARTIST.CREATED_AT;
+    }
+
+    @Override
     public String component1() {
         return getId();
     }
@@ -160,6 +182,11 @@ public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements R
     }
 
     @Override
+    public LocalDateTime component5() {
+        return getCreatedAt();
+    }
+
+    @Override
     public String value1() {
         return getId();
     }
@@ -177,6 +204,11 @@ public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements R
     @Override
     public Integer value4() {
         return getPopularity();
+    }
+
+    @Override
+    public LocalDateTime value5() {
+        return getCreatedAt();
     }
 
     @Override
@@ -204,11 +236,18 @@ public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements R
     }
 
     @Override
-    public ArtistRecord values(String value1, String value2, String value3, Integer value4) {
+    public ArtistRecord value5(LocalDateTime value) {
+        setCreatedAt(value);
+        return this;
+    }
+
+    @Override
+    public ArtistRecord values(String value1, String value2, String value3, Integer value4, LocalDateTime value5) {
         value1(value1);
         value2(value2);
         value3(value3);
         value4(value4);
+        value5(value5);
         return this;
     }
 
@@ -226,12 +265,13 @@ public class ArtistRecord extends UpdatableRecordImpl<ArtistRecord> implements R
     /**
      * Create a detached, initialised ArtistRecord
      */
-    public ArtistRecord(String id, String name, String imageHref, Integer popularity) {
+    public ArtistRecord(String id, String name, String imageHref, Integer popularity, LocalDateTime createdAt) {
         super(Artist.ARTIST);
 
         setId(id);
         setName(name);
         setImageHref(imageHref);
         setPopularity(popularity);
+        setCreatedAt(createdAt);
     }
 }
