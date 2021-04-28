@@ -11,10 +11,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 /**
  * @author Kushtrim Hajrizi
  */
-public class TestDatabaseExtension implements BeforeAllCallback, AfterAllCallback {
+public class TestDatabaseExtension implements BeforeAllCallback {
 
     private final Logger logger = LoggerFactory.getLogger(TestDatabaseExtension.class);
 
+    private static boolean started = false;
     private static GenericContainer<?> postgreSQLContainer;
 
     public static GenericContainer<?> getPostgreSQLContainer() {
@@ -23,23 +24,18 @@ public class TestDatabaseExtension implements BeforeAllCallback, AfterAllCallbac
 
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
-        postgreSQLContainer = new PostgreSQLContainer<>("postgres:13.2")
-                .withDatabaseName("tomorrtest")
-                .withUsername("postgres")
-                .withPassword("postgres")
-                .withInitScript("testdata/test-setup.sql")
-                .withExposedPorts(5432);
-        postgreSQLContainer.start();
-        logger.info("Started PostgreSQL container at {}/{}",
-                postgreSQLContainer.getHost(),
-                postgreSQLContainer.getFirstMappedPort());
-    }
-
-    @Override
-    public void afterAll(ExtensionContext context) throws Exception {
-        if (postgreSQLContainer != null) {
-            postgreSQLContainer.close();
-            logger.info("Closed PostgreSQL container");
+        if (!started) {
+            postgreSQLContainer = new PostgreSQLContainer<>("postgres:13.2")
+                    .withDatabaseName("tomorrtest")
+                    .withUsername("postgres")
+                    .withPassword("postgres")
+                    .withInitScript("testdata/test-setup.sql")
+                    .withExposedPorts(5432);
+            postgreSQLContainer.start();
+            logger.info("Started PostgreSQL container at {}/{}",
+                    postgreSQLContainer.getHost(),
+                    postgreSQLContainer.getFirstMappedPort());
+            started = true;
         }
     }
 }
