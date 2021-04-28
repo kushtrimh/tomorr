@@ -81,14 +81,14 @@ public class AlbumJooqRepositoryTest {
     }
 
     @Test
-    public void save_WhenArtistIsNull_ThrowException() {
+    public void save_WhenAlbumIsNull_ThrowException() {
         assertThrows(NullPointerException.class, () -> {
             albumRepository.save(null);
         });
     }
 
     @Test
-    public void save_WhenArtistIsValid_SaveSuccessfully() {
+    public void save_WhenAlbumIsValid_SaveSuccessfully() {
         var initialCount = albumRepository.count();
         var id = "new-al";
         var album = newAlbumRecord(id);
@@ -104,7 +104,7 @@ public class AlbumJooqRepositoryTest {
     }
 
     @Test
-    public void deleteById_WhenArtistIdIsNull_DoesNotDelete() {
+    public void deleteById_WhenAlbumIdIsNull_DoesNotDelete() {
         var initialCount = albumRepository.count();
         albumRepository.deleteById(null);
         var countAfterDelete = albumRepository.count();
@@ -112,7 +112,7 @@ public class AlbumJooqRepositoryTest {
     }
 
     @Test
-    public void deleteById_WhenArtistDoesNotExist_DoesNotDelete() {
+    public void deleteById_WhenAlbumDoesNotExist_DoesNotDelete() {
         var initialCount = albumRepository.count();
         albumRepository.deleteById("invalid-id");
         var countAfterDelete = albumRepository.count();
@@ -120,7 +120,7 @@ public class AlbumJooqRepositoryTest {
     }
 
     @Test
-    public void deleteById_WhenArtistDoesExist_DeleteAlbum() {
+    public void deleteById_WhenAlbumDoesExist_DeleteAlbum() {
         var id = "album-to-delete";
         var album = newAlbumRecord(id);
         albumRepository.save(album);

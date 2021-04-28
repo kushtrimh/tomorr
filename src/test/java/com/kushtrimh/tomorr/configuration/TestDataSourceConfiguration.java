@@ -2,8 +2,11 @@ package com.kushtrimh.tomorr.configuration;
 
 import com.kushtrimh.tomorr.album.repository.AlbumJooqRepository;
 import com.kushtrimh.tomorr.album.repository.AlbumRepository;
+import com.kushtrimh.tomorr.artist.repository.ArtistJooqRepository;
+import com.kushtrimh.tomorr.artist.repository.ArtistRepository;
 import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
+import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import com.kushtrimh.tomorr.properties.DataSourceProperties;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -81,5 +84,10 @@ public class TestDataSourceConfiguration {
     @Bean
     public AlbumRepository<AlbumRecord> albumRepository(DSLContext dsl) {
         return new AlbumJooqRepository(dsl);
+    }
+
+    @Bean
+    public ArtistRepository<ArtistRecord> artistRepository(DSLContext dsl) {
+        return new ArtistJooqRepository(dsl);
     }
 }
