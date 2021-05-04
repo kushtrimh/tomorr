@@ -127,7 +127,7 @@ public class ArtistJooqRepositoryTest {
     @Test
     public void deleteById_WhenArtistIdDoesNotExist_DoesNotDelete() {
         var initialCount = artistRepository.count();
-        artistRepository.deleteById(null);
+        artistRepository.deleteById("non-existing-id");
         var countAfterDelete = artistRepository.count();
         assertEquals(initialCount, countAfterDelete);
     }
@@ -137,11 +137,11 @@ public class ArtistJooqRepositoryTest {
         var id = "artist-to-delete";
         var artist = newArtistRecord(id);
         artistRepository.save(artist);
-        var initalCount = artistRepository.count();
+        var initialCount = artistRepository.count();
 
         artistRepository.deleteById(id);
         var countAfterDelete = artistRepository.count();
-        assertNotEquals(initalCount, countAfterDelete);
+        assertNotEquals(initialCount, countAfterDelete);
 
         assertNull(artistRepository.findById(id));
     }

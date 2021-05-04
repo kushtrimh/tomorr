@@ -16,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row5;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -57,11 +57,6 @@ public class AppUser extends TableImpl<AppUserRecord> {
      * The column <code>public.app_user.address</code>.
      */
     public final TableField<AppUserRecord, String> ADDRESS = createField(DSL.name("address"), SQLDataType.VARCHAR(1024).nullable(false), this, "");
-
-    /**
-     * The column <code>public.app_user.address_hash</code>.
-     */
-    public final TableField<AppUserRecord, String> ADDRESS_HASH = createField(DSL.name("address_hash"), SQLDataType.VARCHAR(512).nullable(false), this, "");
 
     /**
      * The column <code>public.app_user.type</code>.
@@ -148,11 +143,11 @@ public class AppUser extends TableImpl<AppUserRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<String, String, String, String, LocalDateTime> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row4<String, String, String, LocalDateTime> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

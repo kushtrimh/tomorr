@@ -6,8 +6,11 @@ import com.kushtrimh.tomorr.artist.repository.ArtistJooqRepository;
 import com.kushtrimh.tomorr.artist.repository.ArtistRepository;
 import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
+import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import com.kushtrimh.tomorr.properties.DataSourceProperties;
+import com.kushtrimh.tomorr.user.repository.UserJooqRepository;
+import com.kushtrimh.tomorr.user.repository.UserRepository;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.ConnectionProvider;
@@ -89,5 +92,10 @@ public class TestDataSourceConfiguration {
     @Bean
     public ArtistRepository<ArtistRecord> artistRepository(DSLContext dsl) {
         return new ArtistJooqRepository(dsl);
+    }
+
+    @Bean
+    public UserRepository<AppUserRecord> userRepository(DSLContext dsl) {
+        return new UserJooqRepository(dsl);
     }
 }

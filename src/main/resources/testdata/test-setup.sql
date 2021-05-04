@@ -11,7 +11,6 @@ CREATE TABLE artist (
 CREATE TABLE app_user (
 	id varchar(32) PRIMARY KEY,
 	address varchar(1024) NOT NULL,
-	address_hash varchar(512) NOT NULL,
 	type varchar(64) NOT NULL,
 	created_at timestamp NOT NULL DEFAULT NOW()
 );
@@ -44,8 +43,8 @@ INSERT INTO artist (id, name, image_href, popularity) VALUES ('artist1', 'Artist
 INSERT INTO artist (id, name, image_href, popularity) VALUES ('artist2', 'Artist Two', 'artist-two-image', 95);
 INSERT INTO artist (id, name, image_href, popularity) VALUES ('artist3', 'Artist Three', 'artist-three-image', 100);
 
-INSERT INTO app_user (id, address, address_hash, type) VALUES ('user1', 'user1@tomorr.com', 'user1hash', 'email');
-INSERT INTO app_user (id, address, address_hash, type) VALUES ('user2', 'user2@tomorr.com', 'user2hash', 'email');
+INSERT INTO app_user (id, address, type) VALUES ('user1', 'user1@tomorr.com', 'EMAIL');
+INSERT INTO app_user (id, address, type) VALUES ('user2', 'user2@tomorr.com', 'EMAIL');
 
 INSERT INTO artist_app_user (artist_id, app_user_id) VALUES ('artist1', 'user1');
 INSERT INTO artist_app_user (artist_id, app_user_id) VALUES ('artist3', 'user1');
