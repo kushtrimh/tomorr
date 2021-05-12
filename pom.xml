@@ -107,48 +107,58 @@
                     <target>16</target>
                 </configuration>
             </plugin>
-			<!-- JOOQ  Code generator -->
-			<plugin>
-				<groupId>org.jooq</groupId>
-				<artifactId>jooq-codegen-maven</artifactId>
-				<version>${jooq.version}</version>
-				<executions>
-					<execution>
-						<id>jooq-codegen</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<!-- <skip>${skip.jooq.generation}</skip> -->
-					<jdbc>
-						<driver>org.postgresql.Driver</driver>
-						<url>${env.TOMORR_DB_URL}</url>
-						<user>${env.TOMORR_DB_USERNAME}</user>
-						<password>${env.TOMORR_DB_PASSWORD}</password>
-					</jdbc>
-					<generator>
-						<name>org.jooq.codegen.JavaGenerator</name>
-						<database>
-							<name>org.jooq.meta.postgres.PostgresDatabase</name>
-							<inputSchema>public</inputSchema>
-							<outputSchema></outputSchema>
-							<includes>.*</includes>
-							<excludes></excludes>
-						</database>
-						<generate>
-							<jpaAnnotations>true</jpaAnnotations>
-							<jpaVersion>2.2</jpaVersion>
-						</generate>
-						<target>
-							<packageName>com.kushtrimh.tomorr.dal</packageName>
-							<directory>src/main/java</directory>
-						</target>
-					</generator>
-				</configuration>
-			</plugin>
-        </plugins>
+		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>jooq-code-generate</id>
+			<build>
+				<plugins>
+					<!-- JOOQ  Code generator -->
+					<plugin>
+						<groupId>org.jooq</groupId>
+						<artifactId>jooq-codegen-maven</artifactId>
+						<version>${jooq.version}</version>
+						<executions>
+							<execution>
+								<id>jooq-codegen</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- <skip>${skip.jooq.generation}</skip> -->
+							<jdbc>
+								<driver>org.postgresql.Driver</driver>
+								<url>${env.TOMORR_DB_URL}</url>
+								<user>${env.TOMORR_DB_USERNAME}</user>
+								<password>${env.TOMORR_DB_PASSWORD}</password>
+							</jdbc>
+							<generator>
+								<name>org.jooq.codegen.JavaGenerator</name>
+								<database>
+									<name>org.jooq.meta.postgres.PostgresDatabase</name>
+									<inputSchema>public</inputSchema>
+									<outputSchema></outputSchema>
+									<includes>.*</includes>
+									<excludes></excludes>
+								</database>
+								<generate>
+									<jpaAnnotations>true</jpaAnnotations>
+									<jpaVersion>2.2</jpaVersion>
+								</generate>
+								<target>
+									<packageName>com.kushtrimh.tomorr.dal</packageName>
+									<directory>src/main/java</directory>
+								</target>
+							</generator>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
