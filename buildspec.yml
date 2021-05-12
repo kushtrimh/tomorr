@@ -15,10 +15,7 @@ phases:
       - echo Installing maven
       - yum -y install maven
       - echo installing Docker
-      - yum install -y yum-utils
-      - yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-      - yum update
-      - yum install -y docker-ce docker-ce-cli containerd.io
+      - yum install -y docker
   pre_build:
     commands:
       - echo Starting docker
