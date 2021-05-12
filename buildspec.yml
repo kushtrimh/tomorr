@@ -10,6 +10,7 @@ phases:
       - echo Started installing dependenccies
       - echo Installing Java 16
       - wget https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz
+      - mkdir /usr/lib/jvm/custom/
       - tar -xf openjdk-16.0.1_linux-x64_bin.tar.gz --directory /usr/lib/jvm/custom/jdk-16.0.1
       - echo Installing maven
       - yum -y install maven
