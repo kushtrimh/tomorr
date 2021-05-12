@@ -16,10 +16,10 @@ phases:
       - yum -y install maven
       - echo Installing Docker
       - PYTHON=python2 amazon-linux-extras install -y docker
-  pre_build:
-    commands:
-      - echo Starting docker
-      - systemctl start docker
+#  pre_build:
+#    commands:
+#      - echo Starting docker
+#      - systemctl start docker
   build:
     commands:
       - mvn package
