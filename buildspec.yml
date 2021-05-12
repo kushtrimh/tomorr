@@ -5,9 +5,9 @@ env:
     JAVA_HOME: "/usr/lib/jvm/custom/jdk-16.0.1"
 
 phases:
-  runtime-versions:
-    java: openjdk8
   install:
+    runtime-versions:
+      java: openjdk8
     commands:
       - echo Started installing dependenccies
       - echo Installing Java 16
