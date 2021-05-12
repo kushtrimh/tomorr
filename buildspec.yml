@@ -15,9 +15,7 @@ phases:
       - echo Installing maven
       - yum -y install maven
       - echo Installing Docker
-      - yum install -y http://docker-release-yellow-prod.s3-website-us-east-1.amazonaws.com/linux/centos/8/x86_64/stable/Packages/containerd.io-1.4.4-3.1.el8.x86_64.rpm
-      - yum install -y http://docker-release-yellow-prod.s3-website-us-east-1.amazonaws.com/linux/centos/8/x86_64/stable/Packages/docker-ce-cli-20.10.6-3.el8.x86_64.rpm
-      - yum install -y http://docker-release-yellow-prod.s3-website-us-east-1.amazonaws.com/linux/centos/8/x86_64/stable/Packages/docker-ce-20.10.6-3.el8.x86_64.rpm
+      - curl -fsSL https://get.docker.com/ | sh
   pre_build:
     commands:
       - echo Starting docker
