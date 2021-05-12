@@ -20,4 +20,5 @@ phases:
 artifacts:
   files:
     - target/*.jar
-  name: daulle-$(date +%Y-%m-%d)
+  discard-paths: yes
+  name: tomorr-$(date +%Y-%m-%d).zip
