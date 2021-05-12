@@ -16,7 +16,7 @@ phases:
       - yum -y install maven
       - echo Installing Docker
       - yum -y install amazon-linux-extras yum-utils python-boto
-      - amazon-linux-extras install -y docker
+      - /usr/bin/amazon-linux-extras install -y docker
   pre_build:
     commands:
       - echo Starting docker
