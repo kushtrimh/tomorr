@@ -6,21 +6,19 @@ env:
 
 phases:
   install:
+    runtime-versions:
+      java: corretto11
     commands:
       - echo Started installing dependenccies
       - echo Installing Java 16
       - wget https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz
       - mkdir /usr/lib/jvm/custom/
       - tar -xf openjdk-16.0.1_linux-x64_bin.tar.gz --directory /usr/lib/jvm/custom
-      - echo Installing maven
-      - yum -y install maven
-      - echo Installing Docker
-      - yum -y install amazon-linux-extras yum-utils python-boto
-      - /usr/bin/amazon-linux-extras install -y docker
-  pre_build:
-    commands:
-      - echo Starting docker
-      - systemctl start docker
   build:
     commands:
-      - mvn package
+      - mvn clean package -DexcludedGroups=database
+artifacts:
+  files:
+    - target/*.jar
+  name: daulle-$(date +%Y-%m-%d)
+
