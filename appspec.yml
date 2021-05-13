@@ -4,7 +4,6 @@ files:
     - source: target/tomorr.jar
       destination: /tomorr.jar
 hooks:
-  BeforeInstall:
-    - location: scripts/before-install.sh
   ApplicationStart:
     - location: scripts/start-server.sh
+      runas: codedeployer
