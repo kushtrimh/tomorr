@@ -1,11 +1,10 @@
 version: 0.0
 os: linux
+files:
+    - source: target/tomorr.jar
+      destination: /tomorr.jar
 hooks:
   BeforeInstall:
     - location: scripts/before-install.sh
-#  AfterInstall:
-#    - location:
-#  ApplicationStart:
-#    - location:
-#  ValidateService:
-#    - location:
+  ApplicationStart:
+    - location: scripts/start-server.sh
