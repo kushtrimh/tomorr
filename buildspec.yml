@@ -20,5 +20,6 @@ phases:
 artifacts:
   files:
     - target/*.jar
-  discard-paths: yes
+    - appspec.yml
+    - scripts/*
   name: tomorr-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout).zip
