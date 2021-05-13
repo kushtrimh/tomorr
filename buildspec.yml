@@ -21,4 +21,4 @@ artifacts:
   files:
     - target/*.jar
   discard-paths: yes
-  name: tomorr-$(date +%Y-%m-%d).zip
+  name: tomorr-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout).zip
