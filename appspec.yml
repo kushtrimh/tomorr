@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
     - source: target/tomorr.jar
-      destination: /usr/tmp/tomorr.jar
+      destination: /usr/tmp/
 hooks:
   ApplicationStart:
     - location: scripts/start-server.sh
