@@ -4,6 +4,12 @@ files:
     - source: target/tomorr.jar
       destination: /usr/tmp/
 hooks:
+  ApplicationStop:
+    - location: scripts/stop-server.sh
+      runas: codedeployer
   ApplicationStart:
     - location: scripts/start-server.sh
+      runas: codedeployer
+  ValidateService:
+    - location: scripts/validate-server.sh
       runas: codedeployer
