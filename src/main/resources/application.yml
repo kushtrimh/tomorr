@@ -3,7 +3,30 @@ server:
 spring:
   application:
     name: tomorr
+  quartz:
+    jdbc-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: tomorr-scheduler
+            instanceId: AUTO
+          threadPool:
+            threadCount: 10
+          jobStore:
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            useProperties: true
+            tablePrefix: qrtz_
+            misfireThreshold: 60000
+            isClustered: true
+            clusterCheckinInterval: 10000
 datasource:
   url: ${TOMORR_DB_URL}
   username: ${TOMORR_DB_USERNAME}
   password: ${TOMORR_DB_PASSWORD}
+spotify:
+  api:
+    client: ${TOMORR_SPOTIFY_CLIENT_ID}
+    secret: ${TOMORR_SPOTIFY_CLIENT_SECRET}
+    user-agent: tomorr/0.0.1
+    auth-url: https://accounts.spotify.com/api/token

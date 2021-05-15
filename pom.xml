@@ -52,6 +52,12 @@
 			<version>2.2</version>
 		</dependency>
 
+		<!-- Scheduling -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-quartz</artifactId>
+		</dependency>
+
 		<!-- Dev dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
