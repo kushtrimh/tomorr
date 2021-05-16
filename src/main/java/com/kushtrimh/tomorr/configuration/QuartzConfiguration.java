@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.spotify.job.SpotifyAuthenticationJob;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
@@ -30,6 +31,7 @@ public class QuartzConfiguration {
         this.quartzProperties = quartzProperties;
     }
 
+    @Bean
     public JobDetailFactoryBean authenticationJobDetailFactoryBean() {
         JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
         jobDetailFactoryBean.setJobClass(SpotifyAuthenticationJob.class);
@@ -37,9 +39,14 @@ public class QuartzConfiguration {
         return jobDetailFactoryBean;
     }
 
-    public SimpleTriggerFactoryBean authenticationTriggerFactoryBean() {
-        // TODO:
-        return null;
+    @Bean
+    public SimpleTriggerFactoryBean authenticationTriggerFactoryBean(
+            @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean authenticationJobDetailFactoryBean) {
+        SimpleTriggerFactoryBean simpleTriggerFactoryBean = new SimpleTriggerFactoryBean();
+        simpleTriggerFactoryBean.setJobDetail(authenticationJobDetailFactoryBean.getObject());
+        simpleTriggerFactoryBean.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+        simpleTriggerFactoryBean.setRepeatInterval(3240000);
+        return simpleTriggerFactoryBean;
     }
 
     @Bean

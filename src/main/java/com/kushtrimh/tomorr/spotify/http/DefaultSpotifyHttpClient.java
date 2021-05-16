@@ -4,78 +4,142 @@ import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import com.kushtrimh.tomorr.spotify.api.response.SpotifyApiResponse;
+import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Kushtrim Hajrizi
  */
 public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
 
-    private final String baseUrl;
+    public static final String TOMORR_TRACE_ID_HEADER = "tomorr-trace-id";
+    public static final int RETRY_AFTER_DEFAULT_VALUE = 60;
+
+    private final Logger logger = LoggerFactory.getLogger(DefaultSpotifyHttpClient.class);
+
+    private final String apiUrl;
+    private final String authUrl;
+    private final String userAgent;
     private final RestTemplate restTemplate;
 
     private DefaultSpotifyHttpClient(Builder builder) {
-        this.baseUrl = builder.baseUrl;
+        this.apiUrl = builder.apiUrl;
+        this.authUrl = builder.authUrl;
         this.restTemplate = builder.restTemplate;
+        this.userAgent = builder.userAgent;
     }
 
     @Override
-    public <T extends SpotifyApiResponse> T get(String path, Class<T> cls)
+    public <T extends SpotifyApiResponse> T get(String token, String path, Class<T> cls)
             throws SpotifyApiException, TooManyRequestsException {
-        return execute(getUrl(path), HttpMethod.GET, null, cls);
+        return execute(token, apiUrl + path, HttpMethod.GET, null, cls);
     }
 
     @Override
-    public <Req extends SpotifyApiRequest, Res extends SpotifyApiResponse> Res post(String path, Req body, Class<Res> cls)
+    public <Req extends SpotifyApiRequest, Res extends SpotifyApiResponse> Res post(
+            String token, String path, Req body, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException {
-        return execute(getUrl(path), HttpMethod.POST, new HttpEntity<>(body), cls);
+        return execute(token, apiUrl + path, HttpMethod.POST, body, cls);
     }
 
-    private <Req extends SpotifyApiRequest, Res extends SpotifyApiResponse> Res execute(
-            String url, HttpMethod method, HttpEntity<Req> entity, Class<Res> cls)
-            throws SpotifyApiException, TooManyRequestsException{
+    @Override
+    public TokenResponse getToken(String clientId, String clientSecret) throws SpotifyApiException {
+        String traceId = UUID.randomUUID().toString();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        String authData = clientId + ":" + clientSecret;
+        String encodedAuthData = Base64.getEncoder().encodeToString(authData.getBytes(StandardCharsets.UTF_8));
+        httpHeaders.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuthData);
+        httpHeaders.set(TOMORR_TRACE_ID_HEADER, traceId);
+
+        MultiValueMap<String, String> bodyParams = new LinkedMultiValueMap<>();
+        bodyParams.add("grant_type", "client_credentials");
+        HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(bodyParams, httpHeaders);
+        logger.info("{} Sending auth request at {}", traceId, authUrl);
         try {
-            ResponseEntity<Res> responseEntity = restTemplate.exchange(url, method, entity, cls);
-            if (responseEntity.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
-                int retryAfter = getRetryAfter(responseEntity);
-                throw new TooManyRequestsException(retryAfter);
-            }
-            return responseEntity.getBody();
+            TokenResponse response = restTemplate.postForObject(authUrl, body, TokenResponse.class);
+            logger.info("{} Received successful response for auth request", traceId);
+            return response;
         } catch (RestClientException e) {
+            logger.error("{} Error while sending auth request", traceId, e);
             throw new SpotifyApiException(e);
         }
     }
 
-    private int getRetryAfter(ResponseEntity<?> responseEntity) {
-        HttpHeaders responseHeaders = responseEntity.getHeaders();
-        return Optional.ofNullable(responseHeaders.getFirst("Retry-After"))
-                .map(Integer::parseInt).orElse(60);
+    private <Req extends SpotifyApiRequest, Res extends SpotifyApiResponse> Res execute(
+            String token, String url, HttpMethod method, Req body, Class<Res> cls)
+            throws SpotifyApiException, TooManyRequestsException {
+        String traceId = UUID.randomUUID().toString();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.USER_AGENT, userAgent);
+        httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        httpHeaders.add(TOMORR_TRACE_ID_HEADER, traceId);
+        HttpEntity<Req> entity = new HttpEntity<>(body, httpHeaders);
+        try {
+            logger.info("{} Sending {} request at {}, with content {}",
+                    traceId, method, url, entity.getBody());
+            ResponseEntity<Res> responseEntity = restTemplate.exchange(url, method, entity, cls);
+            Res response = responseEntity.getBody();
+            logger.info("{} Received response {}", traceId, response);
+            return response;
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+                int retryAfter = getRetryAfter(e.getResponseHeaders());
+                logger.warn("{} 429 received for request at {}", traceId, url);
+                throw new TooManyRequestsException(retryAfter);
+            }
+            logger.error("{} Client error for request {}", traceId, e);
+            throw new SpotifyApiException(e);
+        } catch (RestClientException e) {
+            logger.error("{} Error while sending request", traceId, e);
+            throw new SpotifyApiException(e);
+        }
     }
 
-    private String getUrl(String path) {
-        return baseUrl + path;
+    private int getRetryAfter(HttpHeaders responseHeaders) {
+        if (responseHeaders == null) {
+            return RETRY_AFTER_DEFAULT_VALUE;
+        }
+        return Optional.ofNullable(responseHeaders.getFirst("Retry-After"))
+                .map(Integer::parseInt).orElse(RETRY_AFTER_DEFAULT_VALUE);
     }
 
     public static class Builder {
-        private final String baseUrl;
+        private final String apiUrl;
+        private final String authUrl;
         private RestTemplate restTemplate = new RestTemplate();
+        private String userAgent = "tomorr-agent";
 
-        public Builder(String baseUrl) {
-            Objects.requireNonNull(baseUrl);
-            this.baseUrl = baseUrl;
+        public Builder(String apiUrl, String authUrl) {
+            Objects.requireNonNull(apiUrl);
+            Objects.requireNonNull(authUrl);
+            this.apiUrl = apiUrl;
+            this.authUrl = authUrl;
         }
 
         public Builder restTemplate(RestTemplate restTemplate) {
             this.restTemplate = restTemplate;
+            return this;
+        }
+
+        public Builder userAgent(String userAgent) {
+            this.userAgent = userAgent;
             return this;
         }
 

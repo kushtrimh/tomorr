@@ -14,7 +14,7 @@ spring:
           threadPool:
             threadCount: 10
           jobStore:
-            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
             useProperties: true
             tablePrefix: qrtz_
             misfireThreshold: 60000
@@ -25,8 +25,8 @@ datasource:
   username: ${TOMORR_DB_USERNAME}
   password: ${TOMORR_DB_PASSWORD}
 spotify:
-  api:
-    client: ${TOMORR_SPOTIFY_CLIENT_ID}
-    secret: ${TOMORR_SPOTIFY_CLIENT_SECRET}
-    user-agent: tomorr/0.0.1
-    auth-url: https://accounts.spotify.com/api/token
+  client-id: ${TOMORR_SPOTIFY_CLIENT_ID}
+  secret-secret: ${TOMORR_SPOTIFY_CLIENT_SECRET}
+  user-agent: tomorr/0.0.1
+  auth-url: https://accounts.spotify.com/api/token
+  api-url: https://api.spotify.com/v1
