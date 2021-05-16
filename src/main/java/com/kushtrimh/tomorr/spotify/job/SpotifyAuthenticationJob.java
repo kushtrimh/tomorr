@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.spotify.job;
 
+import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -23,6 +24,10 @@ public class SpotifyAuthenticationJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-
+        try {
+            spotifyApiClient.refreshAccessToken();
+        } catch (SpotifyApiException e) {
+            logger.error("Could not retrieve token from api client", e);
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.kushtrimh.tomorr.spotify.http;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
-import com.kushtrimh.tomorr.spotify.api.response.SpotifyApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +10,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -47,16 +48,15 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
     }
 
     @Override
-    public <T extends SpotifyApiResponse> T get(String token, String path, Class<T> cls)
+    public <Req extends SpotifyApiRequest, Res> Res get(String token, Req request, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException {
-        return execute(token, apiUrl + path, HttpMethod.GET, null, cls);
+        return execute(token, buildApiUrl(request), HttpMethod.GET, null, cls);
     }
 
     @Override
-    public <Req extends SpotifyApiRequest, Res extends SpotifyApiResponse> Res post(
-            String token, String path, Req body, Class<Res> cls)
+    public <Req extends SpotifyApiRequest, Res> Res post(String token, Req request, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException {
-        return execute(token, apiUrl + path, HttpMethod.POST, body, cls);
+        return execute(token, buildApiUrl(request), HttpMethod.POST, request, cls);
     }
 
     @Override
@@ -67,6 +67,7 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
         String encodedAuthData = Base64.getEncoder().encodeToString(authData.getBytes(StandardCharsets.UTF_8));
         httpHeaders.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuthData);
         httpHeaders.set(TOMORR_TRACE_ID_HEADER, traceId);
+        httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 
         MultiValueMap<String, String> bodyParams = new LinkedMultiValueMap<>();
         bodyParams.add("grant_type", "client_credentials");
@@ -82,7 +83,7 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
         }
     }
 
-    private <Req extends SpotifyApiRequest, Res extends SpotifyApiResponse> Res execute(
+    private <Req extends SpotifyApiRequest, Res> Res execute(
             String token, String url, HttpMethod method, Req body, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException {
         String traceId = UUID.randomUUID().toString();
@@ -90,6 +91,8 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
         httpHeaders.add(HttpHeaders.USER_AGENT, userAgent);
         httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         httpHeaders.add(TOMORR_TRACE_ID_HEADER, traceId);
+        httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+
         HttpEntity<Req> entity = new HttpEntity<>(body, httpHeaders);
         try {
             logger.info("{} Sending {} request at {}, with content {}",
@@ -110,6 +113,14 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
             logger.error("{} Error while sending request", traceId, e);
             throw new SpotifyApiException(e);
         }
+    }
+
+    private <Req extends SpotifyApiRequest> String buildApiUrl(Req request) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
+                .host(apiUrl)
+                .path(request.getApiRequestType().getPath())
+                .queryParams(request.getQueryParams());
+        return uriBuilder.build().toUriString();
     }
 
     private int getRetryAfter(HttpHeaders responseHeaders) {

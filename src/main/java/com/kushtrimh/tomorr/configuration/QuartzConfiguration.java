@@ -1,8 +1,6 @@
 package com.kushtrimh.tomorr.configuration;
 
 import com.kushtrimh.tomorr.spotify.job.SpotifyAuthenticationJob;
-import org.quartz.Job;
-import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
