@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
-import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
-import com.kushtrimh.tomorr.spotify.http.DefaultSpotifyHttpClient;
 import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Kushtrim Hajrizi
  */
 @Configuration
-public class SpotifyConfiguration {
+public class TestSpotifyConfiguration {
 
     @Bean
     public MappingJackson2HttpMessageConverter mappingConverter() {
@@ -28,23 +26,25 @@ public class SpotifyConfiguration {
     }
 
     @Bean
-    public SpotifyApiUriBuilder spotifyApiUriBuilder(SpotifyProperties spotifyProperties) {
-        return new SpotifyApiUriBuilder(spotifyProperties.getApiUrl());
+    public RestTemplate restTemplate(MappingJackson2HttpMessageConverter mappingConverter) {
+        return new RestTemplateBuilder()
+                .additionalMessageConverters(mappingConverter)
+                .build();
     }
 
     @Bean
-    public SpotifyApiClient spotifyApiClient(SpotifyProperties spotifyProperties,
-                                             SpotifyApiUriBuilder spotifyApiUriBuilder,
-                                             MappingJackson2HttpMessageConverter mappingConverter) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .additionalMessageConverters(mappingConverter)
-                .build();
+    public SpotifyProperties spotifyProperties() {
+        SpotifyProperties spotifyProperties = new SpotifyProperties();
+        spotifyProperties.setClientId("client-id-value");
+        spotifyProperties.setClientId("client-secret-value");
+        spotifyProperties.setApiUrl("http://localhost");
+        spotifyProperties.setAuthUrl("http://localhost/auth");
+        spotifyProperties.setUserAgent("tomorr-test/0.1");
+        return spotifyProperties;
+    }
 
-        DefaultSpotifyHttpClient httpClient = new DefaultSpotifyHttpClient
-                .Builder(spotifyApiUriBuilder, spotifyProperties.getAuthUrl())
-                .userAgent(spotifyProperties.getUserAgent())
-                .restTemplate(restTemplate)
-                .build();
-        return new SpotifyApiClient(httpClient, spotifyProperties);
+    @Bean
+    public SpotifyApiUriBuilder spotifyApiUriBuilder(SpotifyProperties spotifyProperties) {
+        return new SpotifyApiUriBuilder(spotifyProperties.getApiUrl());
     }
 }

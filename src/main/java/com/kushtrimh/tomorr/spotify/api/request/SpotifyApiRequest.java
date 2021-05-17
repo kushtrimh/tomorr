@@ -7,7 +7,7 @@ import org.springframework.util.MultiValueMap;
  */
 public interface SpotifyApiRequest {
 
-    ApiRequestType getApiRequestType();
+    String getPath();
 
     MultiValueMap<String, String> getQueryParams();
 }

@@ -28,7 +28,7 @@ public class TestDatabaseExtension implements BeforeAllCallback {
                     .withDatabaseName("tomorrtest")
                     .withUsername("postgres")
                     .withPassword("postgres")
-                    .withInitScript("testdata/test-setup.sql")
+                    .withInitScript("test-setup.sql")
                     .withExposedPorts(5432);
             postgreSQLContainer.start();
             logger.info("Started PostgreSQL container at {}/{}",

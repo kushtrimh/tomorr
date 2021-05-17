@@ -1,6 +1,5 @@
 package com.kushtrimh.tomorr.spotify.api.request.artist;
 
-import com.kushtrimh.tomorr.spotify.api.request.ApiRequestType;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -12,13 +11,10 @@ import java.util.List;
  * @author Kushtrim Hajrizi
  */
 public class GetArtistsApiRequest implements SpotifyApiRequest {
+    private List<String> artists;
 
-    private List<String> artists = new ArrayList<>();
-
-    public GetArtistsApiRequest() {}
-
-    public GetArtistsApiRequest(List<String> artists) {
-        this.artists = artists;
+    private GetArtistsApiRequest(Builder builder) {
+        this.artists = builder.artists;
     }
 
     public List<String> getArtists() {
@@ -30,8 +26,8 @@ public class GetArtistsApiRequest implements SpotifyApiRequest {
     }
 
     @Override
-    public ApiRequestType getApiRequestType() {
-        return ApiRequestType.ARTISTS;
+    public String getPath() {
+        return "/artists";
     }
 
     @Override
@@ -46,5 +42,18 @@ public class GetArtistsApiRequest implements SpotifyApiRequest {
         return "GetArtistsApiRequest{" +
                 "artists=" + artists +
                 '}';
+    }
+
+    public static class Builder {
+        private List<String> artists = new ArrayList<>();
+
+        public Builder artists(List<String> artists) {
+            this.artists = artists;
+            return this;
+        }
+
+        public GetArtistsApiRequest build() {
+            return new GetArtistsApiRequest(this);
+        }
     }
 }

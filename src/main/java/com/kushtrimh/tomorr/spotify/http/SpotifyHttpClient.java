@@ -10,6 +10,8 @@ import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
  */
 public interface SpotifyHttpClient {
 
+    <Res> Res get(String token, String url, Class<Res> cls) throws SpotifyApiException, TooManyRequestsException;
+
     <Req extends SpotifyApiRequest, Res> Res get(String token, Req request, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException;
 
