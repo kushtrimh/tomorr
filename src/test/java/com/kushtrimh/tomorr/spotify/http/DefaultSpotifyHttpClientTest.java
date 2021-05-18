@@ -5,8 +5,12 @@ import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
+import com.kushtrimh.tomorr.spotify.api.response.album.AlbumResponseData;
 import com.kushtrimh.tomorr.spotify.api.response.artist.ArtistResponseData;
+import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
 import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -201,35 +206,104 @@ public class DefaultSpotifyHttpClientTest {
     // GetArtistAlbumsTests tests
 
     @Test
-    public void get_GetArtistAlbumsApiRequestSentSuccessfully_ReturnResponse() {
-        // TODO:
+    public void get_GetArtistAlbumsApiRequestSentSuccessfully_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException {
+        GetArtistAlbumsApiRequest request = new GetArtistAlbumsApiRequest.Builder("artist1")
+                .build();
+        assertSuccessfulGetArtistAlbumsApiRequest(request, null);
     }
 
     @Test
-    public void get_GetArtistAlbumsApiRequestSentSuccessfullyWithUrl_ReturnResponse() {
-        // TODO:
+    public void get_GetArtistAlbumsApiRequestSentSuccessfullyWithUrl_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException {
+        String url = getApiUrl("/artists/artist1/albums?include_groups=album,single&limit=50&offset=0");
+        assertSuccessfulGetArtistAlbumsApiRequest(null, url);
+    }
+
+    private void assertSuccessfulGetArtistAlbumsApiRequest(GetArtistAlbumsApiRequest request, String url)
+            throws IOException, TooManyRequestsException, SpotifyApiException {
+        String responseBody = Files.readString(new ClassPathResource("spotifyapi/get-artists-albums-response.json")
+                .getFile().toPath(), StandardCharsets.UTF_8);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        server.expect(requestTo(getApiUrl("/artists/artist1/albums?include_groups=album,single&limit=50&offset=0")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess().headers(responseHeaders).body(responseBody));
+
+        GetArtistAlbumsApiResponse response = request == null
+                ? client.get("token", url, GetArtistAlbumsApiResponse.class)
+                : client.get("token", request, GetArtistAlbumsApiResponse.class);
+
+        server.verify();
+        List<AlbumResponseData> albums = response.getItems();
+        assertFalse(albums.isEmpty());
+        assertEquals(2, albums.size());
+        assertEquals(2, response.getLimit());
+        assertEquals(
+                "https://api.spotify.com/v1/artists/1vCWHaC5f2uS3yhpwWbIA6/albums?offset=2&limit=2&include_groups=appears_on&market=ES",
+                response.getNext());
+        assertEquals(0, response.getOffset());
+        assertEquals(308, response.getTotal());
+        AlbumResponseData albumResponseData = albums.stream()
+                .filter(album -> "album1".equals(album.getId())).findFirst().orElse(null);
+        assertNotNull(albumResponseData);
+        assertEquals("album1", albumResponseData.getId());
+        assertEquals("Classic Club Monsters (25 Floor Killers)", albumResponseData.getName());
+        assertEquals("2018-02-02", albumResponseData.getReleaseDate());
+        assertEquals("compilation", albumResponseData.getAlbumType());
+        assertEquals("appears_on", albumResponseData.getAlbumGroup());
+        assertEquals("album", albumResponseData.getType());
+        assertEquals(3, albumResponseData.getImages().size());
     }
 
     // Auth tests
 
     @Test
     public void getToken_WhenClientIdIsNull_ThrowException() {
-        // TODO:
+        assertThrows(NullPointerException.class, () ->
+                client.getToken(null, spotifyProperties.getClientSecret()));
     }
 
     @Test
     public void getToken_WhenClientSecretIsNull_ThrowException() {
-        // TODO:
+        assertThrows(NullPointerException.class, () ->
+                client.getToken(spotifyProperties.getClientId(), null));
     }
 
     @Test
-    public void getToken_WhenRequestIsSentSuccessfully_ReturnTokenResponse() {
-        // TODO:
+    public void getToken_WhenRequestIsSentSuccessfully_ReturnTokenResponse()
+            throws IOException, SpotifyApiException {
+        String authData = spotifyProperties.getClientId() + ":" + spotifyProperties.getClientSecret();
+        String encodedAuthData = Base64.getEncoder().encodeToString(authData.getBytes(StandardCharsets.UTF_8));
+        String responseBody = Files.readString(new ClassPathResource("spotifyapi/get-token-response.json")
+                .getFile().toPath(), StandardCharsets.UTF_8);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        server.expect(requestTo(spotifyProperties.getAuthUrl()))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuthData))
+                .andExpect(header(DefaultSpotifyHttpClient.TOMORR_TRACE_ID_HEADER, any(String.class)))
+                .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE
+                        + ";charset=UTF-8"))
+                .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
+                .andRespond(withSuccess().headers(responseHeaders).body(responseBody));
+
+        TokenResponse response = client.getToken(spotifyProperties.getClientId(), spotifyProperties.getClientSecret());
+        server.verify();
+
+        assertNotNull(response);
+        assertEquals("NgCXRKcMzYjw", response.getAccessToken());
+        assertEquals("bearer", response.getTokenType());
+        assertEquals(3600, response.getExpiresIn());
     }
 
     @Test
     public void getToken_WhenErrorOccurs_ThrowSpotifyApiException() {
-        // TODO:
+        server.expect(requestTo(spotifyProperties.getAuthUrl()))
+                .andRespond(withServerError());
+        assertThrows(SpotifyApiException.class, () ->
+                client.getToken(spotifyProperties.getClientId(), spotifyProperties.getClientSecret()));
     }
 
     // Helper methods

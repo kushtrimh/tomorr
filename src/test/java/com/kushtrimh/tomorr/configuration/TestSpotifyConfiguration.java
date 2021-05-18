@@ -8,6 +8,7 @@ import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,6 +30,7 @@ public class TestSpotifyConfiguration {
     public RestTemplate restTemplate(MappingJackson2HttpMessageConverter mappingConverter) {
         return new RestTemplateBuilder()
                 .additionalMessageConverters(mappingConverter)
+                .additionalMessageConverters(new FormHttpMessageConverter())
                 .build();
     }
 
@@ -36,7 +38,7 @@ public class TestSpotifyConfiguration {
     public SpotifyProperties spotifyProperties() {
         SpotifyProperties spotifyProperties = new SpotifyProperties();
         spotifyProperties.setClientId("client-id-value");
-        spotifyProperties.setClientId("client-secret-value");
+        spotifyProperties.setClientSecret("client-secret-value");
         spotifyProperties.setApiUrl("http://localhost");
         spotifyProperties.setAuthUrl("http://localhost/auth");
         spotifyProperties.setUserAgent("tomorr-test/0.1");

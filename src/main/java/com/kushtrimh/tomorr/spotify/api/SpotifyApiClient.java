@@ -24,6 +24,8 @@ public class SpotifyApiClient {
                             SpotifyProperties spotifyProperties) {
         this.httpClient = httpClient;
         this.spotifyProperties = spotifyProperties;
+
+        this.accessToken = "";
     }
 
     public GetArtistsApiResponse getMultipleArtists(GetArtistsApiRequest request)

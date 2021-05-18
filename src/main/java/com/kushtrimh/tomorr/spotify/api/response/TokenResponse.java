@@ -6,7 +6,7 @@ package com.kushtrimh.tomorr.spotify.api.response;
 public class TokenResponse {
     private String accessToken;
     private String tokenType;
-    private String expiresIn;
+    private int expiresIn;
 
     public String getAccessToken() {
         return accessToken;
@@ -24,11 +24,11 @@ public class TokenResponse {
         this.tokenType = tokenType;
     }
 
-    public String getExpiresIn() {
+    public int getExpiresIn() {
         return expiresIn;
     }
 
-    public void setExpiresIn(String expiresIn) {
+    public void setExpiresIn(int expiresIn) {
         this.expiresIn = expiresIn;
     }
 
