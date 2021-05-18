@@ -9,13 +9,12 @@ import com.kushtrimh.tomorr.dal.tables.AppUser;
 import com.kushtrimh.tomorr.dal.tables.Artist;
 import com.kushtrimh.tomorr.dal.tables.ArtistAlbum;
 import com.kushtrimh.tomorr.dal.tables.ArtistAppUser;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**

@@ -1,13 +1,13 @@
 package com.kushtrimh.tomorr.artist.repository;
 
-import static com.kushtrimh.tomorr.dal.Tables.*;
-
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Objects;
+
+import static com.kushtrimh.tomorr.dal.Tables.ARTIST;
 
 /**
  * @author Kushtrim Hajrizi
