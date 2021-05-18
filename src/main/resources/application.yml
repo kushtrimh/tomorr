@@ -36,4 +36,4 @@ logging:
       kushtrimh:
         tomorr:
           spotify:
-            http: ERROR
+            http: INFO
