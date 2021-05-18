@@ -1,13 +1,13 @@
 package com.kushtrimh.tomorr.album.repository;
 
-import static com.kushtrimh.tomorr.dal.Tables.*;
-
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Objects;
+
+import static com.kushtrimh.tomorr.dal.Tables.*;
 
 /**
  * @author Kushtrim Hajrizi

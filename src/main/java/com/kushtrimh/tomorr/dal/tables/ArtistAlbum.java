@@ -6,9 +6,6 @@ package com.kushtrimh.tomorr.dal.tables;
 
 import com.kushtrimh.tomorr.dal.Public;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistAlbumRecord;
-
-import java.time.LocalDateTime;
-
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
@@ -21,6 +18,8 @@ import org.jooq.TableOptions;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.time.LocalDateTime;
 
 
 /**

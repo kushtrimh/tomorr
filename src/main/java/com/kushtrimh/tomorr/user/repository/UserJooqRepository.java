@@ -1,12 +1,12 @@
 package com.kushtrimh.tomorr.user.repository;
 
-import static com.kushtrimh.tomorr.dal.Tables.*;
-
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import java.util.Objects;
+
+import static com.kushtrimh.tomorr.dal.Tables.APP_USER;
 
 /**
  * @author Kushtrim Hajrizi

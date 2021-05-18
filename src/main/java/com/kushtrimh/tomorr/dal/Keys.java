@@ -12,7 +12,6 @@ import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistAppUserRecord;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
-
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;

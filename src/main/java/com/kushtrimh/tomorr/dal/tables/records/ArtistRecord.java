@@ -5,20 +5,18 @@ package com.kushtrimh.tomorr.dal.tables.records;
 
 
 import com.kushtrimh.tomorr.dal.tables.Artist;
-
-import java.time.LocalDateTime;
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.Record5;
+import org.jooq.Row5;
+import org.jooq.impl.UpdatableRecordImpl;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.jooq.Field;
-import org.jooq.Record1;
-import org.jooq.Record5;
-import org.jooq.Row5;
-import org.jooq.impl.UpdatableRecordImpl;
+import java.time.LocalDateTime;
 
 
 /**
