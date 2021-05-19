@@ -5,6 +5,7 @@ spring:
     name: tomorr
   quartz:
     jdbc-store-type: jdbc
+    startup-delay: 15s
     properties:
       org:
         quartz:
@@ -30,6 +31,9 @@ spotify:
   user-agent: tomorr/0.0.1
   auth-url: https://accounts.spotify.com/api/token
   api-url: https://api.spotify.com/v1
+redis:
+  host: ${TOMORR_REDIS_HOST}
+  port: ${TOMORR_REDIS_PORT}
 logging:
   level:
     com:
