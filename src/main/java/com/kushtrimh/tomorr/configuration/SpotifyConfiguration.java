@@ -22,7 +22,7 @@ public class SpotifyConfiguration {
 
     @Bean
     public MappingJackson2HttpMessageConverter mappingConverter() {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
         return new MappingJackson2HttpMessageConverter(mapper);
@@ -37,12 +37,12 @@ public class SpotifyConfiguration {
     public SpotifyApiClient spotifyApiClient(SpotifyProperties spotifyProperties,
                                              SpotifyApiUriBuilder spotifyApiUriBuilder,
                                              MappingJackson2HttpMessageConverter mappingConverter) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
+        var restTemplate = new RestTemplateBuilder()
                 .additionalMessageConverters(mappingConverter)
                 .additionalMessageConverters(new FormHttpMessageConverter())
                 .build();
 
-        DefaultSpotifyHttpClient httpClient = new DefaultSpotifyHttpClient
+        var httpClient = new DefaultSpotifyHttpClient
                 .Builder(spotifyApiUriBuilder, spotifyProperties.getAuthUrl())
                 .userAgent(spotifyProperties.getUserAgent())
                 .restTemplate(restTemplate)

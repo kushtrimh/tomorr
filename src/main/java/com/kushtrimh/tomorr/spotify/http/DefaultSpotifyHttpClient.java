@@ -68,10 +68,10 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
     public TokenResponse getToken(String clientId, String clientSecret) throws SpotifyApiException {
         Objects.requireNonNull(clientId);
         Objects.requireNonNull(clientSecret);
-        String traceId = UUID.randomUUID().toString();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        String authData = clientId + ":" + clientSecret;
-        String encodedAuthData = Base64.getEncoder().encodeToString(authData.getBytes(StandardCharsets.UTF_8));
+        var traceId = UUID.randomUUID().toString();
+        var httpHeaders = new HttpHeaders();
+        var authData = clientId + ":" + clientSecret;
+        var encodedAuthData = Base64.getEncoder().encodeToString(authData.getBytes(StandardCharsets.UTF_8));
         httpHeaders.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuthData);
         httpHeaders.set(TOMORR_TRACE_ID_HEADER, traceId);
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
@@ -100,14 +100,14 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
         Objects.requireNonNull(cls);
 
         String traceId = UUID.randomUUID().toString();
-        HttpHeaders httpHeaders = new HttpHeaders();
+        var httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.USER_AGENT, userAgent);
         httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         httpHeaders.add(TOMORR_TRACE_ID_HEADER, traceId);
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         httpHeaders.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 
-        HttpEntity<Req> entity = new HttpEntity<>(body, httpHeaders);
+        var entity = new HttpEntity<>(body, httpHeaders);
         try {
             logger.info("{} Sending {} request at {}, with content {}",
                     traceId, method, url, entity.getBody());

@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.user;
 
+import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.generator.IDGenerator;
 import com.kushtrimh.tomorr.user.repository.UserRepository;
@@ -24,6 +25,8 @@ public class DefaultUserServiceTest {
 
     @Mock
     private UserRepository<AppUserRecord> userRepository;
+    @Mock
+    private ArtistService artistService;
     private IDGenerator idGenerator;
 
     private UserService userService;
@@ -31,7 +34,7 @@ public class DefaultUserServiceTest {
     @BeforeEach
     public void init() {
         idGenerator = new IDGenerator();
-        userService = new DefaultUserService(userRepository, idGenerator);
+        userService = new DefaultUserService(userRepository, artistService, idGenerator);
     }
 
     @Test

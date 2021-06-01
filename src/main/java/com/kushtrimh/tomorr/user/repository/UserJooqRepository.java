@@ -36,14 +36,25 @@ public class UserJooqRepository implements UserRepository<AppUserRecord> {
     }
 
     @Override
-    public void save(AppUserRecord user) {
+    public AppUserRecord save(AppUserRecord user) {
         Objects.requireNonNull(user);
         var record = create.newRecord(APP_USER, user);
         record.store();
+        return record;
     }
 
     @Override
     public void deleteById(String id) {
         create.delete(APP_USER).where(APP_USER.ID.eq(id)).execute();
+    }
+
+    @Override
+    public void follow(String userId, String artistId) {
+
+    }
+
+    @Override
+    public boolean followExists(String userId, String artistId) {
+        return false;
     }
 }

@@ -43,10 +43,11 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     }
 
     @Override
-    public void save(AlbumRecord album) {
+    public AlbumRecord save(AlbumRecord album) {
         Objects.requireNonNull(album);
         var record = create.newRecord(ALBUM, album);
         record.store();
+        return record;
     }
 
     @Override

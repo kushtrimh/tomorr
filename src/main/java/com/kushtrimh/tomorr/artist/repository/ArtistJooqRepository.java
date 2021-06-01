@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.artist.repository;
 
+import com.kushtrimh.tomorr.dal.tables.Artist;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -42,10 +43,11 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
     }
 
     @Override
-    public void save(ArtistRecord artist) {
+    public ArtistRecord save(ArtistRecord artist) {
         Objects.requireNonNull(artist);
         var record = create.newRecord(ARTIST, artist);
         record.store();
+        return record;
     }
 
     @Override

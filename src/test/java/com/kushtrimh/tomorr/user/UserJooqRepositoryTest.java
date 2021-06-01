@@ -93,7 +93,8 @@ public class UserJooqRepositoryTest {
         var initialCount = userRepository.count();
         var id = "new-user";
         var user = newUserRecord(id);
-        userRepository.save(user);
+        var savedRecord = userRepository.save(user);
+        assertEquals(user, savedRecord);
         var countAfterSave = userRepository.count();
         assertNotEquals(initialCount, countAfterSave);
 

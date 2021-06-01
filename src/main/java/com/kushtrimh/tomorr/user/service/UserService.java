@@ -16,4 +16,6 @@ public interface UserService {
     void save(User user);
 
     void deleteById(String id);
+
+    void follow(User user, String artistId);
 }

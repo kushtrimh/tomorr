@@ -11,7 +11,11 @@ public interface UserRepository<T> {
 
     T findByAddress(String address);
 
-    void save(T user);
+    T save(T user);
 
     void deleteById(String id);
+
+    void follow(String userId, String artistId);
+
+    boolean followExists(String userId, String artistId);
 }

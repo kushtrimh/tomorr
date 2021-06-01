@@ -63,7 +63,7 @@ public class DefaultAlbumService implements AlbumService {
     }
 
     private AlbumRecord toAlbumRecord(Album album) {
-        AlbumRecord albumRecord = new AlbumRecord();
+        var albumRecord = new AlbumRecord();
         albumRecord.setId(album.id());
         albumRecord.setName(album.name());
         albumRecord.setType(album.albumType().name());

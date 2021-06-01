@@ -31,7 +31,7 @@ public class QuartzConfiguration {
 
     @Bean
     public JobDetailFactoryBean authenticationJobDetailFactoryBean() {
-        JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
+        var jobDetailFactoryBean = new JobDetailFactoryBean();
         jobDetailFactoryBean.setJobClass(SpotifyAuthenticationJob.class);
         jobDetailFactoryBean.setDurability(true);
         return jobDetailFactoryBean;
@@ -40,7 +40,7 @@ public class QuartzConfiguration {
     @Bean
     public SimpleTriggerFactoryBean authenticationTriggerFactoryBean(
             @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean authenticationJobDetailFactoryBean) {
-        SimpleTriggerFactoryBean simpleTriggerFactoryBean = new SimpleTriggerFactoryBean();
+        var simpleTriggerFactoryBean = new SimpleTriggerFactoryBean();
         simpleTriggerFactoryBean.setJobDetail(authenticationJobDetailFactoryBean.getObject());
         simpleTriggerFactoryBean.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
         simpleTriggerFactoryBean.setRepeatInterval(3240000);
@@ -68,13 +68,13 @@ public class QuartzConfiguration {
                                                      ApplicationContext applicationContext,
                                                      JobDetail[] jobDetails,
                                                      Trigger[] triggers) {
-        SpringBeanJobFactory springBeanJobFactory = new SpringBeanJobFactory();
+        var springBeanJobFactory = new SpringBeanJobFactory();
         springBeanJobFactory.setApplicationContext(applicationContext);
 
-        Properties properties = new Properties();
+        var properties = new Properties();
         properties.putAll(quartzProperties.getProperties());
 
-        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
+        var schedulerFactoryBean = new SchedulerFactoryBean();
         schedulerFactoryBean.setQuartzProperties(properties);
         schedulerFactoryBean.setJobFactory(springBeanJobFactory);
         schedulerFactoryBean.setDataSource(dataSource);

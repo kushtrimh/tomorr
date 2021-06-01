@@ -94,7 +94,9 @@ public class AlbumJooqRepositoryTest {
         var initialCount = albumRepository.count();
         var id = "new-al";
         var album = newAlbumRecord(id);
-        albumRepository.save(album);
+        var savedRecord = albumRepository.save(album);
+        assertEquals(album, savedRecord);
+
         var countAfterSave = albumRepository.count();
         assertNotEquals(initialCount, countAfterSave);
 

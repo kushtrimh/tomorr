@@ -109,7 +109,9 @@ public class ArtistJooqRepositoryTest {
         var initialCount = artistRepository.count();
         var id = "new-artist";
         var artist = newArtistRecord(id);
-        artistRepository.save(artist);
+        var savedRecord = artistRepository.save(artist);
+        assertEquals(artist, savedRecord);
+
         var countAfterSave = artistRepository.count();
         assertNotEquals(initialCount, countAfterSave);
 

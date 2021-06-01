@@ -13,7 +13,7 @@ public interface AlbumRepository<T> {
 
     List<T> findByArtist(String artistId);
 
-    void save(T album);
+    T save(T album);
 
     void deleteById(String id);
 }
