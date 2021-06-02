@@ -10,9 +10,9 @@ import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Kushtrim Hajrizi
@@ -36,7 +36,8 @@ public class SpotifyConfiguration {
     @Bean
     public SpotifyApiClient spotifyApiClient(SpotifyProperties spotifyProperties,
                                              SpotifyApiUriBuilder spotifyApiUriBuilder,
-                                             MappingJackson2HttpMessageConverter mappingConverter) {
+                                             MappingJackson2HttpMessageConverter mappingConverter,
+                                             StringRedisTemplate stringRedisTemplate) {
         var restTemplate = new RestTemplateBuilder()
                 .additionalMessageConverters(mappingConverter)
                 .additionalMessageConverters(new FormHttpMessageConverter())
@@ -47,6 +48,6 @@ public class SpotifyConfiguration {
                 .userAgent(spotifyProperties.getUserAgent())
                 .restTemplate(restTemplate)
                 .build();
-        return new SpotifyApiClient(httpClient, spotifyProperties);
+        return new SpotifyApiClient(httpClient, spotifyProperties, stringRedisTemplate);
     }
 }

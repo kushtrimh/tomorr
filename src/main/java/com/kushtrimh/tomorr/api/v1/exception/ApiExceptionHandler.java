@@ -37,6 +37,12 @@ public class ApiExceptionHandler {
         return createApiError("", null, violations, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<ApiError> handleException() {
+        return createApiError("", null,
+                Collections.emptyList(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
     /**
      *
      * @param message

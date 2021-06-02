@@ -123,9 +123,9 @@ public class DefaultArtistServiceTest {
 
     @Test
     public void exists_WhenArtistDoesExist_ReturnTrue() {
-        var id = "qwet3";
-        when(artistRepository.findById(id)).thenReturn(new ArtistRecord());
-        assertFalse(artistService.exists(id));
+        var id = "ga5gw";
+        when(artistRepository.findById(id)).thenReturn(newArtistRecord(id));
+        assertTrue(artistService.exists(id));
     }
 
     private void compareArtistRecordAndArtist(ArtistRecord artistRecord, Artist artist) {

@@ -1,9 +1,8 @@
 package com.kushtrimh.tomorr.user.service;
 
-import com.kushtrimh.tomorr.dal.tables.AppUser;
-import com.kushtrimh.tomorr.exception.AlreadyExistsException;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
+import com.kushtrimh.tomorr.exception.AlreadyExistsException;
 import com.kushtrimh.tomorr.exception.DoesNotExistException;
 import com.kushtrimh.tomorr.generator.IDGenerator;
 import com.kushtrimh.tomorr.spotify.http.DefaultSpotifyHttpClient;

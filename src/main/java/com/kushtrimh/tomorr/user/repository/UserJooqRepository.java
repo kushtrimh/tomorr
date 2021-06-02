@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Objects;
 
-import static com.kushtrimh.tomorr.dal.Tables.APP_USER;
+import static com.kushtrimh.tomorr.dal.Tables.*;
 
 /**
  * @author Kushtrim Hajrizi
