@@ -61,6 +61,12 @@ public class DefaultArtistService implements ArtistService {
         artistRepository.deleteById(id);
     }
 
+    @Transactional
+    @Override
+    public boolean exists(String id) {
+        return findById(id).isPresent();
+    }
+
     private Optional<Artist> getArtistOptional(ArtistRecord artistRecord) {
         if (artistRecord == null) {
             return Optional.empty();
@@ -76,7 +82,7 @@ public class DefaultArtistService implements ArtistService {
     }
 
     private ArtistRecord toArtistRecord(Artist artist) {
-        ArtistRecord record = new ArtistRecord();
+        var record = new ArtistRecord();
         record.setId(artist.id());
         record.setName(artist.name());
         record.setImageHref(artist.imageHref());

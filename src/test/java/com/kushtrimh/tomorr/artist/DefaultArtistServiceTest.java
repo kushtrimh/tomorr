@@ -114,6 +114,20 @@ public class DefaultArtistServiceTest {
         verify(artistRepository, times(1)).deleteById(id);
     }
 
+    @Test
+    public void exists_WhenArtistDoesNotExist_ReturnFalse() {
+        var id = "qwet3";
+        when(artistRepository.findById(id)).thenReturn(null);
+        assertFalse(artistService.exists(id));
+    }
+
+    @Test
+    public void exists_WhenArtistDoesExist_ReturnTrue() {
+        var id = "ga5gw";
+        when(artistRepository.findById(id)).thenReturn(newArtistRecord(id));
+        assertTrue(artistService.exists(id));
+    }
+
     private void compareArtistRecordAndArtist(ArtistRecord artistRecord, Artist artist) {
         assertEquals(artistRecord.getId(), artist.id());
         assertEquals(artistRecord.getName(), artist.name());

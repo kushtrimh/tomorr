@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Tag("database")
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
-@ExtendWith({SpringExtension.class, TestDatabaseExtension.class})
+@ExtendWith(TestDatabaseExtension.class)
+@JooqTest
 public class AlbumJooqRepositoryTest {
 
     private final AlbumRepository<AlbumRecord> albumRepository;
@@ -94,7 +95,9 @@ public class AlbumJooqRepositoryTest {
         var initialCount = albumRepository.count();
         var id = "new-al";
         var album = newAlbumRecord(id);
-        albumRepository.save(album);
+        var savedRecord = albumRepository.save(album);
+        assertEquals(album, savedRecord);
+
         var countAfterSave = albumRepository.count();
         assertNotEquals(initialCount, countAfterSave);
 

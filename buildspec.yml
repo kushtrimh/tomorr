@@ -17,3 +17,8 @@ phases:
   build:
     commands:
       - mvn clean package
+  artifacts:
+    files:
+      - target/*.jar
+      - appspec.yml
+      - scripts/*

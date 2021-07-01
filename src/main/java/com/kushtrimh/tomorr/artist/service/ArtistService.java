@@ -19,4 +19,6 @@ public interface ArtistService {
     void save(Artist artist);
 
     void deleteById(String id);
+
+    boolean exists(String id);
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Objects;
 
-import static com.kushtrimh.tomorr.dal.Tables.ARTIST;
+import static com.kushtrimh.tomorr.dal.Tables.*;
 
 /**
  * @author Kushtrim Hajrizi
@@ -42,10 +42,11 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
     }
 
     @Override
-    public void save(ArtistRecord artist) {
+    public ArtistRecord save(ArtistRecord artist) {
         Objects.requireNonNull(artist);
         var record = create.newRecord(ARTIST, artist);
         record.store();
+        return record;
     }
 
     @Override

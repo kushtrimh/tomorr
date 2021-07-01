@@ -15,7 +15,7 @@ public interface ArtistRepository<T> {
 
     List<T> searchByName(String name);
 
-    void save(T artist);
+    T save(T artist);
 
     void deleteById(String id);
 }

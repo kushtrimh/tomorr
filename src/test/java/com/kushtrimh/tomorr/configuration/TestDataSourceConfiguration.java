@@ -22,7 +22,9 @@ import org.jooq.impl.DefaultDSLContext;
 import org.springframework.boot.autoconfigure.jooq.JooqExceptionTranslator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import org.springframework.transaction.TransactionManager;
 import org.testcontainers.containers.GenericContainer;
 
 import javax.sql.DataSource;
@@ -52,6 +54,11 @@ public class TestDataSourceConfiguration {
         config.setUsername(dataSourceProperties.getUsername());
         config.setPassword(dataSourceProperties.getPassword());
         return new HikariDataSource(config);
+    }
+
+    @Bean
+    public TransactionManager dataSourceTransactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean

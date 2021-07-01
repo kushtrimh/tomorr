@@ -10,9 +10,9 @@ import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Kushtrim Hajrizi
@@ -22,7 +22,7 @@ public class SpotifyConfiguration {
 
     @Bean
     public MappingJackson2HttpMessageConverter mappingConverter() {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
         return new MappingJackson2HttpMessageConverter(mapper);
@@ -36,17 +36,18 @@ public class SpotifyConfiguration {
     @Bean
     public SpotifyApiClient spotifyApiClient(SpotifyProperties spotifyProperties,
                                              SpotifyApiUriBuilder spotifyApiUriBuilder,
-                                             MappingJackson2HttpMessageConverter mappingConverter) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
+                                             MappingJackson2HttpMessageConverter mappingConverter,
+                                             StringRedisTemplate stringRedisTemplate) {
+        var restTemplate = new RestTemplateBuilder()
                 .additionalMessageConverters(mappingConverter)
                 .additionalMessageConverters(new FormHttpMessageConverter())
                 .build();
 
-        DefaultSpotifyHttpClient httpClient = new DefaultSpotifyHttpClient
+        var httpClient = new DefaultSpotifyHttpClient
                 .Builder(spotifyApiUriBuilder, spotifyProperties.getAuthUrl())
                 .userAgent(spotifyProperties.getUserAgent())
                 .restTemplate(restTemplate)
                 .build();
-        return new SpotifyApiClient(httpClient, spotifyProperties);
+        return new SpotifyApiClient(httpClient, spotifyProperties, stringRedisTemplate);
     }
 }
