@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Tag("database")
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
-@ExtendWith({SpringExtension.class, TestDatabaseExtension.class})
+@ExtendWith({TestDatabaseExtension.class})
+@JooqTest
 public class UserJooqRepositoryTest {
 
     private final UserRepository<AppUserRecord> userRepository;
@@ -125,6 +126,43 @@ public class UserJooqRepositoryTest {
         assertNotEquals(initialCount, countAfterDelete);
 
         assertNull(userRepository.findById(id));
+    }
+
+    @Test
+    public void followExists_WhenFollowDataIsNull_ReturnFalse() {
+        assertFalse(userRepository.followExists(null, "artist-id"));
+        assertFalse(userRepository.followExists("user-id", null));
+        assertFalse(userRepository.followExists(null, null));
+    }
+
+    @Test
+    public void followExists_WhenFollowDoesNotExist_ReturnFalse() {
+        assertFalse(userRepository.followExists("user1", "artist14"));
+        assertFalse(userRepository.followExists("user11", "artist4"));
+        assertFalse(userRepository.followExists("user100", "artist3"));
+    }
+
+    @Test
+    public void followExists_WhenFollowDoesExists_ReturnTrue() {
+        assertTrue(userRepository.followExists("user1", "artist1"));
+        assertTrue(userRepository.followExists("user1", "artist3"));
+        assertTrue(userRepository.followExists("user2", "artist1"));
+    }
+
+    @Test
+    public void follow_WhenUserIdOrArtistIdIsNull_ThrowException() {
+        assertThrows(NullPointerException.class, () -> userRepository.follow(null, "artist-id"));
+        assertThrows(NullPointerException.class, () -> userRepository.follow("user-id", null));
+        assertThrows(NullPointerException.class, () -> userRepository.follow(null, null));
+    }
+
+    @Test
+    public void follow_WhenUserIdAndArtistIdGiven_SaveSuccessfully() {
+        var userId = "user2";
+        var artistId = "artist2";
+        assertFalse(userRepository.followExists(userId, artistId));
+        userRepository.follow(userId, artistId);
+        assertTrue(userRepository.followExists(userId, artistId));
     }
 
     private void assertThatUserIsNotDeleted(String id) {

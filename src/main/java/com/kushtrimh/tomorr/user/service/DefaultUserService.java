@@ -73,11 +73,10 @@ public class DefaultUserService implements UserService {
         }
         var address = user.address();
         AppUserRecord userRecord = userRepository.findByAddress(address);
-        if (userRecord != null) {
+        if (userRecord == null) {
             logger.debug("User does not exist, creating new user {}", user);
             userRecord = userRepository.save(toUserRecord(user));
-        }
-        if (userRepository.followExists(address, artistId)) {
+        } else if (userRepository.followExists(userRecord.getId(), artistId)) {
             throw new AlreadyExistsException();
         }
         userRepository.follow(userRecord.getId(), artistId);

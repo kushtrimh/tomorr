@@ -3,6 +3,8 @@ server:
 spring:
   application:
     name: tomorr
+  messages:
+    basename: messages/messages
   quartz:
     jdbc-store-type: jdbc
     startup-delay: 15s
