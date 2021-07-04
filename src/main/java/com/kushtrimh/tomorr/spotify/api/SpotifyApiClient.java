@@ -16,7 +16,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  */
 public class SpotifyApiClient {
 
-    public final static String ACCESS_TOKEN = "accesstoken";
+    public final static String ACCESS_TOKEN_KEY = "accessToken";
 
     private final SpotifyHttpClient httpClient;
     private final SpotifyProperties spotifyProperties;
@@ -47,11 +47,11 @@ public class SpotifyApiClient {
 
     public TokenResponse refreshAccessToken() throws SpotifyApiException {
         TokenResponse response = httpClient.getToken(spotifyProperties.getClientId(), spotifyProperties.getClientSecret());
-        stringRedisTemplate.opsForValue().set(ACCESS_TOKEN, response.getAccessToken());
+        stringRedisTemplate.opsForValue().set(ACCESS_TOKEN_KEY, response.getAccessToken());
         return response;
     }
 
     private String getAccessToken() {
-        return stringRedisTemplate.opsForValue().get(ACCESS_TOKEN);
+        return stringRedisTemplate.opsForValue().get(ACCESS_TOKEN_KEY);
     }
 }

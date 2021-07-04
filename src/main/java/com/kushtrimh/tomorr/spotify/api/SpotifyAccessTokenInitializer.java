@@ -26,7 +26,7 @@ public class SpotifyAccessTokenInitializer implements ApplicationListener<Contex
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        String accessToken = stringRedisTemplate.opsForValue().get(SpotifyApiClient.ACCESS_TOKEN);
+        String accessToken = stringRedisTemplate.opsForValue().get(SpotifyApiClient.ACCESS_TOKEN_KEY);
         if (accessToken != null && !accessToken.isBlank()) {
             logger.info("Token already present, initialization skipped");
             return;

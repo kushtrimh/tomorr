@@ -14,6 +14,7 @@ import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
 import com.kushtrimh.tomorr.spotify.http.SpotifyHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,11 +32,12 @@ import static org.mockito.Mockito.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tag("redis")
+@Tags(value = { @Tag("redis"), @Tag("integration") })
 @ExtendWith({SpringExtension.class, MockitoExtension.class, TestRedisExtension.class})
 @ContextConfiguration(classes = {TestSpotifyConfiguration.class, TestRedisConfiguration.class})
 public class SpotifyApiClientTest {
 
+    // TODO: fix this test, don't include integration testing here
     @Mock
     private SpotifyHttpClient spotifyHttpClient;
 
@@ -55,7 +57,7 @@ public class SpotifyApiClientTest {
     @BeforeEach
     public void init() {
         client = new SpotifyApiClient(spotifyHttpClient, spotifyProperties, stringRedisTemplate);
-        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN, accessTokenValue);
+        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN_KEY, accessTokenValue);
     }
 
     @Test
@@ -98,9 +100,9 @@ public class SpotifyApiClientTest {
         client.refreshAccessToken();
         verify(spotifyHttpClient, times(1))
                 .getToken(spotifyProperties.getClientId(), spotifyProperties.getClientSecret());
-        assertEquals(newAccessToken, stringRedisTemplate.opsForValue().get(SpotifyApiClient.ACCESS_TOKEN));
+        assertEquals(newAccessToken, stringRedisTemplate.opsForValue().get(SpotifyApiClient.ACCESS_TOKEN_KEY));
 
         // Clean up and revert the token back to the default one
-        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN, accessTokenValue);
+        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN_KEY, accessTokenValue);
     }
 }

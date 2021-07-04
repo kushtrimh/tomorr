@@ -42,6 +42,7 @@ public class TestSpotifyConfiguration {
         spotifyProperties.setApiUrl("http://localhost");
         spotifyProperties.setAuthUrl("http://localhost/auth");
         spotifyProperties.setUserAgent("tomorr-test/0.1");
+        spotifyProperties.setRequestLimit(450);
         return spotifyProperties;
     }
 

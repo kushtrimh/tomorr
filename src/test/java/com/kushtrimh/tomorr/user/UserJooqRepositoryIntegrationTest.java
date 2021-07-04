@@ -5,6 +5,7 @@ import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.user.repository.UserRepository;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +17,16 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tag("database")
+@Tags(value = { @Tag("database"), @Tag("integration") })
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
 @ExtendWith({TestDatabaseExtension.class})
 @JooqTest
-public class UserJooqRepositoryTest {
+public class UserJooqRepositoryIntegrationTest {
 
     private final UserRepository<AppUserRecord> userRepository;
 
     @Autowired
-    public UserJooqRepositoryTest(UserRepository<AppUserRecord> userRepository) {
+    public UserJooqRepositoryIntegrationTest(UserRepository<AppUserRecord> userRepository) {
         this.userRepository = userRepository;
     }
 

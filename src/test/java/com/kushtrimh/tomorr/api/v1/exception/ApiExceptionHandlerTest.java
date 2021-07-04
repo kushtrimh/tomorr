@@ -3,8 +3,6 @@ package com.kushtrimh.tomorr.api.v1.exception;
 import com.kushtrimh.tomorr.api.v1.exception.data.ApiError;
 import com.kushtrimh.tomorr.exception.AlreadyExistsException;
 import com.kushtrimh.tomorr.exception.DoesNotExistException;
-import org.hibernate.validator.engine.HibernateConstraintViolation;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,13 +13,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
-
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;

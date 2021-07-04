@@ -33,6 +33,7 @@ spotify:
   user-agent: tomorr/0.0.1
   auth-url: https://accounts.spotify.com/api/token
   api-url: https://api.spotify.com/v1
+  request-limit: 600
 redis:
   host: ${TOMORR_REDIS_HOST}
   port: ${TOMORR_REDIS_PORT}
