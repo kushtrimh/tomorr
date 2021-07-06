@@ -15,7 +15,7 @@ public interface UserRepository<T> {
 
     void deleteById(String id);
 
-    void follow(String userId, String artistId);
+    void associate(String userId, String artistId);
 
-    boolean followExists(String userId, String artistId);
+    boolean associationExists(String userId, String artistId);
 }

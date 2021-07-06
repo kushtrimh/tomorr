@@ -130,40 +130,40 @@ public class UserJooqRepositoryIntegrationTest {
     }
 
     @Test
-    public void followExists_WhenFollowDataIsNull_ReturnFalse() {
-        assertFalse(userRepository.followExists(null, "artist-id"));
-        assertFalse(userRepository.followExists("user-id", null));
-        assertFalse(userRepository.followExists(null, null));
+    public void associationExists_WhenAssociateDataIsNull_ReturnFalse() {
+        assertFalse(userRepository.associationExists(null, "artist-id"));
+        assertFalse(userRepository.associationExists("user-id", null));
+        assertFalse(userRepository.associationExists(null, null));
     }
 
     @Test
-    public void followExists_WhenFollowDoesNotExist_ReturnFalse() {
-        assertFalse(userRepository.followExists("user1", "artist14"));
-        assertFalse(userRepository.followExists("user11", "artist4"));
-        assertFalse(userRepository.followExists("user100", "artist3"));
+    public void associationExists_WhenAssociateDoesNotExist_ReturnFalse() {
+        assertFalse(userRepository.associationExists("user1", "artist14"));
+        assertFalse(userRepository.associationExists("user11", "artist4"));
+        assertFalse(userRepository.associationExists("user100", "artist3"));
     }
 
     @Test
-    public void followExists_WhenFollowDoesExists_ReturnTrue() {
-        assertTrue(userRepository.followExists("user1", "artist1"));
-        assertTrue(userRepository.followExists("user1", "artist3"));
-        assertTrue(userRepository.followExists("user2", "artist1"));
+    public void associationExists_WhenAssociateDoesExists_ReturnTrue() {
+        assertTrue(userRepository.associationExists("user1", "artist1"));
+        assertTrue(userRepository.associationExists("user1", "artist3"));
+        assertTrue(userRepository.associationExists("user2", "artist1"));
     }
 
     @Test
-    public void follow_WhenUserIdOrArtistIdIsNull_ThrowException() {
-        assertThrows(NullPointerException.class, () -> userRepository.follow(null, "artist-id"));
-        assertThrows(NullPointerException.class, () -> userRepository.follow("user-id", null));
-        assertThrows(NullPointerException.class, () -> userRepository.follow(null, null));
+    public void associate_WhenUserIdOrArtistIdIsNull_ThrowException() {
+        assertThrows(NullPointerException.class, () -> userRepository.associate(null, "artist-id"));
+        assertThrows(NullPointerException.class, () -> userRepository.associate("user-id", null));
+        assertThrows(NullPointerException.class, () -> userRepository.associate(null, null));
     }
 
     @Test
-    public void follow_WhenUserIdAndArtistIdGiven_SaveSuccessfully() {
+    public void associate_WhenUserIdAndArtistIdGiven_SaveSuccessfully() {
         var userId = "user2";
         var artistId = "artist2";
-        assertFalse(userRepository.followExists(userId, artistId));
-        userRepository.follow(userId, artistId);
-        assertTrue(userRepository.followExists(userId, artistId));
+        assertFalse(userRepository.associationExists(userId, artistId));
+        userRepository.associate(userId, artistId);
+        assertTrue(userRepository.associationExists(userId, artistId));
     }
 
     private void assertThatUserIsNotDeleted(String id) {

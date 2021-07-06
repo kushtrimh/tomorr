@@ -1,9 +1,7 @@
 package com.kushtrimh.tomorr.user.service;
 
-import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.exception.AlreadyExistsException;
-import com.kushtrimh.tomorr.exception.DoesNotExistException;
 import com.kushtrimh.tomorr.generator.IDGenerator;
 import com.kushtrimh.tomorr.spotify.http.DefaultSpotifyHttpClient;
 import com.kushtrimh.tomorr.user.User;
@@ -26,14 +24,11 @@ public class DefaultUserService implements UserService {
     private final Logger logger = LoggerFactory.getLogger(DefaultSpotifyHttpClient.class);
 
     private final UserRepository<AppUserRecord> userRepository;
-    private final ArtistService artistService;
     private final IDGenerator iDGenerator;
 
     public DefaultUserService(UserRepository<AppUserRecord> userRepository,
-                              ArtistService artistService,
                               IDGenerator idGenerator) {
         this.userRepository = userRepository;
-        this.artistService = artistService;
         this.iDGenerator = idGenerator;
     }
 
@@ -67,19 +62,16 @@ public class DefaultUserService implements UserService {
 
     @Transactional
     @Override
-    public void follow(User user, String artistId) {
-        if (!artistService.exists(artistId)) {
-            throw new DoesNotExistException("artist");
-        }
+    public void associate(User user, String artistId) {
         var address = user.address();
         AppUserRecord userRecord = userRepository.findByAddress(address);
         if (userRecord == null) {
             logger.debug("User does not exist, creating new user {}", user);
             userRecord = userRepository.save(toUserRecord(user));
-        } else if (userRepository.followExists(userRecord.getId(), artistId)) {
+        } else if (userRepository.associationExists(userRecord.getId(), artistId)) {
             throw new AlreadyExistsException();
         }
-        userRepository.follow(userRecord.getId(), artistId);
+        userRepository.associate(userRecord.getId(), artistId);
         logger.info("Saved follow for user {} with artist {}", userRecord.getId(), artistId);
     }
 

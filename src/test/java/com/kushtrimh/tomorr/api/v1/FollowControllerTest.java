@@ -1,9 +1,9 @@
 package com.kushtrimh.tomorr.api.v1;
 
 import com.kushtrimh.tomorr.api.v1.request.FollowRequest;
+import com.kushtrimh.tomorr.follow.service.FollowService;
 import com.kushtrimh.tomorr.user.User;
 import com.kushtrimh.tomorr.user.UserType;
-import com.kushtrimh.tomorr.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FollowControllerTest {
 
     @Mock
-    private UserService userService;
+    private FollowService followService;
 
     private MockMvc mockMvc;
 
@@ -39,7 +39,7 @@ public class FollowControllerTest {
 
     @BeforeEach
     public void init() {
-        FollowerController followerController = new FollowerController(userService);
+        FollowController followerController = new FollowController(followService);
         mockMvc = MockMvcBuilders.standaloneSetup(followerController).build();
     }
 
@@ -47,7 +47,7 @@ public class FollowControllerTest {
     public void follow_WhenRequestBodyIsEmpty_ReturnBadRequest() throws Exception {
         mockMvc.perform(post("/v1/follow"))
                 .andExpect(status().isBadRequest());
-        verify(userService, times(0))
+        verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
     }
 
@@ -57,7 +57,7 @@ public class FollowControllerTest {
         followRequest.setArtistId("artist-id");
         mockMvc.perform(postWith("/v1/follow", followRequest))
                 .andExpect(status().isBadRequest());
-        verify(userService, times(0))
+        verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
     }
 
@@ -67,7 +67,7 @@ public class FollowControllerTest {
         followRequest.setUser("user-id");
         mockMvc.perform(postWith("/v1/follow", followRequest))
                 .andExpect(status().isBadRequest());
-        verify(userService, times(0))
+        verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
     }
 
@@ -83,7 +83,7 @@ public class FollowControllerTest {
         User expectedUser = new User(userId, UserType.EMAIL);
         mockMvc.perform(postWith("/v1/follow", followRequest))
                 .andExpect(status().isOk());
-        verify(userService, times(1))
+        verify(followService, times(1))
                 .follow(expectedUser, artistId);
     }
 

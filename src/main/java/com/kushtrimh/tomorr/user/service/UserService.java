@@ -17,5 +17,5 @@ public interface UserService {
 
     void deleteById(String id);
 
-    void follow(User user, String artistId);
+    void associate(User user, String artistId);
 }

@@ -49,7 +49,7 @@ public class UserJooqRepository implements UserRepository<AppUserRecord> {
     }
 
     @Override
-    public void follow(String userId, String artistId) {
+    public void associate(String userId, String artistId) {
         Objects.requireNonNull(userId);
         Objects.requireNonNull(artistId);
         var record = create.newRecord(ARTIST_APP_USER);
@@ -59,7 +59,7 @@ public class UserJooqRepository implements UserRepository<AppUserRecord> {
     }
 
     @Override
-    public boolean followExists(String userId, String artistId) {
+    public boolean associationExists(String userId, String artistId) {
         return create.fetchExists(create.selectOne()
                 .from(ARTIST_APP_USER)
                 .where(ARTIST_APP_USER.APP_USER_ID.eq(userId).and(ARTIST_APP_USER.ARTIST_ID.eq(artistId))));
