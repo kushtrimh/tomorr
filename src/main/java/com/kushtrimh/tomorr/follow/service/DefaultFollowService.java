@@ -38,7 +38,8 @@ public class DefaultFollowService implements FollowService {
         Objects.requireNonNull(user);
         Objects.requireNonNull(artistId);
         if (!artistService.exists(artistId)) {
-            // TODO: search for artist on spotify
+            // TODO: search for artist on spotify, on a new search service, and ArtistCache to amange the cache
+
         }
         userService.associate(user, artistId);
     }
