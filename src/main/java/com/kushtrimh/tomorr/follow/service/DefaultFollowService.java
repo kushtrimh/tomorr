@@ -1,6 +1,5 @@
 package com.kushtrimh.tomorr.follow.service;
 
-import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
 import com.kushtrimh.tomorr.user.User;

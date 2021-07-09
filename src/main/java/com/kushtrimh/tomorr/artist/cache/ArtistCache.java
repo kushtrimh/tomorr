@@ -8,9 +8,9 @@ import java.util.Set;
  */
 public interface ArtistCache {
 
-    Set<String> getSearchedArtistIds();
+    Set<String> getArtistIds();
 
-    void putSearchedArtistIds(List<String> artistIds);
+    void putArtistIds(List<String> artistIds);
 
-    boolean containsSearchedArtistId(String artistId);
+    boolean containsArtistId(String artistId);
 }
