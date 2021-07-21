@@ -40,7 +40,7 @@ public class ArtistRedisCache implements ArtistCache {
             for (String artistId: artistIds) {
                 stringRedisConnection.zAdd(SEARCHED_ARTIST_IDS_KEY, Instant.now().getEpochSecond(), artistId);
             }
-            stringRedisConnection.zRemRange(SEARCHED_ARTIST_IDS_KEY, 0,  -1000);
+            stringRedisConnection.zRemRange(SEARCHED_ARTIST_IDS_KEY, 0,  -1001);
             return null;
         });
     }

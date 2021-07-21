@@ -85,7 +85,7 @@ public class ArtistRedisCacheTest {
                 eq(SEARCHED_ARTIST_IDS_KEY), any(Double.class), eq("artist4"));
 
         verify(redisConnection, times(1))
-                .zRemRange(SEARCHED_ARTIST_IDS_KEY, 0, -1000);
+                .zRemRange(SEARCHED_ARTIST_IDS_KEY, 0, -1001);
     }
 
     @Test
