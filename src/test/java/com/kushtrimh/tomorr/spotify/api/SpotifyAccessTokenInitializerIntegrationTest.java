@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 public class SpotifyAccessTokenInitializerIntegrationTest {
 
     @Mock
-    private SpotifyApiClient spotifyApiClient;
+    private DefaultSpotifyApiClient spotifyApiClient;
 
     private final StringRedisTemplate stringRedisTemplate;
     private final ApplicationContext context;
@@ -49,7 +49,7 @@ public class SpotifyAccessTokenInitializerIntegrationTest {
     @Test
     public void onApplicationEvent_WhenAccessTokenIsNotPresentInRedis_RefreshToken()
             throws SpotifyApiException {
-        stringRedisTemplate.delete(SpotifyApiClient.ACCESS_TOKEN_KEY);
+        stringRedisTemplate.delete(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY);
         initializer.onApplicationEvent(new ContextRefreshedEvent(context));
         verify(spotifyApiClient, times(1)).refreshAccessToken();
     }
@@ -57,7 +57,7 @@ public class SpotifyAccessTokenInitializerIntegrationTest {
     @Test
     public void onApplicationEvent_WhenAccessTokenIsAlreadyPresentInRedis_DoNothing()
             throws SpotifyApiException {
-        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN_KEY, "token-token");
+        stringRedisTemplate.opsForValue().set(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY, "token-token");
         initializer.onApplicationEvent(new ContextRefreshedEvent(context));
         verify(spotifyApiClient, times(0)).refreshAccessToken();
     }

@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 @Tags(value = { @Tag("redis"), @Tag("integration") })
 @ExtendWith({SpringExtension.class, MockitoExtension.class, TestRedisExtension.class})
 @ContextConfiguration(classes = {TestSpotifyConfiguration.class, TestRedisConfiguration.class})
-public class SpotifyApiClientTest {
+public class DefaultSpotifyApiClientTest {
 
     // TODO: fix this test, don't include integration testing here
     @Mock
@@ -49,15 +49,15 @@ public class SpotifyApiClientTest {
     private final String accessTokenValue = "access-token-value-tsg6523dstw5";
 
     @Autowired
-    public SpotifyApiClientTest(SpotifyProperties spotifyProperties, StringRedisTemplate stringRedisTemplate) {
+    public DefaultSpotifyApiClientTest(SpotifyProperties spotifyProperties, StringRedisTemplate stringRedisTemplate) {
         this.spotifyProperties = spotifyProperties;
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @BeforeEach
     public void init() {
-        client = new SpotifyApiClient(spotifyHttpClient, spotifyProperties, stringRedisTemplate);
-        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN_KEY, accessTokenValue);
+        client = new DefaultSpotifyApiClient(spotifyHttpClient, spotifyProperties, stringRedisTemplate);
+        stringRedisTemplate.opsForValue().set(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY, accessTokenValue);
     }
 
     @Test
@@ -100,9 +100,9 @@ public class SpotifyApiClientTest {
         client.refreshAccessToken();
         verify(spotifyHttpClient, times(1))
                 .getToken(spotifyProperties.getClientId(), spotifyProperties.getClientSecret());
-        assertEquals(newAccessToken, stringRedisTemplate.opsForValue().get(SpotifyApiClient.ACCESS_TOKEN_KEY));
+        assertEquals(newAccessToken, stringRedisTemplate.opsForValue().get(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY));
 
         // Clean up and revert the token back to the default one
-        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN_KEY, accessTokenValue);
+        stringRedisTemplate.opsForValue().set(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY, accessTokenValue);
     }
 }

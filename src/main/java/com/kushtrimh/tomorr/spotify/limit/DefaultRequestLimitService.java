@@ -38,6 +38,11 @@ public class DefaultRequestLimitService implements RequestLimitService {
     }
 
     @Override
+    public boolean cantSendRequest() {
+        return !canSendRequest();
+    }
+
+    @Override
     public int getRemainingRequestLimit() {
         return globalRequestLimit - integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY);
     }

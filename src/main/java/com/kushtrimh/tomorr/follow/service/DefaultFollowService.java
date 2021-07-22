@@ -1,7 +1,8 @@
 package com.kushtrimh.tomorr.follow.service;
 
+import com.kushtrimh.tomorr.artist.cache.ArtistCache;
+import com.kushtrimh.tomorr.artist.service.ArtistSearchService;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
-import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
 import com.kushtrimh.tomorr.user.User;
 import com.kushtrimh.tomorr.user.service.UserService;
 import org.slf4j.Logger;
@@ -21,25 +22,30 @@ public class DefaultFollowService implements FollowService {
 
     private final UserService userService;
     private final ArtistService artistService;
-    private final SpotifyApiClient spotifyApiClient;
+    private final ArtistCache artistCache;
+    private final ArtistSearchService artistSearchService;
 
     public DefaultFollowService(UserService userService,
                                 ArtistService artistService,
-                                SpotifyApiClient spotifyApiClient) {
+                                ArtistCache artistCache,
+                                ArtistSearchService artistSearchService) {
         this.userService = userService;
         this.artistService = artistService;
-        this.spotifyApiClient = spotifyApiClient;
+        this.artistCache = artistCache;
+        this.artistSearchService = artistSearchService;
     }
 
     @Transactional
     @Override
-    public void follow(User user, String artistId) {
+    public boolean follow(User user, String artistId) {
         Objects.requireNonNull(user);
         Objects.requireNonNull(artistId);
-        if (!artistService.exists(artistId)) {
-            // TODO: search for artist on spotify, on a new search service, and ArtistCache to amange the cache
-
+        // Check if artist id exists anywhere on cache -> database -> Spotify.
+        // If it does not exist at any of those places, it means artist id is probably invalid
+        if (artistCache.containsArtistId(artistId) || artistService.exists(artistId) || artistSearchService.exists(artistId)) {
+            userService.associate(user, artistId);
+            return true;
         }
-        userService.associate(user, artistId);
+        return false;
     }
 }

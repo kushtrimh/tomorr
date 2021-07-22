@@ -7,5 +7,5 @@ import com.kushtrimh.tomorr.user.User;
  */
 public interface FollowService {
 
-    void follow(User user, String artistId);
+    boolean follow(User user, String artistId);
 }

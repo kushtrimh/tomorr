@@ -7,6 +7,9 @@ public interface RequestLimitService {
 
     boolean canSendRequest();
 
+    // TODO: Add tests for cant send request
+    boolean cantSendRequest();
+
     int getRemainingRequestLimit();
 
     int getSentRequestsCounter();

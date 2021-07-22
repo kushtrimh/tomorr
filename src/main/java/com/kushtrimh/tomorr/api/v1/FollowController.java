@@ -27,7 +27,10 @@ public class FollowController {
     @PostMapping("/v1/follow")
     public ResponseEntity<?> follow(@RequestBody @Valid FollowRequest followRequest) {
         User user = new User(followRequest.getUser(), UserType.EMAIL);
-        followService.follow(user, followRequest.getArtistId());
+        boolean followed = followService.follow(user, followRequest.getArtistId());
+        if (!followed) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
