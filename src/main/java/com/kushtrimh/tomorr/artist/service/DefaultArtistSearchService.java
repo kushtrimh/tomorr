@@ -8,6 +8,8 @@ import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author Kushtrim Hajrizi
  */
@@ -24,10 +26,11 @@ public class DefaultArtistSearchService implements ArtistSearchService {
 
     @Override
     public boolean exists(String artistId) {
-        GetArtistApiRequest request = new GetArtistApiRequest.Builder(artistId).build();
+        var request = new GetArtistApiRequest.Builder(artistId).build();
         try {
             GetArtistApiResponse response = spotifyApiClient.getArtist(request);
-            return response != null;
+            artistCache.putArtistIds(List.of(response.getArtistResponseData().getId()));
+            return true;
         } catch (TooManyRequestsException | SpotifyApiException e) {
             return false;
         }
