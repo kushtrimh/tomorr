@@ -14,28 +14,31 @@ import com.kushtrimh.tomorr.spotify.limit.RequestLimitService;
  */
 public class LimitAwareSpotifyApiClient implements SpotifyApiClient {
     // TODO: Switch to using AOP instead of checking each method one by one
-    private final DefaultSpotifyApiClient baseClient;
+    private final SpotifyApiClient baseClient;
     private final RequestLimitService requestLimitService;
 
-    public LimitAwareSpotifyApiClient(DefaultSpotifyApiClient baseClient, RequestLimitService requestLimitService) {
+    public LimitAwareSpotifyApiClient(SpotifyApiClient baseClient, RequestLimitService requestLimitService) {
         this.baseClient = baseClient;
         this.requestLimitService = requestLimitService;
     }
 
     @Override
-    public GetArtistsApiResponse getMultipleArtists(GetArtistsApiRequest request) throws TooManyRequestsException, SpotifyApiException {
+    public GetArtistsApiResponse getMultipleArtists(GetArtistsApiRequest request)
+            throws TooManyRequestsException, SpotifyApiException {
         checkLimit();
         return baseClient.getMultipleArtists(request);
     }
 
     @Override
-    public GetArtistAlbumsApiResponse getArtistAlbums(GetArtistAlbumsApiRequest request) throws TooManyRequestsException, SpotifyApiException {
+    public GetArtistAlbumsApiResponse getArtistAlbums(GetArtistAlbumsApiRequest request)
+            throws TooManyRequestsException, SpotifyApiException {
         checkLimit();
         return baseClient.getArtistAlbums(request);
     }
 
     @Override
-    public GetArtistAlbumsApiResponse getArtistAlbums(String url) throws TooManyRequestsException, SpotifyApiException {
+    public GetArtistAlbumsApiResponse getArtistAlbums(String url)
+            throws TooManyRequestsException, SpotifyApiException {
         checkLimit();
         return baseClient.getArtistAlbums(url);
     }

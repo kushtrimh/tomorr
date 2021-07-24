@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,19 +73,30 @@ public class FollowControllerTest {
     }
 
     @Test
+    public void follow_WhenParametersAreValidButArtistIsNotFound_ReturnNotFound() throws Exception {
+        assertFollowingIsDone(false);
+    }
+
+    @Test
     public void follow_WhenParametersAreValid_SaveFollowingAndReturnOk() throws Exception {
+        assertFollowingIsDone(true);
+    }
+
+    private void assertFollowingIsDone(boolean success) throws Exception {
         String userId = "user-id";
         String artistId = "artist-id";
-
         FollowRequest followRequest = new FollowRequest();
         followRequest.setArtistId(artistId);
         followRequest.setUser(userId);
+        User user = new User(userId, UserType.EMAIL);
 
-        User expectedUser = new User(userId, UserType.EMAIL);
+        ResultMatcher status = success ? status().isOk() : status().isNotFound();
+
+        when(followService.follow(user, artistId)).thenReturn(success);
         mockMvc.perform(postWith("/v1/follow", followRequest))
-                .andExpect(status().isOk());
+                .andExpect(status);
         verify(followService, times(1))
-                .follow(expectedUser, artistId);
+                .follow(user, artistId);
     }
 
     private MockHttpServletRequestBuilder postWith(String url, Object data) throws JsonProcessingException {

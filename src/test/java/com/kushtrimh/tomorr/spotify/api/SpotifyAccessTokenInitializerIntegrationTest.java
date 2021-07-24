@@ -3,6 +3,7 @@ package com.kushtrimh.tomorr.spotify.api;
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
 import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
+import com.kushtrimh.tomorr.spotify.SpotifyCacheKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -49,7 +50,7 @@ public class SpotifyAccessTokenInitializerIntegrationTest {
     @Test
     public void onApplicationEvent_WhenAccessTokenIsNotPresentInRedis_RefreshToken()
             throws SpotifyApiException {
-        stringRedisTemplate.delete(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY);
+        stringRedisTemplate.delete(SpotifyCacheKeys.ACCESS_TOKEN_KEY);
         initializer.onApplicationEvent(new ContextRefreshedEvent(context));
         verify(spotifyApiClient, times(1)).refreshAccessToken();
     }
@@ -57,7 +58,7 @@ public class SpotifyAccessTokenInitializerIntegrationTest {
     @Test
     public void onApplicationEvent_WhenAccessTokenIsAlreadyPresentInRedis_DoNothing()
             throws SpotifyApiException {
-        stringRedisTemplate.opsForValue().set(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY, "token-token");
+        stringRedisTemplate.opsForValue().set(SpotifyCacheKeys.ACCESS_TOKEN_KEY, "token-token");
         initializer.onApplicationEvent(new ContextRefreshedEvent(context));
         verify(spotifyApiClient, times(0)).refreshAccessToken();
     }

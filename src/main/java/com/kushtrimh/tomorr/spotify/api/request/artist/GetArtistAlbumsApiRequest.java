@@ -16,6 +16,8 @@ public class GetArtistAlbumsApiRequest implements SpotifyApiRequest {
     private int limit;
     private int offset;
 
+    public GetArtistAlbumsApiRequest() {}
+
     private GetArtistAlbumsApiRequest(Builder builder) {
         this.artistId = builder.artistId;
         this.includeGroups = builder.includeGroups;

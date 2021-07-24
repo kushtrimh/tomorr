@@ -61,6 +61,24 @@ public class DefaultRequestLimitServiceTest {
     }
 
     @Test
+    public void cantSendRequest_WhenRequestCounterIsBiggerThanLimit_ReturnTrue() {
+        when(integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY)).thenReturn(460);
+        assertTrue(requestLimitService.cantSendRequest());
+    }
+
+    @Test
+    public void cantSendRequest_WhenRequestCounterIsEqualsToLimit_ReturnTrue() {
+        when(integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY)).thenReturn(450);
+        assertTrue(requestLimitService.cantSendRequest());
+    }
+
+    @Test
+    public void cantSendRequest_WhenRequestCounterIsSmallerThanLimit_ReturnFalse() {
+        when(integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY)).thenReturn(350);
+        assertFalse(requestLimitService.cantSendRequest());
+    }
+
+    @Test
     public void getRemainingRequestLimit_WhenCalled_ReturnRemainingRequestLimit() {
         when(integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY)).thenReturn(350);
         assertEquals(100, requestLimitService.getRemainingRequestLimit());

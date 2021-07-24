@@ -13,6 +13,8 @@ import java.util.List;
 public class GetArtistsApiRequest implements SpotifyApiRequest {
     private List<String> artists;
 
+    public GetArtistsApiRequest() {}
+
     private GetArtistsApiRequest(Builder builder) {
         this.artists = builder.artists;
     }

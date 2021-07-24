@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.spotify.api.response.album.AlbumResponseData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Kushtrim Hajrizi
@@ -53,6 +54,19 @@ public class GetArtistAlbumsApiResponse {
 
     public void setTotal(int total) {
         this.total = total;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GetArtistAlbumsApiResponse response = (GetArtistAlbumsApiResponse) o;
+        return limit == response.limit && offset == response.offset && total == response.total && Objects.equals(next, response.next);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(limit, offset, next, total);
     }
 
     @Override

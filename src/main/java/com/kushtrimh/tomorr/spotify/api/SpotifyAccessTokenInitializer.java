@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.spotify.api;
 
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
+import com.kushtrimh.tomorr.spotify.SpotifyCacheKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -26,7 +27,7 @@ public class SpotifyAccessTokenInitializer implements ApplicationListener<Contex
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        String accessToken = stringRedisTemplate.opsForValue().get(DefaultSpotifyApiClient.ACCESS_TOKEN_KEY);
+        String accessToken = stringRedisTemplate.opsForValue().get(SpotifyCacheKeys.ACCESS_TOKEN_KEY);
         if (accessToken != null && !accessToken.isBlank()) {
             logger.info("Token already present, initialization skipped");
             return;

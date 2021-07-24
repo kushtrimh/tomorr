@@ -2,6 +2,7 @@ package com.kushtrimh.tomorr.spotify.api;
 
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
+import com.kushtrimh.tomorr.spotify.SpotifyCacheKeys;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
@@ -15,9 +16,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  * @author Kushtrim Hajrizi
  */
 public class DefaultSpotifyApiClient implements SpotifyApiClient {
-
-    // TODO: Move this somewhere else
-    public final static String ACCESS_TOKEN_KEY = "accessToken";
 
     private final SpotifyHttpClient httpClient;
     private final SpotifyProperties spotifyProperties;
@@ -52,11 +50,11 @@ public class DefaultSpotifyApiClient implements SpotifyApiClient {
     @Override
     public TokenResponse refreshAccessToken() throws SpotifyApiException {
         TokenResponse response = httpClient.getToken(spotifyProperties.getClientId(), spotifyProperties.getClientSecret());
-        stringRedisTemplate.opsForValue().set(ACCESS_TOKEN_KEY, response.getAccessToken());
+        stringRedisTemplate.opsForValue().set(SpotifyCacheKeys.ACCESS_TOKEN_KEY, response.getAccessToken());
         return response;
     }
 
     private String getAccessToken() {
-        return stringRedisTemplate.opsForValue().get(ACCESS_TOKEN_KEY);
+        return stringRedisTemplate.opsForValue().get(SpotifyCacheKeys.ACCESS_TOKEN_KEY);
     }
 }

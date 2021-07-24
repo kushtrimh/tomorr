@@ -136,8 +136,6 @@ public class DefaultUserServiceTest {
         verify(userRepository, times(1)).associate(userId, artistId);
     }
 
-    // TODO: Add tests for associationExists
-
     public void compareUserRecordAndUser(AppUserRecord record, User user) {
         assertEquals(record.getAddress(), user.address());
         assertEquals(record.getType(), user.type().name());
