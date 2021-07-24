@@ -11,7 +11,7 @@ import java.util.List;
  * @author Kushtrim Hajrizi
  */
 public class GetArtistsApiRequest implements SpotifyApiRequest {
-    private List<String> artists;
+    private List<String> artists = new ArrayList<>();
 
     public GetArtistsApiRequest() {}
 

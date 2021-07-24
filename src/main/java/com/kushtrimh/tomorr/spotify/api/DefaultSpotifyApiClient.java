@@ -5,9 +5,11 @@ import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.SpotifyCacheKeys;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
+import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
 import com.kushtrimh.tomorr.spotify.http.SpotifyHttpClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -45,6 +47,12 @@ public class DefaultSpotifyApiClient implements SpotifyApiClient {
     public GetArtistAlbumsApiResponse getArtistAlbums(String url)
             throws TooManyRequestsException, SpotifyApiException {
         return httpClient.get(getAccessToken(), url, GetArtistAlbumsApiResponse.class);
+    }
+
+    @Override
+    public GetArtistApiResponse getArtist(GetArtistApiRequest request)
+            throws TooManyRequestsException, SpotifyApiException {
+        return httpClient.get(getAccessToken(), request, GetArtistApiResponse.class);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class GetArtistAlbumsApiRequest implements SpotifyApiRequest {
     private String artistId;
-    private List<String> includeGroups;
+    private List<String> includeGroups = new ArrayList<>();
     private String market;
     private int limit;
     private int offset;
