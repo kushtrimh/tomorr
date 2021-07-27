@@ -5,6 +5,8 @@ import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.SearchApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.SearchApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
@@ -50,6 +52,13 @@ public class LimitAwareSpotifyApiClient implements SpotifyApiClient {
             throws TooManyRequestsException, SpotifyApiException {
         checkLimit();
         return baseClient.getArtist(request);
+    }
+
+    @Override
+    public SearchApiResponse search(SearchApiRequest request)
+            throws TooManyRequestsException, SpotifyApiException {
+        checkLimit();
+        return baseClient.search(request);
     }
 
     @Override

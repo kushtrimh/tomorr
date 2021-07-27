@@ -8,6 +8,10 @@ import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.SearchApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.SearchApiResponse;
+import com.kushtrimh.tomorr.spotify.api.response.SearchResponseData;
+import com.kushtrimh.tomorr.spotify.api.response.SearchTrackResponseData;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.api.response.album.AlbumResponseData;
 import com.kushtrimh.tomorr.spotify.api.response.artist.ArtistResponseData;
@@ -180,13 +184,7 @@ public class DefaultSpotifyHttpClientTest {
     private void assertSuccessfulGetArtistsApiRequest(GetArtistsApiRequest request, String url)
             throws TooManyRequestsException, SpotifyApiException, IOException {
         var token = "token";
-        String responseBody = Files.readString(new ClassPathResource("spotifyapi/get-artists-response.json")
-                .getFile().toPath(), StandardCharsets.UTF_8);
-        var responseHeaders = new HttpHeaders();
-        responseHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        server.expect(requestTo(getApiUrl("/artists?ids=artist1,artist2")))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess().headers(responseHeaders).body(responseBody));
+        setupServerExpectation("spotifyapi/get-artists-response.json", "/artists?ids=artist1,artist2");
 
         GetArtistsApiResponse response = request == null
                 ? client.get(token, url, GetArtistsApiResponse.class)
@@ -224,13 +222,7 @@ public class DefaultSpotifyHttpClientTest {
 
     private void assertSuccessfulGetArtistAlbumsApiRequest(GetArtistAlbumsApiRequest request, String url)
             throws IOException, TooManyRequestsException, SpotifyApiException {
-        String responseBody = Files.readString(new ClassPathResource("spotifyapi/get-artists-albums-response.json")
-                .getFile().toPath(), StandardCharsets.UTF_8);
-        var responseHeaders = new HttpHeaders();
-        responseHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        server.expect(requestTo(getApiUrl("/artists/artist1/albums?include_groups=album,single&limit=50&offset=0")))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess().headers(responseHeaders).body(responseBody));
+        setupServerExpectation("spotifyapi/get-artists-albums-response.json", "/artists/artist1/albums?include_groups=album,single&limit=50&offset=0");
 
         GetArtistAlbumsApiResponse response = request == null
                 ? client.get("token", url, GetArtistAlbumsApiResponse.class)
@@ -279,13 +271,7 @@ public class DefaultSpotifyHttpClientTest {
 
     private void assertSuccessfulGetArtistApiRequest(String artistId, GetArtistApiRequest request, String url)
             throws IOException, TooManyRequestsException, SpotifyApiException {
-        String responseBody = Files.readString(new ClassPathResource("spotifyapi/get-artist-response.json")
-                .getFile().toPath(), StandardCharsets.UTF_8);
-        var responseHeaders = new HttpHeaders();
-        responseHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        server.expect(requestTo(getApiUrl("/artists/" + artistId)))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess().headers(responseHeaders).body(responseBody));
+        setupServerExpectation("spotifyapi/get-artist-response.json", "/artists/" + artistId);
 
         GetArtistApiResponse response = request == null ?
                 client.get("token", url, GetArtistApiResponse.class) :
@@ -298,6 +284,54 @@ public class DefaultSpotifyHttpClientTest {
         assertEquals("Artist Name", artistResponseData.getName());
         assertEquals(36, artistResponseData.getPopularity());
         assertFalse(artistResponseData.getImages().isEmpty());
+    }
+
+    // SearchApiRequest tests
+    @Test
+    public void get_SearchApiRequestSentSuccessfully_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException {
+        var request = new SearchApiRequest.Builder("artist")
+                .limit(2)
+                .types(List.of("artist", "track"))
+                .build();
+        assertSuccessfulSearchApiRequest(request, null);
+    }
+
+    @Test
+    public void get_SearchApiRequestSentSuccessfullyWithUrl_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException {
+        var url = getApiUrl("/search?q=artist&limit=2&offset=0&type=artist,track");
+        assertSuccessfulSearchApiRequest(null, url);
+    }
+
+    private void assertSuccessfulSearchApiRequest(SearchApiRequest request, String url)
+            throws IOException, TooManyRequestsException, SpotifyApiException {
+        setupServerExpectation("spotifyapi/search-response.json", "/search?q=artist&limit=2&offset=0&type=artist,track");
+
+        SearchApiResponse response = request == null ?
+                client.get("token", url, SearchApiResponse.class) :
+                client.get("token", request, SearchApiResponse.class);
+
+        server.verify();
+
+        SearchResponseData<ArtistResponseData> artists = response.getArtists();
+        SearchResponseData<SearchTrackResponseData> tracks = response.getTracks();
+        assertNotNull(artists);
+        assertNotNull(tracks);
+
+        assertEquals(2, artists.getLimit());
+        assertEquals(0, artists.getOffset());
+        assertEquals(1687, artists.getTotal());
+
+        assertEquals(2, tracks.getLimit());
+        assertEquals(0, tracks.getOffset());
+        assertEquals(28514, tracks.getTotal());
+
+        assertEquals(2, artists.getItems().size());
+        assertEquals(2, tracks.getItems().size());
+
+        assertEquals("Artist One", artists.getItems().get(0).getName());
+        assertEquals("Track One", tracks.getItems().get(0).getAlbum().getName());
     }
 
     // Auth tests
@@ -363,5 +397,16 @@ public class DefaultSpotifyHttpClientTest {
 
     private String getApiUrl(String pathAndParams) {
         return spotifyProperties.getApiUrl() + pathAndParams;
+    }
+
+
+    private void setupServerExpectation(String responseResource, String query) throws IOException {
+        String responseBody = Files.readString(new ClassPathResource(responseResource)
+                .getFile().toPath(), StandardCharsets.UTF_8);
+        var responseHeaders = new HttpHeaders();
+        responseHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        server.expect(requestTo(getApiUrl(query)))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess().headers(responseHeaders).body(responseBody));
     }
 }

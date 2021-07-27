@@ -7,6 +7,8 @@ import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.SearchApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.SearchApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
@@ -53,6 +55,12 @@ public class DefaultSpotifyApiClient implements SpotifyApiClient {
     public GetArtistApiResponse getArtist(GetArtistApiRequest request)
             throws TooManyRequestsException, SpotifyApiException {
         return httpClient.get(getAccessToken(), request, GetArtistApiResponse.class);
+    }
+
+    @Override
+    public SearchApiResponse search(SearchApiRequest request)
+            throws TooManyRequestsException, SpotifyApiException {
+        return httpClient.get(getAccessToken(), request, SearchApiResponse.class);
     }
 
     @Override
