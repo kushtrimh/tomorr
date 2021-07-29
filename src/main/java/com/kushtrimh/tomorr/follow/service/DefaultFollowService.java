@@ -17,8 +17,6 @@ import java.util.Objects;
  */
 @Service
 public class DefaultFollowService implements FollowService {
-    // TODO: Test this class
-
     private final Logger logger = LoggerFactory.getLogger(DefaultFollowService.class);
 
     private final UserService userService;
