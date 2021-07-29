@@ -3,9 +3,13 @@ package com.kushtrimh.tomorr.spotify.api;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.SearchApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.SearchApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.ArtistResponseData;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
+import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
 import com.kushtrimh.tomorr.spotify.limit.RequestLimitService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,9 +44,9 @@ public class LimitAwareSpotifyApiClientTest {
     @Test
     public void getMultipleArtists_WhenLimitIsNotExceeded_CallBaseClient()
             throws TooManyRequestsException, SpotifyApiException {
-        GetArtistsApiRequest request = new GetArtistsApiRequest.Builder()
+        var request = new GetArtistsApiRequest.Builder()
                 .artists(List.of("artist1", "artist2")).build();
-        GetArtistsApiResponse response = new GetArtistsApiResponse();
+        var response = new GetArtistsApiResponse();
         ArtistResponseData artistResponseData = new ArtistResponseData();
         artistResponseData.setId("artist1");
         response.setArtists(List.of(artistResponseData));
@@ -65,10 +69,10 @@ public class LimitAwareSpotifyApiClientTest {
     @Test
     public void getArtistAlbums_WhenLimitIsNotExceeded_CallBaseClient()
             throws TooManyRequestsException, SpotifyApiException {
-        GetArtistAlbumsApiRequest request = new GetArtistAlbumsApiRequest.Builder("artist1")
+        var request = new GetArtistAlbumsApiRequest.Builder("artist1")
                 .limit(50)
                 .build();
-        GetArtistAlbumsApiResponse response = new GetArtistAlbumsApiResponse();
+        var response = new GetArtistAlbumsApiResponse();
         response.setTotal(100);
 
         when(requestLimitService.cantSendRequest()).thenReturn(false);
@@ -90,7 +94,7 @@ public class LimitAwareSpotifyApiClientTest {
     public void getArtistAlbums_WhenLimitIsNotExceeded_CallBaseClientWithUrl()
             throws TooManyRequestsException, SpotifyApiException {
         String url = "http://localhost/api/artists/artist1/albums";
-        GetArtistAlbumsApiResponse response = new GetArtistAlbumsApiResponse();
+        var response = new GetArtistAlbumsApiResponse();
         response.setTotal(100);
 
         when(requestLimitService.cantSendRequest()).thenReturn(false);
@@ -102,9 +106,58 @@ public class LimitAwareSpotifyApiClientTest {
     }
 
     @Test
+    public void getArtist_WhenLimitIsExceeded_CallBaseClientWithRequest() {
+        when(requestLimitService.cantSendRequest()).thenReturn(true);
+        assertThrows(TooManyRequestsException.class,
+                () -> limitAwareSpotifyApiClient.getArtist(new GetArtistApiRequest()));
+    }
+
+    @Test
+    public void getArtist_WhenLimitIsNotExceeded_CallBaseClientWithRequest()
+            throws TooManyRequestsException, SpotifyApiException {
+        var request = new GetArtistApiRequest.Builder("artist1")
+                .build();
+        var response = new GetArtistApiResponse();
+        var artistResponseData = new ArtistResponseData();
+        artistResponseData.setId("artist1");
+        artistResponseData.setName("Artist One");
+        artistResponseData.setPopularity(15);
+        response.setArtistResponseData(artistResponseData);
+
+        when(requestLimitService.cantSendRequest()).thenReturn(false);
+        when(baseClient.getArtist(request)).thenReturn(response);
+
+        GetArtistApiResponse returnedResponse = limitAwareSpotifyApiClient.getArtist(request);
+        assertEquals(response, returnedResponse);
+        verify(baseClient, times(1)).getArtist(request);
+    }
+
+    @Test
+    public void search_WhenLimitIsExceeded_CallBaseClientWithRequest() {
+        when(requestLimitService.cantSendRequest()).thenReturn(true);
+        assertThrows(TooManyRequestsException.class,
+                () -> limitAwareSpotifyApiClient.search(new SearchApiRequest()));
+    }
+
+    @Test
+    public void search_WhenLimitIsNotExceeded_CallBaseClientWithRequest()
+            throws TooManyRequestsException, SpotifyApiException {
+        var request = new SearchApiRequest.Builder("art")
+                .build();
+        var response = new SearchApiResponse();
+
+        when(requestLimitService.cantSendRequest()).thenReturn(false);
+        when(baseClient.search(request)).thenReturn(response);
+
+        SearchApiResponse returnedResponse = limitAwareSpotifyApiClient.search(request);
+        assertEquals(response, returnedResponse);
+        verify(baseClient, times(1)).search(request);
+    }
+
+    @Test
     public void getArtistAlbums_WhenLimitIsExceeded_ThrowTooManyRequestsException() {
         when(requestLimitService.cantSendRequest()).thenReturn(true);
-        String url = "http://localhost/api/artists/artist1/albums";
+        var url = "http://localhost/api/artists/artist1/albums";
         assertThrows(TooManyRequestsException.class,
                 () -> limitAwareSpotifyApiClient.getArtistAlbums(url));
     }
