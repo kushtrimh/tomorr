@@ -5,9 +5,13 @@ import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
+import com.kushtrimh.tomorr.spotify.api.request.artist.SearchApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.SearchApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
+import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
 import com.kushtrimh.tomorr.spotify.http.SpotifyHttpClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +65,7 @@ public class DefaultSpotifyApiClientTest {
     public void getMultipleArtists_WhenCalledWithRequest_ForwardRequestToHttpClient()
             throws TooManyRequestsException, SpotifyApiException {
         when(valueOperations.get(ACCESS_TOKEN_KEY)).thenReturn(accessTokenValue);
-        GetArtistsApiRequest request = new GetArtistsApiRequest.Builder()
+        var request = new GetArtistsApiRequest.Builder()
                 .artists(List.of("artist1", "artist2")).build();
         client.getMultipleArtists(request);
         verify(spotifyHttpClient, times(1))
@@ -72,7 +76,7 @@ public class DefaultSpotifyApiClientTest {
     public void getArtistAlbums_WhenCalledWithRequest_ForwardRequestToHttpClient()
             throws TooManyRequestsException, SpotifyApiException {
         when(valueOperations.get(ACCESS_TOKEN_KEY)).thenReturn(accessTokenValue);
-        GetArtistAlbumsApiRequest request = new GetArtistAlbumsApiRequest.Builder("artist1")
+        var request = new GetArtistAlbumsApiRequest.Builder("artist1")
                 .build();
         client.getArtistAlbums(request);
         verify(spotifyHttpClient, times(1))
@@ -87,6 +91,30 @@ public class DefaultSpotifyApiClientTest {
         client.getArtistAlbums(url);
         verify(spotifyHttpClient, times(1))
                 .get(accessTokenValue, url, GetArtistAlbumsApiResponse.class);
+    }
+
+    @Test
+    public void getArtist_WhenCalledWithRequest_ForwardRequestToHttpClient()
+            throws TooManyRequestsException, SpotifyApiException {
+        when(valueOperations.get(ACCESS_TOKEN_KEY)).thenReturn(accessTokenValue);
+        var request = new GetArtistApiRequest.Builder("artist1")
+                .build();
+        client.getArtist(request);
+        verify(spotifyHttpClient, times(1))
+                .get(accessTokenValue, request, GetArtistApiResponse.class);
+    }
+
+    @Test
+    public void search_WhenCalledWithRequest_ForwardRequestToHttpClient()
+            throws TooManyRequestsException, SpotifyApiException {
+        when(valueOperations.get(ACCESS_TOKEN_KEY)).thenReturn(accessTokenValue);
+        var request = new SearchApiRequest.Builder("artist")
+                .limit(50)
+                .types(List.of("artist", "track"))
+                .build();
+        client.search(request);
+        verify(spotifyHttpClient, times(1))
+                .get(accessTokenValue, request, SearchApiResponse.class);
     }
 
     @Test
