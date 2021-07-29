@@ -15,8 +15,6 @@ import java.util.List;
  */
 @Service
 public class DefaultArtistSearchService implements ArtistSearchService {
-    // TODO: Test this class
-
     private final ArtistCache artistCache;
     private final SpotifyApiClient spotifyApiClient;
 
