@@ -10,6 +10,13 @@ public class ImageResponseData {
     private int width;
     private String url;
 
+    public ImageResponseData() {
+    }
+
+    public ImageResponseData(String url) {
+        this.url = url;
+    }
+
     public String getUrl() {
         return url;
     }

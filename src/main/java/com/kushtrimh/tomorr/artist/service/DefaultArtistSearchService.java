@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Kushtrim Hajrizi
@@ -51,11 +53,10 @@ public class DefaultArtistSearchService implements ArtistSearchService {
         }
     }
 
-    // TODO: Add tests for this method
-
     @Override
     @Cacheable("artistsSearch")
     public List<Artist> search(String name, boolean external) {
+        Objects.requireNonNull(name);
         List<Artist> artists = artistService.searchByName(name);
         if (!external) {
             return artists;
@@ -69,9 +70,9 @@ public class DefaultArtistSearchService implements ArtistSearchService {
             SearchApiResponse response = spotifyApiClient.search(searchApiRequest);
             List<Artist> artistsFromExternalQuery = response.getArtists().getItems().stream()
                     .map(this::toArtist)
-                    .toList();
-            artists.addAll(artistsFromExternalQuery);
-            return artists.stream().distinct().toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
+            artistsFromExternalQuery.addAll(artists);
+            return artistsFromExternalQuery.stream().distinct().toList();
         } catch (TooManyRequestsException | SpotifyApiException e) {
             logger.warn("Could not search for artists externally", e);
         }
