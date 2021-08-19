@@ -1,4 +1,4 @@
-package com.kushtrimh.tomorr.api.v1;
+package com.kushtrimh.tomorr.api.v1.response.follow;
 
 import com.kushtrimh.tomorr.api.v1.request.FollowRequest;
 import com.kushtrimh.tomorr.follow.service.FollowService;

@@ -19,6 +19,7 @@ import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -48,7 +49,13 @@ public class RedisConfiguration {
                 "default", RedisCacheConfiguration.defaultCacheConfig()
                         .disableCachingNullValues()
                         .computePrefixWith(CacheKeyPrefix.prefixed("default"))
+                        .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer)),
+                "artistsSearch", RedisCacheConfiguration.defaultCacheConfig()
+                        .disableCachingNullValues()
+                        .computePrefixWith(CacheKeyPrefix.prefixed("artist:search"))
                         .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
+                        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                        .entryTtl(Duration.ofMinutes(5))
         );
         // Configure Redis cache manager
         return RedisCacheManager.builder(redisConnectionFactory)
