@@ -13,8 +13,6 @@ import javax.annotation.PostConstruct;
 @Service
 public class DefaultRequestLimitService implements RequestLimitService {
 
-    public static final String SENT_REQUESTS_COUNTER_KEY= "spotify:sentRequestsCounter";
-
     private final RedisTemplate<String, Integer> integerRedisTemplate;
     private final ValueOperations<String, Integer> integerValueOperations;
     private final int globalRequestLimit;
@@ -28,37 +26,39 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @PostConstruct
     public void init() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 0);
+        for (LimitType limitTypes: LimitType.values()) {
+            integerValueOperations.setIfAbsent(limitTypes.getCacheKey(), 0);
+        }
     }
 
     @Override
-    public boolean canSendRequest() {
-        int sendRequestsCounter = integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY);
+    public boolean canSendRequest(LimitType limitType) {
+        int sendRequestsCounter = integerValueOperations.get(limitType.getCacheKey());
         return (globalRequestLimit - sendRequestsCounter)  > 0;
     }
 
     @Override
-    public boolean cantSendRequest() {
-        return !canSendRequest();
+    public boolean cantSendRequest(LimitType limitType) {
+        return !canSendRequest(limitType);
     }
 
     @Override
-    public int getRemainingRequestLimit() {
-        return globalRequestLimit - integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY);
+    public int getRemainingRequestLimit(LimitType limitType) {
+        return globalRequestLimit - integerValueOperations.get(limitType.getCacheKey());
     }
 
     @Override
-    public int getSentRequestsCounter() {
-        return integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY);
+    public int getSentRequestsCounter(LimitType limitType) {
+        return integerValueOperations.get(limitType.getCacheKey());
     }
 
     @Override
-    public long increment() {
-        return integerValueOperations.increment(SENT_REQUESTS_COUNTER_KEY);
+    public long increment(LimitType limitType) {
+        return integerValueOperations.increment(limitType.getCacheKey());
     }
 
     @Override
-    public void reset() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 0);
+    public void reset(LimitType limitType) {
+        integerValueOperations.set(limitType.getCacheKey(), 0);
     }
 }

@@ -11,6 +11,7 @@ import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
+import com.kushtrimh.tomorr.spotify.limit.LimitType;
 import com.kushtrimh.tomorr.spotify.limit.RequestLimitService;
 
 /**
@@ -67,7 +68,7 @@ public class LimitAwareSpotifyApiClient implements SpotifyApiClient {
     }
 
     private void checkLimit() throws TooManyRequestsException {
-        if (requestLimitService.cantSendRequest()) {
+        if (requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL)) {
             throw new TooManyRequestsException("Reach limit for requests");
         }
     }

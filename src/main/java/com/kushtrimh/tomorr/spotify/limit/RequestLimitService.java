@@ -5,15 +5,17 @@ package com.kushtrimh.tomorr.spotify.limit;
  */
 public interface RequestLimitService {
 
-    boolean canSendRequest();
+    boolean canSendRequest(LimitType limitType);
 
-    boolean cantSendRequest();
+    boolean cantSendRequest(LimitType limitType);
 
-    int getRemainingRequestLimit();
+    int getRemainingRequestLimit(LimitType limitType);
 
-    int getSentRequestsCounter();
+    int getSentRequestsCounter(LimitType limitType);
 
-    long increment();
+    long increment(LimitType limitType);
 
-    void reset();
+    void reset(LimitType limitType);
+
+    // TODO: Add support for reset all
 }

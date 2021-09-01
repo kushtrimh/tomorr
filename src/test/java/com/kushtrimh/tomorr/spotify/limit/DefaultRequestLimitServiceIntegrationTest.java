@@ -16,7 +16,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static com.kushtrimh.tomorr.spotify.limit.DefaultRequestLimitService.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -43,69 +42,72 @@ public class DefaultRequestLimitServiceIntegrationTest {
     @BeforeEach
     public void init() {
         requestLimitService = new DefaultRequestLimitService(spotifyProperties, integerRedisTemplate);
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 0);
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 0);
+        integerValueOperations.set(LimitType.ARTIST_SEARCH.getCacheKey(), 0);
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsBiggerThanLimit_ReturnFalse() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 475);
-        assertFalse(requestLimitService.canSendRequest());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 475);
+        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsEqualsToLimit_ReturnFalse() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 450);
-        assertFalse(requestLimitService.canSendRequest());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 450);
+        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsSmallerThanLimit_ReturnTrue() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 25);
-        assertTrue(requestLimitService.canSendRequest());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 25);
+        assertTrue(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsBiggerThanLimit_ReturnTrue() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 475);
-        assertTrue(requestLimitService.cantSendRequest());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 475);
+        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsEqualsToLimit_ReturnTrue() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 450);
-        assertTrue(requestLimitService.cantSendRequest());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 450);
+        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsSmallerThanLimit_ReturnFalse() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 25);
-        assertFalse(requestLimitService.cantSendRequest());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 25);
+        assertFalse(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void getRemainingRequestLimit_WhenCalled_ReturnRemainingRequestLimit() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 340);
-        assertEquals(110, requestLimitService.getRemainingRequestLimit());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 340);
+        assertEquals(110, requestLimitService.getRemainingRequestLimit(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void getSentRequestsCounter_WhenCalled_ReturnRequestCounter() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 154);
-        assertEquals(154, requestLimitService.getSentRequestsCounter());
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 154);
+        assertEquals(154, requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_EXTERNAL));
     }
 
     @Test
     public void increment_WhenCalled_IncrementCounter() {
-        assertEquals(0, integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY));
-        requestLimitService.increment();
-        assertEquals(1, integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY));
+        String key = LimitType.SPOTIFY_EXTERNAL.getCacheKey();
+        assertEquals(0, integerValueOperations.get(key));
+        requestLimitService.increment(LimitType.SPOTIFY_EXTERNAL);
+        assertEquals(1, integerValueOperations.get(key));
     }
 
     @Test
     public void reset_WhenCalled_ResetCounter() {
-        integerValueOperations.set(SENT_REQUESTS_COUNTER_KEY, 235);
-        assertEquals(235, integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY));
-        requestLimitService.reset();
-        assertEquals(0, integerValueOperations.get(SENT_REQUESTS_COUNTER_KEY));
+        String key = LimitType.SPOTIFY_EXTERNAL.getCacheKey();
+        integerValueOperations.set(key, 235);
+        assertEquals(235, integerValueOperations.get(key));
+        requestLimitService.reset(LimitType.SPOTIFY_EXTERNAL);
+        assertEquals(0, integerValueOperations.get(key));
     }
 }

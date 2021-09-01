@@ -2,6 +2,8 @@ package com.kushtrimh.tomorr.api.v1;
 
 import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.service.ArtistSearchService;
+import com.kushtrimh.tomorr.spotify.limit.LimitType;
+import com.kushtrimh.tomorr.spotify.limit.RequestLimitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,18 +27,30 @@ public class ArtistControllerTest {
 
     @Mock
     private ArtistSearchService artistSearchService;
+    @Mock
+    private RequestLimitService requestLimitService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void init() {
-        ArtistController controller = new ArtistController(artistSearchService);
+        ArtistController controller = new ArtistController(artistSearchService, requestLimitService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
+
+    @Test
+    public void search_WhenRequestLimitIsExceeded_ReturnTooManyRequestsCode() throws Exception {
+        var artistName =" artist-name";
+        when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(true);
+        mockMvc.perform(get("/v1/artist/search")
+                .param("name", artistName))
+                .andExpect(status().isTooManyRequests());
     }
 
     @Test
     public void search_WhenReturnedDataIsEmpty_ReturnEmptyResponse() throws Exception {
         var artistName = "artist-name";
+        when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(false);
         String response = mockMvc.perform(get("/v1/artist/search")
                         .param("name", artistName))
                 .andExpect(status().isOk())
@@ -45,16 +59,29 @@ public class ArtistControllerTest {
     }
 
     @Test
-    public void search_WhenArtistsAreFound_ReturnArtistsResponse() throws Exception {
+    public void search_WhenArtistsAreFoundWithExternalSearchDisabled_ReturnArtistsResponse() throws Exception {
+        var artistName = "artist-name";
+        when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(false);
+        assertArtistSearchSuccessfulResponse(artistName, false);
+    }
+
+    @Test
+    public void search_WhenArtistsAreFoundWithExternalSearchEnabled_ReturnArtistsResponse() throws Exception {
+        var artistName = "artist-name";
+        when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(false);
+        assertArtistSearchSuccessfulResponse(artistName, true);
+    }
+
+    private void assertArtistSearchSuccessfulResponse(String artistName, boolean external) throws Exception {
         List<Artist> artists = List.of(
                 new Artist("artist1", "Artist One", null, 0),
                 new Artist("artist2", "Artist Two", null, 0)
                 );
 
-        var artistName = "artist-name";
-        when(artistSearchService.search(artistName, false)).thenReturn(artists);
+        when(artistSearchService.search(artistName, external)).thenReturn(artists);
         String response = mockMvc.perform(get("/v1/artist/search")
-                        .param("name", artistName))
+                        .param("name", artistName)
+                        .param("external", String.valueOf(external)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertEquals("{\"artists\":[{\"id\":\"artist1\",\"name\":\"Artist One\"},{\"id\":\"artist2\",\"name\":\"Artist Two\"}]}",
