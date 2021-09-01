@@ -21,9 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/artist")
 public class ArtistController {
-
-    // TODO: Add tests for this class
-
+    
     private final ArtistSearchService artistSearchService;
     private final RequestLimitService requestLimitService;
 
