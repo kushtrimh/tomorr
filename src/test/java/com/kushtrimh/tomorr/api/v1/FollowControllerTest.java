@@ -1,7 +1,7 @@
 package com.kushtrimh.tomorr.api.v1;
 
 import com.kushtrimh.tomorr.api.v1.request.FollowRequest;
-import com.kushtrimh.tomorr.api.v1.response.follow.FollowController;
+import com.kushtrimh.tomorr.api.v1.follow.FollowController;
 import com.kushtrimh.tomorr.follow.service.FollowService;
 import com.kushtrimh.tomorr.user.User;
 import com.kushtrimh.tomorr.user.UserType;
