@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.spotify.limit;
 
+import com.kushtrimh.tomorr.properties.LimitProperties;
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -15,26 +16,28 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     private final RedisTemplate<String, Integer> integerRedisTemplate;
     private final ValueOperations<String, Integer> integerValueOperations;
-    private final int globalRequestLimit;
+    private final LimitProperties limitProperties;
 
 
-    public DefaultRequestLimitService(SpotifyProperties spotifyProperties, RedisTemplate<String, Integer> integerRedisTemplate) {
+    public DefaultRequestLimitService(LimitProperties limitProperties, RedisTemplate<String, Integer> integerRedisTemplate) {
         this.integerRedisTemplate = integerRedisTemplate;
         this.integerValueOperations = integerRedisTemplate.opsForValue();
-        this.globalRequestLimit = spotifyProperties.getRequestLimit();
+        this.limitProperties = limitProperties;
     }
 
     @PostConstruct
     public void init() {
         for (LimitType limitTypes: LimitType.values()) {
-            integerValueOperations.setIfAbsent(limitTypes.getCacheKey(), 0);
+            String cacheKey = limitTypes.getCacheKey();
+            if (cacheKey != null) {
+                integerValueOperations.setIfAbsent(cacheKey, 0);
+            }
         }
     }
 
     @Override
     public boolean canSendRequest(LimitType limitType) {
-        int sendRequestsCounter = integerValueOperations.get(limitType.getCacheKey());
-        return (globalRequestLimit - sendRequestsCounter)  > 0;
+        return (getLimit(limitType) - getCount(limitType))  > 0;
     }
 
     @Override
@@ -44,21 +47,46 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @Override
     public int getRemainingRequestLimit(LimitType limitType) {
-        return globalRequestLimit - integerValueOperations.get(limitType.getCacheKey());
+        return getLimit(limitType) - getCount(limitType);
     }
 
     @Override
     public int getSentRequestsCounter(LimitType limitType) {
-        return integerValueOperations.get(limitType.getCacheKey());
+        return getCount(limitType);
     }
 
     @Override
     public long increment(LimitType limitType) {
+        if (limitType == LimitType.GLOBAL) {
+            return -1L;
+        }
         return integerValueOperations.increment(limitType.getCacheKey());
     }
 
     @Override
     public void reset(LimitType limitType) {
+        if (limitType == LimitType.GLOBAL) {
+            return;
+        }
         integerValueOperations.set(limitType.getCacheKey(), 0);
+    }
+
+    private int getCount(LimitType limitType) {
+        if (limitType == LimitType.GLOBAL) {
+            int count = 0;
+            for (LimitType type: LimitType.getCacheableTypes()) {
+                count += integerValueOperations.get(type.getCacheKey());
+            }
+            return count;
+        }
+        return integerValueOperations.get(limitType.getCacheKey());
+    }
+
+    private int getLimit(LimitType limitType) {
+        return switch (limitType) {
+            case SPOTIFY_EXTERNAL -> limitProperties.getSpotify();
+            case ARTIST_SEARCH -> limitProperties.getArtistSearch();
+            default -> limitProperties.getGlobal();
+        };
     }
 }

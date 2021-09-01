@@ -14,7 +14,6 @@ public class SpotifyProperties {
     private String userAgent;
     private String authUrl;
     private String apiUrl;
-    private int requestLimit;
 
     public String getClientId() {
         return clientId;
@@ -56,14 +55,6 @@ public class SpotifyProperties {
         this.apiUrl = apiUrl;
     }
 
-    public int getRequestLimit() {
-        return requestLimit;
-    }
-
-    public void setRequestLimit(int requestLimit) {
-        this.requestLimit = requestLimit;
-    }
-
     @Override
     public String toString() {
         return "SpotifyProperties{" +
@@ -72,7 +63,6 @@ public class SpotifyProperties {
                 ", userAgent='" + userAgent + '\'' +
                 ", authUrl='" + authUrl + '\'' +
                 ", apiUrl='" + apiUrl + '\'' +
-                ", requestLimit='" + requestLimit + '\'' +
                 '}';
     }
 }

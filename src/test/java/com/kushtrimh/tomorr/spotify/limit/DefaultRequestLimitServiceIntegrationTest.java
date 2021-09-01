@@ -1,8 +1,10 @@
 package com.kushtrimh.tomorr.spotify.limit;
 
+import com.kushtrimh.tomorr.configuration.TestLimitConfiguration;
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
 import com.kushtrimh.tomorr.configuration.TestSpotifyConfiguration;
 import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
+import com.kushtrimh.tomorr.properties.LimitProperties;
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -22,26 +24,27 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Kushtrim Hajrizi
  */
 @Tags(value = { @Tag("redis"), @Tag("integration") })
-@ContextConfiguration(classes = {TestSpotifyConfiguration.class, TestRedisConfiguration.class})
+@ContextConfiguration(classes = {TestSpotifyConfiguration.class,
+        TestRedisConfiguration.class, TestLimitConfiguration.class})
 @ExtendWith({SpringExtension.class, MockitoExtension.class, TestRedisExtension.class})
 public class DefaultRequestLimitServiceIntegrationTest {
 
-    private final SpotifyProperties spotifyProperties;
+    private final LimitProperties limitProperties;
     private final RedisTemplate<String, Integer> integerRedisTemplate;
     private final ValueOperations<String, Integer> integerValueOperations;
 
     private DefaultRequestLimitService requestLimitService;
 
     @Autowired
-    public DefaultRequestLimitServiceIntegrationTest(SpotifyProperties spotifyProperties, RedisTemplate<String, Integer> integerRedisTemplate) {
-        this.spotifyProperties = spotifyProperties;
+    public DefaultRequestLimitServiceIntegrationTest(LimitProperties limitProperties, RedisTemplate<String, Integer> integerRedisTemplate) {
+        this.limitProperties = limitProperties;
         this.integerRedisTemplate = integerRedisTemplate;
         this.integerValueOperations = integerRedisTemplate.opsForValue();
     }
 
     @BeforeEach
     public void init() {
-        requestLimitService = new DefaultRequestLimitService(spotifyProperties, integerRedisTemplate);
+        requestLimitService = new DefaultRequestLimitService(limitProperties, integerRedisTemplate);
         integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 0);
         integerValueOperations.set(LimitType.ARTIST_SEARCH.getCacheKey(), 0);
     }
