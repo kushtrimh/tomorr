@@ -3,8 +3,10 @@ package com.kushtrimh.tomorr.spotify.api;
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
 import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
+import com.kushtrimh.tomorr.spotify.SpotifyCacheKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -21,13 +23,13 @@ import static org.mockito.Mockito.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tag("redis")
+@Tags(value = { @Tag("redis"), @Tag("integration") })
 @ExtendWith({SpringExtension.class, MockitoExtension.class, TestRedisExtension.class})
 @ContextConfiguration(classes = TestRedisConfiguration.class)
-public class SpotifyAccessTokenInitializerTest {
+public class SpotifyAccessTokenInitializerIntegrationTest {
 
     @Mock
-    private SpotifyApiClient spotifyApiClient;
+    private DefaultSpotifyApiClient spotifyApiClient;
 
     private final StringRedisTemplate stringRedisTemplate;
     private final ApplicationContext context;
@@ -35,7 +37,7 @@ public class SpotifyAccessTokenInitializerTest {
     private SpotifyAccessTokenInitializer initializer;
 
     @Autowired
-    public SpotifyAccessTokenInitializerTest(ApplicationContext context, StringRedisTemplate stringRedisTemplate) {
+    public SpotifyAccessTokenInitializerIntegrationTest(ApplicationContext context, StringRedisTemplate stringRedisTemplate) {
         this.context = context;
         this.stringRedisTemplate = stringRedisTemplate;
     }
@@ -48,7 +50,7 @@ public class SpotifyAccessTokenInitializerTest {
     @Test
     public void onApplicationEvent_WhenAccessTokenIsNotPresentInRedis_RefreshToken()
             throws SpotifyApiException {
-        stringRedisTemplate.delete(SpotifyApiClient.ACCESS_TOKEN);
+        stringRedisTemplate.delete(SpotifyCacheKeys.ACCESS_TOKEN_KEY);
         initializer.onApplicationEvent(new ContextRefreshedEvent(context));
         verify(spotifyApiClient, times(1)).refreshAccessToken();
     }
@@ -56,7 +58,7 @@ public class SpotifyAccessTokenInitializerTest {
     @Test
     public void onApplicationEvent_WhenAccessTokenIsAlreadyPresentInRedis_DoNothing()
             throws SpotifyApiException {
-        stringRedisTemplate.opsForValue().set(SpotifyApiClient.ACCESS_TOKEN, "token-token");
+        stringRedisTemplate.opsForValue().set(SpotifyCacheKeys.ACCESS_TOKEN_KEY, "token-token");
         initializer.onApplicationEvent(new ContextRefreshedEvent(context));
         verify(spotifyApiClient, times(0)).refreshAccessToken();
     }

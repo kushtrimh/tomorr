@@ -36,6 +36,9 @@ spotify:
 redis:
   host: ${TOMORR_REDIS_HOST}
   port: ${TOMORR_REDIS_PORT}
+request-limit:
+  spotify: 600
+  artist-search: 150
 logging:
   level:
     com:

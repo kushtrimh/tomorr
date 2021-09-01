@@ -5,6 +5,7 @@ import com.kushtrimh.tomorr.configuration.TestDataSourceConfiguration;
 import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +17,16 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tag("database")
+@Tags(value = { @Tag("database"), @Tag("integration") })
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
 @ExtendWith(TestDatabaseExtension.class)
 @JooqTest
-public class AlbumJooqRepositoryTest {
+public class AlbumJooqRepositoryIntegrationTest {
 
     private final AlbumRepository<AlbumRecord> albumRepository;
 
     @Autowired
-    public AlbumJooqRepositoryTest(AlbumRepository<AlbumRecord> albumRepository) {
+    public AlbumJooqRepositoryIntegrationTest(AlbumRepository<AlbumRecord> albumRepository) {
         this.albumRepository = albumRepository;
     }
 

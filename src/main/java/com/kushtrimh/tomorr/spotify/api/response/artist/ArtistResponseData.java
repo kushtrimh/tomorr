@@ -14,6 +14,16 @@ public class ArtistResponseData {
     private List<ImageResponseData> images;
     private int popularity;
 
+    public ArtistResponseData() {
+    }
+
+    public ArtistResponseData(String id, String name, List<ImageResponseData> images, int popularity) {
+        this.id = id;
+        this.name = name;
+        this.images = images;
+        this.popularity = popularity;
+    }
+
     public String getId() {
         return id;
     }

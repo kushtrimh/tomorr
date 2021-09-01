@@ -17,7 +17,7 @@ import java.util.Optional;
 @Service
 public class DefaultArtistService implements ArtistService {
 
-    private ArtistRepository<ArtistRecord> artistRepository;
+    private final ArtistRepository<ArtistRecord> artistRepository;
 
     public DefaultArtistService(ArtistRepository<ArtistRecord> artistRepository) {
         this.artistRepository = artistRepository;

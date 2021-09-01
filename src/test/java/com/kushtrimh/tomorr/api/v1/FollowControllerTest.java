@@ -1,9 +1,10 @@
 package com.kushtrimh.tomorr.api.v1;
 
+import com.kushtrimh.tomorr.api.v1.follow.FollowController;
 import com.kushtrimh.tomorr.api.v1.request.FollowRequest;
+import com.kushtrimh.tomorr.follow.service.FollowService;
 import com.kushtrimh.tomorr.user.User;
 import com.kushtrimh.tomorr.user.UserType;
-import com.kushtrimh.tomorr.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FollowControllerTest {
 
     @Mock
-    private UserService userService;
+    private FollowService followService;
 
     private MockMvc mockMvc;
 
@@ -39,7 +41,7 @@ public class FollowControllerTest {
 
     @BeforeEach
     public void init() {
-        FollowerController followerController = new FollowerController(userService);
+        FollowController followerController = new FollowController(followService);
         mockMvc = MockMvcBuilders.standaloneSetup(followerController).build();
     }
 
@@ -47,7 +49,7 @@ public class FollowControllerTest {
     public void follow_WhenRequestBodyIsEmpty_ReturnBadRequest() throws Exception {
         mockMvc.perform(post("/v1/follow"))
                 .andExpect(status().isBadRequest());
-        verify(userService, times(0))
+        verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
     }
 
@@ -57,7 +59,7 @@ public class FollowControllerTest {
         followRequest.setArtistId("artist-id");
         mockMvc.perform(postWith("/v1/follow", followRequest))
                 .andExpect(status().isBadRequest());
-        verify(userService, times(0))
+        verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
     }
 
@@ -67,24 +69,35 @@ public class FollowControllerTest {
         followRequest.setUser("user-id");
         mockMvc.perform(postWith("/v1/follow", followRequest))
                 .andExpect(status().isBadRequest());
-        verify(userService, times(0))
+        verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
     }
 
     @Test
+    public void follow_WhenParametersAreValidButArtistIsNotFound_ReturnNotFound() throws Exception {
+        assertFollowingIsDone(false);
+    }
+
+    @Test
     public void follow_WhenParametersAreValid_SaveFollowingAndReturnOk() throws Exception {
+        assertFollowingIsDone(true);
+    }
+
+    private void assertFollowingIsDone(boolean success) throws Exception {
         String userId = "user-id";
         String artistId = "artist-id";
-
         FollowRequest followRequest = new FollowRequest();
         followRequest.setArtistId(artistId);
         followRequest.setUser(userId);
+        User user = new User(userId, UserType.EMAIL);
 
-        User expectedUser = new User(userId, UserType.EMAIL);
+        ResultMatcher status = success ? status().isOk() : status().isNotFound();
+
+        when(followService.follow(user, artistId)).thenReturn(success);
         mockMvc.perform(postWith("/v1/follow", followRequest))
-                .andExpect(status().isOk());
-        verify(userService, times(1))
-                .follow(expectedUser, artistId);
+                .andExpect(status);
+        verify(followService, times(1))
+                .follow(user, artistId);
     }
 
     private MockHttpServletRequestBuilder postWith(String url, Object data) throws JsonProcessingException {

@@ -1,9 +1,7 @@
 package com.kushtrimh.tomorr.user;
 
-import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.exception.AlreadyExistsException;
-import com.kushtrimh.tomorr.exception.DoesNotExistException;
 import com.kushtrimh.tomorr.generator.IDGenerator;
 import com.kushtrimh.tomorr.user.repository.UserRepository;
 import com.kushtrimh.tomorr.user.service.DefaultUserService;
@@ -28,15 +26,13 @@ public class DefaultUserServiceTest {
     @Mock
     private UserRepository<AppUserRecord> userRepository;
     @Mock
-    private ArtistService artistService;
-    @Mock
     private IDGenerator idGenerator;
 
     private UserService userService;
 
     @BeforeEach
     public void init() {
-        userService = new DefaultUserService(userRepository, artistService, idGenerator);
+        userService = new DefaultUserService(userRepository, idGenerator);
     }
 
     @Test
@@ -104,51 +100,40 @@ public class DefaultUserServiceTest {
     }
 
     @Test
-    public void follow_WhenArtistDoesNotExist_ThrowDoesNotExistException() {
-        var artistId = "artist1";
-        var user = new User("user1@tomorrtest.com", UserType.EMAIL);
-        when(artistService.exists(artistId)).thenReturn(false);
-        assertThrows(DoesNotExistException.class, () -> userService.follow(user, artistId));
-    }
-
-    @Test
-    public void follow_WhenUserDoesNotExists_CreateNewUserAndSaveFollow() {
+    public void associate_WhenUserDoesNotExists_CreateNewUserAndSaveAssociation() {
         var artistId = "artist1";
         var userId = "user1";
         var user = new User("user1@tomorrtest.com", UserType.EMAIL);
         var userRecord = newUserRecord(userId);
         when(idGenerator.generate()).thenReturn(userId);
-        when(artistService.exists(artistId)).thenReturn(true);
         when(userRepository.findByAddress(user.address())).thenReturn(null);
         when(userRepository.save(userRecord)).thenReturn(userRecord);
-        userService.follow(user, artistId);
+        userService.associate(user, artistId);
         verify(userRepository, times(1)).save(userRecord);
-        verify(userRepository, times(1)).follow(userRecord.getId(), artistId);
+        verify(userRepository, times(1)).associate(userRecord.getId(), artistId);
     }
 
     @Test
-    public void follow_WhenFollowAlreadyExists_ThrowAlreadyExistsException() {
+    public void associate_WhenAssociationAlreadyExists_ThrowAlreadyExistsException() {
         var artistId = "artist1";
         var userId = "user1";
         var user = new User("user1@tomorrtest.com", UserType.EMAIL);
         var userRecord = newUserRecord(userId);
-        when(artistService.exists(artistId)).thenReturn(true);
         when(userRepository.findByAddress(user.address())).thenReturn(userRecord);
-        when(userRepository.followExists(userId, artistId)).thenReturn(true);
-        assertThrows(AlreadyExistsException.class, () -> userService.follow(user, artistId));
+        when(userRepository.associationExists(userId, artistId)).thenReturn(true);
+        assertThrows(AlreadyExistsException.class, () -> userService.associate(user, artistId));
     }
 
     @Test
-    public void follow_WhenFollowingWithUserThatAlreadyExists_SaveFollow() {
+    public void associate_WhenAssociatingWithUserThatAlreadyExists_SaveAssociation() {
         var artistId = "artist1";
         var userId = "user1";
         var user = new User("user1@tomorrtest.com", UserType.EMAIL);
         var userRecord = newUserRecord(userId);
-        when(artistService.exists(artistId)).thenReturn(true);
         when(userRepository.findByAddress(user.address())).thenReturn(userRecord);
-        when(userRepository.followExists(userId, artistId)).thenReturn(false);
-        userService.follow(user, artistId);
-        verify(userRepository, times(1)).follow(userId, artistId);
+        when(userRepository.associationExists(userId, artistId)).thenReturn(false);
+        userService.associate(user, artistId);
+        verify(userRepository, times(1)).associate(userId, artistId);
     }
 
     public void compareUserRecordAndUser(AppUserRecord record, User user) {
