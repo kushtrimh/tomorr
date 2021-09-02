@@ -1,7 +1,6 @@
-package com.kushtrimh.tomorr.spotify.limit;
+package com.kushtrimh.tomorr.limit;
 
 import com.kushtrimh.tomorr.properties.LimitProperties;
-import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

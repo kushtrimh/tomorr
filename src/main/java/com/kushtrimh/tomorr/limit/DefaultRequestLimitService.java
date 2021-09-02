@@ -1,7 +1,6 @@
-package com.kushtrimh.tomorr.spotify.limit;
+package com.kushtrimh.tomorr.limit;
 
 import com.kushtrimh.tomorr.properties.LimitProperties;
-import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;

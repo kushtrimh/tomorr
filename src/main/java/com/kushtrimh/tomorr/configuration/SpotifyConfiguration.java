@@ -8,7 +8,7 @@ import com.kushtrimh.tomorr.spotify.api.DefaultSpotifyApiClient;
 import com.kushtrimh.tomorr.spotify.api.LimitAwareSpotifyApiClient;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
 import com.kushtrimh.tomorr.spotify.http.DefaultSpotifyHttpClient;
-import com.kushtrimh.tomorr.spotify.limit.RequestLimitService;
+import com.kushtrimh.tomorr.limit.RequestLimitService;
 import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

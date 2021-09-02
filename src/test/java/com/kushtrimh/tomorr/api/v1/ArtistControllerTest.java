@@ -2,8 +2,8 @@ package com.kushtrimh.tomorr.api.v1;
 
 import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.service.ArtistSearchService;
-import com.kushtrimh.tomorr.spotify.limit.LimitType;
-import com.kushtrimh.tomorr.spotify.limit.RequestLimitService;
+import com.kushtrimh.tomorr.limit.LimitType;
+import com.kushtrimh.tomorr.limit.RequestLimitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
