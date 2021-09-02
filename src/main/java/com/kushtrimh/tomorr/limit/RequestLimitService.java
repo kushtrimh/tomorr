@@ -1,4 +1,4 @@
-package com.kushtrimh.tomorr.spotify.limit;
+package com.kushtrimh.tomorr.limit;
 
 /**
  * @author Kushtrim Hajrizi
