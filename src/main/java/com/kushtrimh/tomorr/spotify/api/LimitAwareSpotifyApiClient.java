@@ -1,5 +1,7 @@
 package com.kushtrimh.tomorr.spotify.api;
 
+import com.kushtrimh.tomorr.limit.LimitType;
+import com.kushtrimh.tomorr.limit.RequestLimitService;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
@@ -11,8 +13,6 @@ import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
 import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
-import com.kushtrimh.tomorr.limit.LimitType;
-import com.kushtrimh.tomorr.limit.RequestLimitService;
 
 /**
  * @author Kushtrim Hajrizi
