@@ -7,23 +7,23 @@ import java.util.Objects;
 /**
  * @author Kushtrim Hajrizi
  */
-public class ArtistData implements TaskData {
+public class ArtistTaskData implements TaskData {
     private String artistId;
     private String nextNode;
     private TaskType taskType;
 
-    public ArtistData(String artistId, String nextNode, TaskType taskType) {
+    public ArtistTaskData(String artistId, String nextNode, TaskType taskType) {
         this.artistId = artistId;
         this.nextNode = nextNode;
         this.taskType = taskType;
     }
 
-    public static ArtistData fromArtistId(String artistId, TaskType taskType) {
-        return new ArtistData(artistId, null, taskType);
+    public static ArtistTaskData fromArtistId(String artistId, TaskType taskType) {
+        return new ArtistTaskData(artistId, null, taskType);
     }
 
-    public static ArtistData fromNextNode(String nextNode, TaskType taskType) {
-        return new ArtistData(null, nextNode, taskType);
+    public static ArtistTaskData fromNextNode(String nextNode, TaskType taskType) {
+        return new ArtistTaskData(null, nextNode, taskType);
     }
 
     public String getArtistId() {
@@ -55,7 +55,7 @@ public class ArtistData implements TaskData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ArtistData that = (ArtistData) o;
+        ArtistTaskData that = (ArtistTaskData) o;
         return Objects.equals(artistId, that.artistId) && Objects.equals(nextNode, that.nextNode) && taskType == that.taskType;
     }
 

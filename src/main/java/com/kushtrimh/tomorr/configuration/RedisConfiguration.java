@@ -3,6 +3,8 @@ package com.kushtrimh.tomorr.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.kushtrimh.tomorr.properties.RedisProperties;
+import com.kushtrimh.tomorr.task.Task;
+import com.kushtrimh.tomorr.task.data.ArtistTaskData;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,10 +42,7 @@ public class RedisConfiguration {
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         // Configure the validator
-        var typeValidator = BasicPolymorphicTypeValidator.builder().build();
-        var mapper = new ObjectMapper();
-        mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL);
-        var serializer = new GenericJackson2JsonRedisSerializer(mapper);
+        GenericJackson2JsonRedisSerializer serializer = newGenericJacksonSerializer();
         // Cache configurations
         Map<String, RedisCacheConfiguration> cacheConfigurationMap = Map.of(
                 "default", RedisCacheConfiguration.defaultCacheConfig()
@@ -69,11 +68,28 @@ public class RedisConfiguration {
     }
 
     @Bean
+    public RedisTemplate<String, Task<ArtistTaskData>> redisArtistSyncTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Task<ArtistTaskData>> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(newGenericJacksonSerializer());
+        return template;
+    }
+
+    @Bean
     public RedisTemplate<String, Integer> integerRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Integer> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
         return template;
+    }
+
+
+    private GenericJackson2JsonRedisSerializer newGenericJacksonSerializer() {
+        var typeValidator = BasicPolymorphicTypeValidator.builder().build();
+        var mapper = new ObjectMapper();
+        mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL);
+        return new GenericJackson2JsonRedisSerializer(mapper);
     }
 }
