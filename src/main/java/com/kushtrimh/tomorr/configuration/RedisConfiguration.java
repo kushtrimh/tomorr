@@ -2,6 +2,7 @@ package com.kushtrimh.tomorr.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kushtrimh.tomorr.properties.RedisProperties;
 import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.data.ArtistTaskData;
@@ -85,11 +86,13 @@ public class RedisConfiguration {
         return template;
     }
 
-
     private GenericJackson2JsonRedisSerializer newGenericJacksonSerializer() {
-        var typeValidator = BasicPolymorphicTypeValidator.builder().build();
+        var typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.kushtrimh.tomorr")
+                .build();
         var mapper = new ObjectMapper();
         mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL);
+        mapper.registerModule(new JavaTimeModule());
         return new GenericJackson2JsonRedisSerializer(mapper);
     }
 }

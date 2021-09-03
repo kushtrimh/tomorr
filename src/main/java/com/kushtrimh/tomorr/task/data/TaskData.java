@@ -7,5 +7,5 @@ import com.kushtrimh.tomorr.task.TaskType;
  */
 public interface TaskData {
 
-    TaskType getType();
+    TaskType getTaskType();
 }

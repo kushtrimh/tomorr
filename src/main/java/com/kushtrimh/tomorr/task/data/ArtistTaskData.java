@@ -12,6 +12,9 @@ public class ArtistTaskData implements TaskData {
     private String nextNode;
     private TaskType taskType;
 
+    public ArtistTaskData() {
+    }
+
     public ArtistTaskData(String artistId, String nextNode, TaskType taskType) {
         this.artistId = artistId;
         this.nextNode = nextNode;
@@ -43,7 +46,7 @@ public class ArtistTaskData implements TaskData {
     }
 
     @Override
-    public TaskType getType() {
+    public TaskType getTaskType() {
         return taskType;
     }
 
