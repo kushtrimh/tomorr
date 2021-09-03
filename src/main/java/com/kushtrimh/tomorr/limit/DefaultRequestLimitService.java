@@ -13,13 +13,11 @@ import javax.annotation.PostConstruct;
 @Service
 public class DefaultRequestLimitService implements RequestLimitService {
 
-    private final RedisTemplate<String, Integer> integerRedisTemplate;
     private final ValueOperations<String, Integer> integerValueOperations;
     private final LimitProperties limitProperties;
 
 
     public DefaultRequestLimitService(LimitProperties limitProperties, RedisTemplate<String, Integer> integerRedisTemplate) {
-        this.integerRedisTemplate = integerRedisTemplate;
         this.integerValueOperations = integerRedisTemplate.opsForValue();
         this.limitProperties = limitProperties;
     }
@@ -56,22 +54,29 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @Override
     public long increment(LimitType limitType) {
-        if (limitType == LimitType.GLOBAL) {
-            return -1L;
+        if (limitType == LimitType.ALL) {
+            for (LimitType type: LimitType.getCacheableTypes()) {
+                integerValueOperations.increment(type.getCacheKey());
+            }
+            return 1L;
+        } else {
+            return integerValueOperations.increment(limitType.getCacheKey());
         }
-        return integerValueOperations.increment(limitType.getCacheKey());
     }
 
     @Override
     public void reset(LimitType limitType) {
-        if (limitType == LimitType.GLOBAL) {
-            return;
+        if (limitType == LimitType.ALL) {
+            for (LimitType type: LimitType.getCacheableTypes()) {
+                integerValueOperations.set(type.getCacheKey(), 0);
+            }
+        } else {
+            integerValueOperations.set(limitType.getCacheKey(), 0);
         }
-        integerValueOperations.set(limitType.getCacheKey(), 0);
     }
 
     private int getCount(LimitType limitType) {
-        if (limitType == LimitType.GLOBAL) {
+        if (limitType == LimitType.ALL) {
             int count = 0;
             for (LimitType type: LimitType.getCacheableTypes()) {
                 count += integerValueOperations.get(type.getCacheKey());

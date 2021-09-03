@@ -18,6 +18,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class DefaultRequestLimitServiceTest {
 
+    // TODO: Fix tests for request limit, add more tests for ALL type
+
     @Mock
     private RedisTemplate<String, Integer> integerRedisTemplate;
     @Mock
@@ -132,7 +134,7 @@ public class DefaultRequestLimitServiceTest {
 
     @Test
     public void increment_WhenCalledForGlobal_DoNotIncrement() {
-        requestLimitService.increment(LimitType.GLOBAL);
+        requestLimitService.increment(LimitType.ALL);
         verify(integerValueOperations, never()).increment(any(String.class));
     }
 
@@ -144,7 +146,7 @@ public class DefaultRequestLimitServiceTest {
 
     @Test
     public void reset_WhenCalledForGlobal_DoNotReset() {
-        requestLimitService.reset(LimitType.GLOBAL);
+        requestLimitService.reset(LimitType.ALL);
         verify(integerValueOperations, never()).set(any(String.class), eq(0));
     }
 }

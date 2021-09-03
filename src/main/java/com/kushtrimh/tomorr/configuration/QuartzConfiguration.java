@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.configuration;
 
 import com.kushtrimh.tomorr.spotify.job.SpotifyAuthenticationJob;
+import com.kushtrimh.tomorr.task.job.ArtistSyncTaskCreatorJob;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
@@ -10,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
@@ -29,37 +31,48 @@ public class QuartzConfiguration {
         this.quartzProperties = quartzProperties;
     }
 
+    // Authentication Job
     @Bean
     public JobDetailFactoryBean authenticationJobDetailFactoryBean() {
-        var jobDetailFactoryBean = new JobDetailFactoryBean();
-        jobDetailFactoryBean.setJobClass(SpotifyAuthenticationJob.class);
-        jobDetailFactoryBean.setDurability(true);
-        return jobDetailFactoryBean;
+        return createJobDetailFactoryBean(SpotifyAuthenticationJob.class);
     }
 
     @Bean
     public SimpleTriggerFactoryBean authenticationTriggerFactoryBean(
-            @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean authenticationJobDetailFactoryBean) {
-        var simpleTriggerFactoryBean = new SimpleTriggerFactoryBean();
-        simpleTriggerFactoryBean.setJobDetail(authenticationJobDetailFactoryBean.getObject());
-        simpleTriggerFactoryBean.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
-        simpleTriggerFactoryBean.setRepeatInterval(3240000);
-        return simpleTriggerFactoryBean;
+            @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean jobDetailFactoryBean) {
+        return createInfiniteSimpleTriggerFactoryBean(jobDetailFactoryBean, 3240000);
+    }
+
+    // Artist Sync Task Creator Job
+    @Bean
+    public JobDetailFactoryBean artistSyncTaskCreatorJobDetailFactoryBean() {
+        return createJobDetailFactoryBean(ArtistSyncTaskCreatorJob.class);
     }
 
     @Bean
+    public SimpleTriggerFactoryBean artistSyncTaskCreatorTriggerFactoryBean(
+            @Qualifier("artistSyncTaskCreatorJobDetailFactoryBean") JobDetailFactoryBean jobDetailFactoryBean) {
+        return createInfiniteSimpleTriggerFactoryBean(jobDetailFactoryBean, 60000);
+    }
+
+    // Job details and triggers
+    @Bean
     public JobDetail[] jobDetails(
-            @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean authenticationJobDetailFactoryBean) {
+            @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean authenticationJobDetailFactoryBean,
+            @Qualifier("artistSyncTaskCreatorJobDetailFactoryBean") JobDetailFactoryBean artistSyncTaskCreatorJobDetailFactoryBean) {
         return new JobDetail[] {
-                authenticationJobDetailFactoryBean.getObject()
+                authenticationJobDetailFactoryBean.getObject(),
+                artistSyncTaskCreatorJobDetailFactoryBean.getObject()
         };
     }
 
     @Bean
     public Trigger[] triggers(
-            @Qualifier("authenticationTriggerFactoryBean") SimpleTriggerFactoryBean authenticationTriggerFactoryBean) {
+            @Qualifier("authenticationTriggerFactoryBean") SimpleTriggerFactoryBean authenticationTriggerFactoryBean,
+            @Qualifier("artistSyncTaskCreatorTriggerFactoryBean") SimpleTriggerFactoryBean artistSyncTaskCreatorTriggerFactoryBean) {
         return new Trigger[] {
-                authenticationTriggerFactoryBean.getObject()
+                authenticationTriggerFactoryBean.getObject(),
+                artistSyncTaskCreatorTriggerFactoryBean.getObject()
         };
     }
 
@@ -81,5 +94,22 @@ public class QuartzConfiguration {
         schedulerFactoryBean.setJobDetails(jobDetails);
         schedulerFactoryBean.setTriggers(triggers);
         return schedulerFactoryBean;
+    }
+
+
+    private JobDetailFactoryBean createJobDetailFactoryBean(Class<? extends QuartzJobBean> cls) {
+        var jobDetailFactoryBean = new JobDetailFactoryBean();
+        jobDetailFactoryBean.setJobClass(cls);
+        jobDetailFactoryBean.setDurability(true);
+        return jobDetailFactoryBean;
+    }
+
+    private SimpleTriggerFactoryBean createInfiniteSimpleTriggerFactoryBean(JobDetailFactoryBean jobDetailFactoryBean,
+                                                                            long repeatInterval) {
+        var simpleTriggerFactoryBean = new SimpleTriggerFactoryBean();
+        simpleTriggerFactoryBean.setJobDetail(jobDetailFactoryBean.getObject());
+        simpleTriggerFactoryBean.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+        simpleTriggerFactoryBean.setRepeatInterval(repeatInterval);
+        return simpleTriggerFactoryBean;
     }
 }

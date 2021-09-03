@@ -6,7 +6,7 @@ import java.util.List;
  * @author Kushtrim Hajrizi
  */
 public enum LimitType {
-    GLOBAL(null),
+    ALL(null),
     SPOTIFY_EXTERNAL("spotify:requestCounter"),
     ARTIST_SEARCH("artistSearch:requestCounter");
 
