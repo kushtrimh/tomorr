@@ -50,7 +50,7 @@ public class ArtistControllerTest {
     @Test
     public void search_WhenReturnedDataIsEmpty_ReturnEmptyResponse() throws Exception {
         var artistName = "artist-name";
-        when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(false);
+        when(requestLimitService.tryFor(LimitType.ARTIST_SEARCH)).thenReturn(true);
         String response = mockMvc.perform(get("/v1/artist/search")
                         .param("name", artistName))
                 .andExpect(status().isOk())
@@ -61,14 +61,14 @@ public class ArtistControllerTest {
     @Test
     public void search_WhenArtistsAreFoundWithExternalSearchDisabled_ReturnArtistsResponse() throws Exception {
         var artistName = "artist-name";
-        when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(false);
+        when(requestLimitService.tryFor(LimitType.ARTIST_SEARCH)).thenReturn(true);
         assertArtistSearchSuccessfulResponse(artistName, false);
     }
 
     @Test
     public void search_WhenArtistsAreFoundWithExternalSearchEnabled_ReturnArtistsResponse() throws Exception {
         var artistName = "artist-name";
-        when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(false);
+        when(requestLimitService.tryFor(LimitType.ARTIST_SEARCH)).thenReturn(true);
         assertArtistSearchSuccessfulResponse(artistName, true);
     }
 

@@ -33,7 +33,7 @@ public class ArtistController {
     @GetMapping("/search")
     private ResponseEntity<ArtistSearchResponse> search(@RequestParam String name,
                                                         @RequestParam(required = false, defaultValue = "false") boolean external) {
-        if (requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)) {
+        if (!requestLimitService.tryFor(LimitType.ARTIST_SEARCH)) {
             return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
         List<Artist> artists = artistSearchService.search(name, external);
