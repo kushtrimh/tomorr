@@ -85,12 +85,24 @@ public class DefaultRequestLimitService implements RequestLimitService {
     @Override
     public void reset(LimitType limitType) {
         if (limitType == LimitType.ALL) {
-            for (LimitType type : LimitType.getCacheableTypes()) {
-                integerValueOperations.set(type.getCacheKey(), 0);
-            }
+            resetAll();
         } else {
             integerValueOperations.set(limitType.getCacheKey(), 0);
         }
+    }
+
+    @Override
+    public void resetAll() {
+        integerRedisTemplate.executePipelined(new SessionCallback<>() {
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
+                ValueOperations<String, Integer> valueOperations = (ValueOperations<String, Integer>) redisOperations.opsForValue();
+                for (LimitType type: LimitType.getCacheableTypes()) {
+                    valueOperations.set(type.getCacheKey(), 0);
+                }
+                return null;
+            }
+        });
     }
 
     private int getCount(LimitType limitType, ValueOperations<String, Integer> operations) {

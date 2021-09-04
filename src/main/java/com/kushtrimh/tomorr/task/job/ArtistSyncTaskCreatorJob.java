@@ -35,15 +35,14 @@ public class ArtistSyncTaskCreatorJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        logger.info("Artist sync job started...");
+        logger.debug("Artist sync job started...");
 
         long taskRelatedRequests = requestLimitService.getSentRequestsCounter(LimitType.ARTIST_SEARCH);
         long artistSearchRequests = requestLimitService.getSentRequestsCounter(LimitType.ARTIST_SEARCH);
-        // TODO: Change to getTaskRequestLimit
         logger.info("{} task related requests sent, limit {}", taskRelatedRequests, limitProperties.getSpotify());
         logger.info("{} artist search related requests sent, limit {}", artistSearchRequests, limitProperties.getArtistSearch());
 
-        requestLimitService.reset(LimitType.ALL);
+        requestLimitService.resetAll();
         logger.info("All request limits reset back to 0");
 
         long tasksInQueue = artistSyncTaskManager.getQueuedTasksCount();

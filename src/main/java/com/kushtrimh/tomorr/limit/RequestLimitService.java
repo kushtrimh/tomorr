@@ -25,5 +25,5 @@ public interface RequestLimitService {
 
     void reset(LimitType limitType);
 
-    // TODO: Add support for reset all
+    void resetAll();
 }
