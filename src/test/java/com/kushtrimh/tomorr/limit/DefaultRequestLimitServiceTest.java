@@ -133,9 +133,10 @@ public class DefaultRequestLimitServiceTest {
     }
 
     @Test
-    public void increment_WhenCalledForGlobal_DoNotIncrement() {
+    public void increment_WhenCalledForGlobal_IncrementForAllTypes() {
         requestLimitService.increment(LimitType.ALL);
-        verify(integerValueOperations, never()).increment(any(String.class));
+        verify(integerValueOperations, times(1)).increment(LimitType.SPOTIFY_EXTERNAL.getCacheKey());
+        verify(integerValueOperations, times(1)).increment(LimitType.ARTIST_SEARCH.getCacheKey());
     }
 
     @Test
