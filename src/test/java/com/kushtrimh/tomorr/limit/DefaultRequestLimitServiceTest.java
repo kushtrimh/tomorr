@@ -182,18 +182,9 @@ public class DefaultRequestLimitServiceTest {
     private void assertTryFor(boolean canSendRequest, VerificationMode verificationMode, int requestCount) {
         LimitType limitType = LimitType.SPOTIFY_EXTERNAL;
         String cacheKey = limitType.getCacheKey();
-        RedisOperations<String, Integer> operations = mock(RedisOperations.class);
-        ValueOperations<String, Integer> valueOperations = mock(ValueOperations.class);
-        when(operations.opsForValue()).thenReturn(valueOperations);
         when(limitProperties.getSpotify()).thenReturn(450);
-        when(integerRedisTemplate.executePipelined(any(SessionCallback.class)))
-                .thenAnswer(invocation -> {
-                    SessionCallback<?> sessionCallback = invocation.getArgument(0, SessionCallback.class);
-                    return sessionCallback.execute(operations);
-                });
-        when(limitProperties.getSpotify()).thenReturn(450);
-        when(valueOperations.get(cacheKey)).thenReturn(requestCount);
+        when(integerValueOperations.get(cacheKey)).thenReturn(requestCount);
         assertEquals(canSendRequest, requestLimitService.tryFor(limitType));
-        verify(valueOperations, verificationMode).increment(cacheKey);
+        verify(integerValueOperations, verificationMode).increment(cacheKey);
     }
 }

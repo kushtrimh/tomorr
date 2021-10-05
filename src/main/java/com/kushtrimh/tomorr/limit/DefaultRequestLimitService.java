@@ -9,8 +9,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -68,23 +66,12 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @Override
     public boolean tryFor(LimitType limitType) {
-        Objects.requireNonNull(limitType);
-        List<Object> results = integerRedisTemplate.executePipelined(new SessionCallback<List<Object>>() {
-            @Override
-            public <K, V> List<Object> execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
-                ValueOperations<String, Integer> operations = (ValueOperations<String, Integer>) redisOperations.opsForValue();
-                boolean canSendRequest = getRemainingRequestLimit(limitType, operations) > 0;
-                if (canSendRequest) {
-                    increment(limitType, operations);
-                    return Collections.singletonList(true);
-                }
-                return Collections.emptyList();
-            }
-        });
-        if (results.isEmpty()) {
-            return false;
+        boolean canSendRequest = getRemainingRequestLimit(limitType, integerValueOperations) > 0;
+        if (canSendRequest) {
+            increment(limitType, integerValueOperations);
+            return true;
         }
-        return (Boolean) results.get(0);
+        return false;
     }
 
     @Override
