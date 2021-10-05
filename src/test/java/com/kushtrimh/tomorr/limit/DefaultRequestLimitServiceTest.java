@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.verification.VerificationMode;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.ValueOperations;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,8 +20,6 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 public class DefaultRequestLimitServiceTest {
-
-    // TODO: Fix tests for request limit, add more tests for ALL type
 
     @Mock
     private RedisTemplate<String, Integer> integerRedisTemplate;
@@ -93,7 +94,7 @@ public class DefaultRequestLimitServiceTest {
         var key = limitType.getCacheKey();
 
         when(integerValueOperations.get(key)).thenReturn(350);
-        assertEquals(100, requestLimitService.getRemainingRequestLimit(LimitType.SPOTIFY_EXTERNAL));
+        assertEquals(100, requestLimitService.getRemainingRequestLimit(limitType));
 
         when(integerValueOperations.get(key)).thenReturn(372);
         assertEquals(78, requestLimitService.getRemainingRequestLimit(limitType));
@@ -133,10 +134,8 @@ public class DefaultRequestLimitServiceTest {
     }
 
     @Test
-    public void increment_WhenCalledForGlobal_IncrementForAllTypes() {
-        requestLimitService.increment(LimitType.ALL);
-        verify(integerValueOperations, times(1)).increment(LimitType.SPOTIFY_EXTERNAL.getCacheKey());
-        verify(integerValueOperations, times(1)).increment(LimitType.ARTIST_SEARCH.getCacheKey());
+    public void increment_WhenCalledWithNull_ThrowNullPointerException() {
+        assertThrows(NullPointerException.class, () -> requestLimitService.increment(null));
     }
 
     @Test
@@ -146,8 +145,55 @@ public class DefaultRequestLimitServiceTest {
     }
 
     @Test
-    public void reset_WhenCalledForGlobal_DoNotReset() {
-        requestLimitService.reset(LimitType.ALL);
-        verify(integerValueOperations, never()).set(any(String.class), eq(0));
+    public void reset_WhenCalledWithNull_ThrowNullPointerException() {
+        assertThrows(NullPointerException.class, () -> requestLimitService.reset(null));
+    }
+
+    @Test
+    public void resetAll_WhenCalled_ResetAllCounters() {
+        RedisOperations<String, Integer> operations = mock(RedisOperations.class);
+        ValueOperations<String, Integer> valueOperations = mock(ValueOperations.class);
+        when(operations.opsForValue()).thenReturn(valueOperations);
+        when(integerRedisTemplate.executePipelined(any(SessionCallback.class)))
+                .thenAnswer(invocation -> {
+                    SessionCallback<?> sessionCallback = invocation.getArgument(0, SessionCallback.class);
+                    return sessionCallback.execute(operations);
+                });
+        requestLimitService.resetAll();
+        verify(valueOperations, times(1)).set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 0);
+        verify(valueOperations, times(1)).set(LimitType.ARTIST_SEARCH.getCacheKey(), 0);
+    }
+
+    @Test
+    public void tryFor_WhenUsingNullAsLimitType_ThrowNullPointerException() {
+        assertThrows(NullPointerException.class, () -> requestLimitService.tryFor(null));
+    }
+
+    @Test
+    public void tryFor_WhenCantSendRequest_ReturnFalse() {
+        assertTryFor(false, never(), 450);
+    }
+
+    @Test
+    public void tryFor_WheCanSendRequest_ReturnTrueAndIncrement() {
+        assertTryFor(true, times(1), 400);
+    }
+
+    private void assertTryFor(boolean canSendRequest, VerificationMode verificationMode, int requestCount) {
+        LimitType limitType = LimitType.SPOTIFY_EXTERNAL;
+        String cacheKey = limitType.getCacheKey();
+        RedisOperations<String, Integer> operations = mock(RedisOperations.class);
+        ValueOperations<String, Integer> valueOperations = mock(ValueOperations.class);
+        when(operations.opsForValue()).thenReturn(valueOperations);
+        when(limitProperties.getSpotify()).thenReturn(450);
+        when(integerRedisTemplate.executePipelined(any(SessionCallback.class)))
+                .thenAnswer(invocation -> {
+                    SessionCallback<?> sessionCallback = invocation.getArgument(0, SessionCallback.class);
+                    return sessionCallback.execute(operations);
+                });
+        when(limitProperties.getSpotify()).thenReturn(450);
+        when(valueOperations.get(cacheKey)).thenReturn(requestCount);
+        assertEquals(canSendRequest, requestLimitService.tryFor(limitType));
+        verify(valueOperations, verificationMode).increment(cacheKey);
     }
 }

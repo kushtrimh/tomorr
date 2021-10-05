@@ -9,7 +9,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Kushtrim Hajrizi
@@ -60,11 +62,13 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @Override
     public void increment(LimitType limitType) {
+        Objects.requireNonNull(limitType);
         increment(limitType, integerValueOperations);
     }
 
     @Override
     public boolean tryFor(LimitType limitType) {
+        Objects.requireNonNull(limitType);
         List<Object> results = integerRedisTemplate.executePipelined(new SessionCallback<List<Object>>() {
             @Override
             public <K, V> List<Object> execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
@@ -72,8 +76,9 @@ public class DefaultRequestLimitService implements RequestLimitService {
                 boolean canSendRequest = getRemainingRequestLimit(limitType, operations) > 0;
                 if (canSendRequest) {
                     increment(limitType, operations);
+                    return Collections.singletonList(true);
                 }
-                return null;
+                return Collections.emptyList();
             }
         });
         if (results.isEmpty()) {
@@ -84,11 +89,8 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @Override
     public void reset(LimitType limitType) {
-        if (limitType == LimitType.ALL) {
-            resetAll();
-        } else {
-            integerValueOperations.set(limitType.getCacheKey(), 0);
-        }
+        Objects.requireNonNull(limitType);
+        integerValueOperations.set(limitType.getCacheKey(), 0);
     }
 
     @Override
@@ -97,7 +99,7 @@ public class DefaultRequestLimitService implements RequestLimitService {
             @Override
             public <K, V> Object execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
                 ValueOperations<String, Integer> valueOperations = (ValueOperations<String, Integer>) redisOperations.opsForValue();
-                for (LimitType type: LimitType.getCacheableTypes()) {
+                for (LimitType type : LimitType.getCacheableTypes()) {
                     valueOperations.set(type.getCacheKey(), 0);
                 }
                 return null;
@@ -106,24 +108,11 @@ public class DefaultRequestLimitService implements RequestLimitService {
     }
 
     private int getCount(LimitType limitType, ValueOperations<String, Integer> operations) {
-        if (limitType == LimitType.ALL) {
-            int count = 0;
-            for (LimitType type : LimitType.getCacheableTypes()) {
-                count += operations.get(type.getCacheKey());
-            }
-            return count;
-        }
         return operations.get(limitType.getCacheKey());
     }
 
     private void increment(LimitType limitType, ValueOperations<String, Integer> operations) {
-        if (limitType == LimitType.ALL) {
-            for (LimitType type : LimitType.getCacheableTypes()) {
-                integerValueOperations.increment(type.getCacheKey());
-            }
-        } else {
-            integerValueOperations.increment(limitType.getCacheKey());
-        }
+        operations.increment(limitType.getCacheKey());
     }
 
     private int getLimit(LimitType limitType) {
