@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tags(value = { @Tag("redis"), @Tag("integration") })
+@Tags(value = {@Tag("redis"), @Tag("integration")})
 @ContextConfiguration(classes = {TestRedisConfiguration.class})
 @ExtendWith({SpringExtension.class, TestRedisExtension.class})
 public class ArtistSyncTaskManagerIntegrationTest {
@@ -47,7 +47,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
                 ArtistTaskData.fromArtistId("artist02", TaskType.INITIAL_SYNC),
                 ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)
         );
-        manager.create(data);
+        manager.add(data);
         List<ArtistTaskData> retrievedData = Stream.of(
                 template.opsForList().leftPop(ARTIST_SYNC_TASK_QUEUE_KEY),
                 template.opsForList().leftPop(ARTIST_SYNC_TASK_QUEUE_KEY),
@@ -59,7 +59,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
     @Test
     public void create_WhenCalledWithValidData_CreateTaskAndAddToQueue() {
         ArtistTaskData artistTaskData = ArtistTaskData.fromArtistId("artist04", TaskType.SYNC);
-        manager.create(artistTaskData);
+        manager.add(artistTaskData);
         Task<ArtistTaskData> returnedTask = template.opsForList().leftPop(ARTIST_SYNC_TASK_QUEUE_KEY);
         assertEquals(artistTaskData, returnedTask.getData());
     }
@@ -70,7 +70,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
                 ArtistTaskData.fromArtistId("artist01", TaskType.SYNC),
                 ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)
         );
-        manager.create(data);
+        manager.add(data);
         assertEquals(2, manager.getQueuedTasksCount());
         template.delete(ARTIST_SYNC_TASK_QUEUE_KEY);
     }

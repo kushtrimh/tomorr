@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,12 +28,12 @@ public class ArtistSyncTaskManager implements TaskManager<ArtistTaskData> {
     }
 
     @Override
-    public void create(ArtistTaskData data) {
-        create(List.of(data));
+    public void add(ArtistTaskData data) {
+        add(List.of(data));
     }
 
     @Override
-    public void create(List<ArtistTaskData> dataList) {
+    public void add(List<ArtistTaskData> dataList) {
         Objects.requireNonNull(dataList);
 
         logger.info("{} tasks to be created", dataList.size());
@@ -47,5 +48,15 @@ public class ArtistSyncTaskManager implements TaskManager<ArtistTaskData> {
     public long getQueuedTasksCount() {
         Long count = template.opsForList().size(ARTIST_SYNC_TASK_QUEUE_KEY);
         return count != null ? count : 0;
+    }
+
+    @Override
+    public List<Task<ArtistTaskData>> getAll() {
+        List<Task<ArtistTaskData>> tasks = template.opsForList().range(ARTIST_SYNC_TASK_QUEUE_KEY, 0, -1);
+        template.delete(ARTIST_SYNC_TASK_QUEUE_KEY);
+        if (tasks == null || tasks.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return tasks;
     }
 }

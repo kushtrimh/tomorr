@@ -47,6 +47,12 @@ public class DefaultArtistService implements ArtistService {
         return records.stream().map(this::toArtist).toList();
     }
 
+    @Override
+    public List<Artist> findToSync(String syncKey, int count) {
+        // TODO: Get with different sync key, and update sync key
+        return null;
+    }
+
     @Transactional
     @Override
     public void save(Artist artist) {

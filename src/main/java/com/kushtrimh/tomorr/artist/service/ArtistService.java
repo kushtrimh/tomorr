@@ -16,6 +16,8 @@ public interface ArtistService {
 
     List<Artist> searchByName(String name);
 
+    List<Artist> findToSync(String syncKey, int count);
+
     void save(Artist artist);
 
     void deleteById(String id);

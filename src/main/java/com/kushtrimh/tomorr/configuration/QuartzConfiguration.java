@@ -1,7 +1,7 @@
 package com.kushtrimh.tomorr.configuration;
 
 import com.kushtrimh.tomorr.spotify.job.SpotifyAuthenticationJob;
-import com.kushtrimh.tomorr.task.job.ArtistSyncTaskCreatorJob;
+import com.kushtrimh.tomorr.sync.job.ArtistSyncJob;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
@@ -43,15 +43,15 @@ public class QuartzConfiguration {
         return createInfiniteSimpleTriggerFactoryBean(jobDetailFactoryBean, 3240000);
     }
 
-    // Artist Sync Task Creator Job
+    // Artist Sync Job
     @Bean
-    public JobDetailFactoryBean artistSyncTaskCreatorJobDetailFactoryBean() {
-        return createJobDetailFactoryBean(ArtistSyncTaskCreatorJob.class);
+    public JobDetailFactoryBean artistSyncJobDetailFactoryBean() {
+        return createJobDetailFactoryBean(ArtistSyncJob.class);
     }
 
     @Bean
-    public SimpleTriggerFactoryBean artistSyncTaskCreatorTriggerFactoryBean(
-            @Qualifier("artistSyncTaskCreatorJobDetailFactoryBean") JobDetailFactoryBean jobDetailFactoryBean) {
+    public SimpleTriggerFactoryBean artistSyncTriggerFactoryBean(
+            @Qualifier("artistSyncJobDetailFactoryBean") JobDetailFactoryBean jobDetailFactoryBean) {
         return createInfiniteSimpleTriggerFactoryBean(jobDetailFactoryBean, 60000);
     }
 
@@ -59,20 +59,20 @@ public class QuartzConfiguration {
     @Bean
     public JobDetail[] jobDetails(
             @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean authenticationJobDetailFactoryBean,
-            @Qualifier("artistSyncTaskCreatorJobDetailFactoryBean") JobDetailFactoryBean artistSyncTaskCreatorJobDetailFactoryBean) {
+            @Qualifier("artistSyncJobDetailFactoryBean") JobDetailFactoryBean artistSyncJobDetailFactoryBean) {
         return new JobDetail[] {
                 authenticationJobDetailFactoryBean.getObject(),
-                artistSyncTaskCreatorJobDetailFactoryBean.getObject()
+                artistSyncJobDetailFactoryBean.getObject()
         };
     }
 
     @Bean
     public Trigger[] triggers(
             @Qualifier("authenticationTriggerFactoryBean") SimpleTriggerFactoryBean authenticationTriggerFactoryBean,
-            @Qualifier("artistSyncTaskCreatorTriggerFactoryBean") SimpleTriggerFactoryBean artistSyncTaskCreatorTriggerFactoryBean) {
+            @Qualifier("artistSyncTriggerFactoryBean") SimpleTriggerFactoryBean artistSyncTriggerFactoryBean) {
         return new Trigger[] {
                 authenticationTriggerFactoryBean.getObject(),
-                artistSyncTaskCreatorTriggerFactoryBean.getObject()
+                artistSyncTriggerFactoryBean.getObject()
         };
     }
 

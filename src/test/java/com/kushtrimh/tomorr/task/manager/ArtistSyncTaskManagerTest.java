@@ -37,12 +37,12 @@ public class ArtistSyncTaskManagerTest {
 
     @Test
     public void create_WhenCalledWithNullData_ThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> manager.create((ArtistTaskData) null));
+        assertThrows(NullPointerException.class, () -> manager.add((ArtistTaskData) null));
     }
 
     @Test
     public void create_WhenCalledWithNullList_ThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> manager.create((List<ArtistTaskData>) null));
+        assertThrows(NullPointerException.class, () -> manager.add((List<ArtistTaskData>) null));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ArtistSyncTaskManagerTest {
                 ArtistTaskData.fromNextNode("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC),
                 ArtistTaskData.fromArtistId("artist02", TaskType.INITIAL_SYNC)
                 );
-        manager.create(artistTaskData);
+        manager.add(artistTaskData);
         assertThatTasksAreCreatedSuccessfully(artistTaskData);
     }
 
@@ -61,7 +61,7 @@ public class ArtistSyncTaskManagerTest {
     public void create_WhenCalledWithValidData_CreateTaskAndAddToQueue() {
         when(template.opsForList()).thenReturn(listOperations);
         var taskData = ArtistTaskData.fromArtistId("artist01", TaskType.SYNC);
-        manager.create(taskData);
+        manager.add(taskData);
         assertThatTasksAreCreatedSuccessfully(List.of(taskData));
     }
 
