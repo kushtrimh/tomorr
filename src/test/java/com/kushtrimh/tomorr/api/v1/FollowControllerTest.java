@@ -102,7 +102,7 @@ public class FollowControllerTest {
 
     private MockHttpServletRequestBuilder postWith(String url, Object data) throws JsonProcessingException {
         return post(url)
-            .content(mapper.writeValueAsString(data))
-            .contentType(MediaType.APPLICATION_JSON_VALUE);
+                .content(mapper.writeValueAsString(data))
+                .contentType(MediaType.APPLICATION_JSON_VALUE);
     }
 }

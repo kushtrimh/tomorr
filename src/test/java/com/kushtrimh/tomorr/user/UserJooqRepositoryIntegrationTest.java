@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tags(value = { @Tag("database"), @Tag("integration") })
+@Tags(value = {@Tag("database"), @Tag("integration")})
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
 @ExtendWith({TestDatabaseExtension.class})
 @JooqTest
@@ -86,7 +86,7 @@ public class UserJooqRepositoryIntegrationTest {
     @Test
     public void save_WhenUserIsNull_ThrowException() {
         assertThrows(NullPointerException.class, () -> {
-           userRepository.save(null);
+            userRepository.save(null);
         });
     }
 

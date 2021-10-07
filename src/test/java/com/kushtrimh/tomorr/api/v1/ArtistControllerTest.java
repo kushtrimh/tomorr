@@ -40,10 +40,10 @@ public class ArtistControllerTest {
 
     @Test
     public void search_WhenRequestLimitIsExceeded_ReturnTooManyRequestsCode() throws Exception {
-        var artistName =" artist-name";
+        var artistName = " artist-name";
         when(requestLimitService.cantSendRequest(LimitType.ARTIST_SEARCH)).thenReturn(true);
         mockMvc.perform(get("/v1/artist/search")
-                .param("name", artistName))
+                        .param("name", artistName))
                 .andExpect(status().isTooManyRequests());
     }
 
@@ -76,7 +76,7 @@ public class ArtistControllerTest {
         List<Artist> artists = List.of(
                 new Artist("artist1", "Artist One", null, 0),
                 new Artist("artist2", "Artist Two", null, 0)
-                );
+        );
 
         when(artistSearchService.search(artistName, external)).thenReturn(artists);
         String response = mockMvc.perform(get("/v1/artist/search")

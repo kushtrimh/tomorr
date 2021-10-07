@@ -60,7 +60,7 @@ public class QuartzConfiguration {
     public JobDetail[] jobDetails(
             @Qualifier("authenticationJobDetailFactoryBean") JobDetailFactoryBean authenticationJobDetailFactoryBean,
             @Qualifier("artistSyncJobDetailFactoryBean") JobDetailFactoryBean artistSyncJobDetailFactoryBean) {
-        return new JobDetail[] {
+        return new JobDetail[]{
                 authenticationJobDetailFactoryBean.getObject(),
                 artistSyncJobDetailFactoryBean.getObject()
         };
@@ -70,7 +70,7 @@ public class QuartzConfiguration {
     public Trigger[] triggers(
             @Qualifier("authenticationTriggerFactoryBean") SimpleTriggerFactoryBean authenticationTriggerFactoryBean,
             @Qualifier("artistSyncTriggerFactoryBean") SimpleTriggerFactoryBean artistSyncTriggerFactoryBean) {
-        return new Trigger[] {
+        return new Trigger[]{
                 authenticationTriggerFactoryBean.getObject(),
                 artistSyncTriggerFactoryBean.getObject()
         };

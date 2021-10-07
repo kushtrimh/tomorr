@@ -13,6 +13,8 @@ public interface ArtistRepository<T> {
 
     T findByName(String name);
 
+    List<T> findToSync(String syncKey, int count);
+
     List<T> searchByName(String name);
 
     T save(T artist);

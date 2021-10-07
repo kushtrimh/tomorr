@@ -52,7 +52,7 @@ public class ArtistSyncTaskManagerTest {
                 ArtistTaskData.fromArtistId("artist01", TaskType.SYNC),
                 ArtistTaskData.fromNextNode("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC),
                 ArtistTaskData.fromArtistId("artist02", TaskType.INITIAL_SYNC)
-                );
+        );
         manager.add(artistTaskData);
         assertThatTasksAreCreatedSuccessfully(artistTaskData);
     }

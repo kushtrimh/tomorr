@@ -37,7 +37,7 @@ public class IDGenerator {
         var idBuilder = new StringBuilder();
         var setLength = defaultSet.length();
         for (var i = 0; i < defaultLength; i++) {
-            idBuilder.append(defaultSet.charAt((int)(Math.random() * setLength)));
+            idBuilder.append(defaultSet.charAt((int) (Math.random() * setLength)));
         }
         return idBuilder.toString();
     }

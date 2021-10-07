@@ -9,12 +9,23 @@ import com.kushtrimh.tomorr.dal.tables.AppUser;
 import com.kushtrimh.tomorr.dal.tables.Artist;
 import com.kushtrimh.tomorr.dal.tables.ArtistAlbum;
 import com.kushtrimh.tomorr.dal.tables.ArtistAppUser;
+import com.kushtrimh.tomorr.dal.tables.QrtzBlobTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzCalendars;
+import com.kushtrimh.tomorr.dal.tables.QrtzCronTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzFiredTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzJobDetails;
+import com.kushtrimh.tomorr.dal.tables.QrtzLocks;
+import com.kushtrimh.tomorr.dal.tables.QrtzPausedTriggerGrps;
+import com.kushtrimh.tomorr.dal.tables.QrtzSchedulerState;
+import com.kushtrimh.tomorr.dal.tables.QrtzSimpleTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzSimpropTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzTriggers;
 
 
 /**
  * Convenience access to all tables in public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class Tables {
 
     /**
@@ -41,4 +52,59 @@ public class Tables {
      * The table <code>public.artist_app_user</code>.
      */
     public static final ArtistAppUser ARTIST_APP_USER = ArtistAppUser.ARTIST_APP_USER;
+
+    /**
+     * The table <code>public.qrtz_blob_triggers</code>.
+     */
+    public static final QrtzBlobTriggers QRTZ_BLOB_TRIGGERS = QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS;
+
+    /**
+     * The table <code>public.qrtz_calendars</code>.
+     */
+    public static final QrtzCalendars QRTZ_CALENDARS = QrtzCalendars.QRTZ_CALENDARS;
+
+    /**
+     * The table <code>public.qrtz_cron_triggers</code>.
+     */
+    public static final QrtzCronTriggers QRTZ_CRON_TRIGGERS = QrtzCronTriggers.QRTZ_CRON_TRIGGERS;
+
+    /**
+     * The table <code>public.qrtz_fired_triggers</code>.
+     */
+    public static final QrtzFiredTriggers QRTZ_FIRED_TRIGGERS = QrtzFiredTriggers.QRTZ_FIRED_TRIGGERS;
+
+    /**
+     * The table <code>public.qrtz_job_details</code>.
+     */
+    public static final QrtzJobDetails QRTZ_JOB_DETAILS = QrtzJobDetails.QRTZ_JOB_DETAILS;
+
+    /**
+     * The table <code>public.qrtz_locks</code>.
+     */
+    public static final QrtzLocks QRTZ_LOCKS = QrtzLocks.QRTZ_LOCKS;
+
+    /**
+     * The table <code>public.qrtz_paused_trigger_grps</code>.
+     */
+    public static final QrtzPausedTriggerGrps QRTZ_PAUSED_TRIGGER_GRPS = QrtzPausedTriggerGrps.QRTZ_PAUSED_TRIGGER_GRPS;
+
+    /**
+     * The table <code>public.qrtz_scheduler_state</code>.
+     */
+    public static final QrtzSchedulerState QRTZ_SCHEDULER_STATE = QrtzSchedulerState.QRTZ_SCHEDULER_STATE;
+
+    /**
+     * The table <code>public.qrtz_simple_triggers</code>.
+     */
+    public static final QrtzSimpleTriggers QRTZ_SIMPLE_TRIGGERS = QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS;
+
+    /**
+     * The table <code>public.qrtz_simprop_triggers</code>.
+     */
+    public static final QrtzSimpropTriggers QRTZ_SIMPROP_TRIGGERS = QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS;
+
+    /**
+     * The table <code>public.qrtz_triggers</code>.
+     */
+    public static final QrtzTriggers QRTZ_TRIGGERS = QrtzTriggers.QRTZ_TRIGGERS;
 }

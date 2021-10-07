@@ -18,6 +18,7 @@ public interface RequestLimitService {
     /**
      * Checks if request can be sent for the given limit type, and increases the request counter
      * for the limit type if request can be sent. If not limit is not increased.
+     *
      * @param limitType
      * @return true if request can be sent, false otherwise
      */

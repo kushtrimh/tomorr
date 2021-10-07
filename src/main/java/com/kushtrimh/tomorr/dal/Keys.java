@@ -8,10 +8,33 @@ import com.kushtrimh.tomorr.dal.tables.Album;
 import com.kushtrimh.tomorr.dal.tables.AppUser;
 import com.kushtrimh.tomorr.dal.tables.Artist;
 import com.kushtrimh.tomorr.dal.tables.ArtistAppUser;
+import com.kushtrimh.tomorr.dal.tables.QrtzBlobTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzCalendars;
+import com.kushtrimh.tomorr.dal.tables.QrtzCronTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzFiredTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzJobDetails;
+import com.kushtrimh.tomorr.dal.tables.QrtzLocks;
+import com.kushtrimh.tomorr.dal.tables.QrtzPausedTriggerGrps;
+import com.kushtrimh.tomorr.dal.tables.QrtzSchedulerState;
+import com.kushtrimh.tomorr.dal.tables.QrtzSimpleTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzSimpropTriggers;
+import com.kushtrimh.tomorr.dal.tables.QrtzTriggers;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistAppUserRecord;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzBlobTriggersRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzCalendarsRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzCronTriggersRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzFiredTriggersRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzJobDetailsRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzLocksRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzPausedTriggerGrpsRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzSchedulerStateRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzSimpleTriggersRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzSimpropTriggersRecord;
+import com.kushtrimh.tomorr.dal.tables.records.QrtzTriggersRecord;
+import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -19,18 +42,39 @@ import org.jooq.impl.Internal;
 
 
 /**
- * A class modelling foreign key relationships and constraints of tables in 
+ * A class modelling foreign key relationships and constraints of tables in
  * public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class Keys {
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<AlbumRecord> ALBUM_PKEY = Internal.createUniqueKey(Album.ALBUM, DSL.name("album_pkey"), new TableField[] { Album.ALBUM.ID }, true);
-    public static final UniqueKey<AppUserRecord> APP_USER_PKEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_pkey"), new TableField[] { AppUser.APP_USER.ID }, true);
-    public static final UniqueKey<ArtistRecord> ARTIST_PKEY = Internal.createUniqueKey(Artist.ARTIST, DSL.name("artist_pkey"), new TableField[] { Artist.ARTIST.ID }, true);
-    public static final UniqueKey<ArtistAppUserRecord> ARTIST_APP_USER_PKEY = Internal.createUniqueKey(ArtistAppUser.ARTIST_APP_USER, DSL.name("artist_app_user_pkey"), new TableField[] { ArtistAppUser.ARTIST_APP_USER.ARTIST_ID, ArtistAppUser.ARTIST_APP_USER.APP_USER_ID }, true);
+    public static final UniqueKey<AlbumRecord> ALBUM_PKEY = Internal.createUniqueKey(Album.ALBUM, DSL.name("album_pkey"), new TableField[]{Album.ALBUM.ID}, true);
+    public static final UniqueKey<AppUserRecord> APP_USER_PKEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_pkey"), new TableField[]{AppUser.APP_USER.ID}, true);
+    public static final UniqueKey<ArtistRecord> ARTIST_PKEY = Internal.createUniqueKey(Artist.ARTIST, DSL.name("artist_pkey"), new TableField[]{Artist.ARTIST.ID}, true);
+    public static final UniqueKey<ArtistAppUserRecord> ARTIST_APP_USER_PKEY = Internal.createUniqueKey(ArtistAppUser.ARTIST_APP_USER, DSL.name("artist_app_user_pkey"), new TableField[]{ArtistAppUser.ARTIST_APP_USER.ARTIST_ID, ArtistAppUser.ARTIST_APP_USER.APP_USER_ID}, true);
+    public static final UniqueKey<QrtzBlobTriggersRecord> QRTZ_BLOB_TRIGGERS_PKEY = Internal.createUniqueKey(QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS, DSL.name("qrtz_blob_triggers_pkey"), new TableField[]{QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS.SCHED_NAME, QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS.TRIGGER_NAME, QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final UniqueKey<QrtzCalendarsRecord> QRTZ_CALENDARS_PKEY = Internal.createUniqueKey(QrtzCalendars.QRTZ_CALENDARS, DSL.name("qrtz_calendars_pkey"), new TableField[]{QrtzCalendars.QRTZ_CALENDARS.SCHED_NAME, QrtzCalendars.QRTZ_CALENDARS.CALENDAR_NAME}, true);
+    public static final UniqueKey<QrtzCronTriggersRecord> QRTZ_CRON_TRIGGERS_PKEY = Internal.createUniqueKey(QrtzCronTriggers.QRTZ_CRON_TRIGGERS, DSL.name("qrtz_cron_triggers_pkey"), new TableField[]{QrtzCronTriggers.QRTZ_CRON_TRIGGERS.SCHED_NAME, QrtzCronTriggers.QRTZ_CRON_TRIGGERS.TRIGGER_NAME, QrtzCronTriggers.QRTZ_CRON_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final UniqueKey<QrtzFiredTriggersRecord> QRTZ_FIRED_TRIGGERS_PKEY = Internal.createUniqueKey(QrtzFiredTriggers.QRTZ_FIRED_TRIGGERS, DSL.name("qrtz_fired_triggers_pkey"), new TableField[]{QrtzFiredTriggers.QRTZ_FIRED_TRIGGERS.SCHED_NAME, QrtzFiredTriggers.QRTZ_FIRED_TRIGGERS.ENTRY_ID}, true);
+    public static final UniqueKey<QrtzJobDetailsRecord> QRTZ_JOB_DETAILS_PKEY = Internal.createUniqueKey(QrtzJobDetails.QRTZ_JOB_DETAILS, DSL.name("qrtz_job_details_pkey"), new TableField[]{QrtzJobDetails.QRTZ_JOB_DETAILS.SCHED_NAME, QrtzJobDetails.QRTZ_JOB_DETAILS.JOB_NAME, QrtzJobDetails.QRTZ_JOB_DETAILS.JOB_GROUP}, true);
+    public static final UniqueKey<QrtzLocksRecord> QRTZ_LOCKS_PKEY = Internal.createUniqueKey(QrtzLocks.QRTZ_LOCKS, DSL.name("qrtz_locks_pkey"), new TableField[]{QrtzLocks.QRTZ_LOCKS.SCHED_NAME, QrtzLocks.QRTZ_LOCKS.LOCK_NAME}, true);
+    public static final UniqueKey<QrtzPausedTriggerGrpsRecord> QRTZ_PAUSED_TRIGGER_GRPS_PKEY = Internal.createUniqueKey(QrtzPausedTriggerGrps.QRTZ_PAUSED_TRIGGER_GRPS, DSL.name("qrtz_paused_trigger_grps_pkey"), new TableField[]{QrtzPausedTriggerGrps.QRTZ_PAUSED_TRIGGER_GRPS.SCHED_NAME, QrtzPausedTriggerGrps.QRTZ_PAUSED_TRIGGER_GRPS.TRIGGER_GROUP}, true);
+    public static final UniqueKey<QrtzSchedulerStateRecord> QRTZ_SCHEDULER_STATE_PKEY = Internal.createUniqueKey(QrtzSchedulerState.QRTZ_SCHEDULER_STATE, DSL.name("qrtz_scheduler_state_pkey"), new TableField[]{QrtzSchedulerState.QRTZ_SCHEDULER_STATE.SCHED_NAME, QrtzSchedulerState.QRTZ_SCHEDULER_STATE.INSTANCE_NAME}, true);
+    public static final UniqueKey<QrtzSimpleTriggersRecord> QRTZ_SIMPLE_TRIGGERS_PKEY = Internal.createUniqueKey(QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS, DSL.name("qrtz_simple_triggers_pkey"), new TableField[]{QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS.SCHED_NAME, QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS.TRIGGER_NAME, QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final UniqueKey<QrtzSimpropTriggersRecord> QRTZ_SIMPROP_TRIGGERS_PKEY = Internal.createUniqueKey(QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS, DSL.name("qrtz_simprop_triggers_pkey"), new TableField[]{QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS.SCHED_NAME, QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS.TRIGGER_NAME, QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final UniqueKey<QrtzTriggersRecord> QRTZ_TRIGGERS_PKEY = Internal.createUniqueKey(QrtzTriggers.QRTZ_TRIGGERS, DSL.name("qrtz_triggers_pkey"), new TableField[]{QrtzTriggers.QRTZ_TRIGGERS.SCHED_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_GROUP}, true);
+
+    // -------------------------------------------------------------------------
+    // FOREIGN KEY definitions
+    // -------------------------------------------------------------------------
+
+    public static final ForeignKey<QrtzBlobTriggersRecord, QrtzTriggersRecord> QRTZ_BLOB_TRIGGERS__QRTZ_BLOB_TRIGGERS_SCHED_NAME_TRIGGER_NAME_TRIGGER_GROUP_FKEY = Internal.createForeignKey(QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS, DSL.name("qrtz_blob_triggers_sched_name_trigger_name_trigger_group_fkey"), new TableField[]{QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS.SCHED_NAME, QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS.TRIGGER_NAME, QrtzBlobTriggers.QRTZ_BLOB_TRIGGERS.TRIGGER_GROUP}, Keys.QRTZ_TRIGGERS_PKEY, new TableField[]{QrtzTriggers.QRTZ_TRIGGERS.SCHED_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final ForeignKey<QrtzCronTriggersRecord, QrtzTriggersRecord> QRTZ_CRON_TRIGGERS__QRTZ_CRON_TRIGGERS_SCHED_NAME_TRIGGER_NAME_TRIGGER_GROUP_FKEY = Internal.createForeignKey(QrtzCronTriggers.QRTZ_CRON_TRIGGERS, DSL.name("qrtz_cron_triggers_sched_name_trigger_name_trigger_group_fkey"), new TableField[]{QrtzCronTriggers.QRTZ_CRON_TRIGGERS.SCHED_NAME, QrtzCronTriggers.QRTZ_CRON_TRIGGERS.TRIGGER_NAME, QrtzCronTriggers.QRTZ_CRON_TRIGGERS.TRIGGER_GROUP}, Keys.QRTZ_TRIGGERS_PKEY, new TableField[]{QrtzTriggers.QRTZ_TRIGGERS.SCHED_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final ForeignKey<QrtzSimpleTriggersRecord, QrtzTriggersRecord> QRTZ_SIMPLE_TRIGGERS__QRTZ_SIMPLE_TRIGGERS_SCHED_NAME_TRIGGER_NAME_TRIGGER_GROUP_FKEY = Internal.createForeignKey(QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS, DSL.name("qrtz_simple_triggers_sched_name_trigger_name_trigger_group_fkey"), new TableField[]{QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS.SCHED_NAME, QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS.TRIGGER_NAME, QrtzSimpleTriggers.QRTZ_SIMPLE_TRIGGERS.TRIGGER_GROUP}, Keys.QRTZ_TRIGGERS_PKEY, new TableField[]{QrtzTriggers.QRTZ_TRIGGERS.SCHED_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final ForeignKey<QrtzSimpropTriggersRecord, QrtzTriggersRecord> QRTZ_SIMPROP_TRIGGERS__QRTZ_SIMPROP_TRIGGERS_SCHED_NAME_TRIGGER_NAME_TRIGGER_GROU_FKEY = Internal.createForeignKey(QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS, DSL.name("qrtz_simprop_triggers_sched_name_trigger_name_trigger_grou_fkey"), new TableField[]{QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS.SCHED_NAME, QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS.TRIGGER_NAME, QrtzSimpropTriggers.QRTZ_SIMPROP_TRIGGERS.TRIGGER_GROUP}, Keys.QRTZ_TRIGGERS_PKEY, new TableField[]{QrtzTriggers.QRTZ_TRIGGERS.SCHED_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_NAME, QrtzTriggers.QRTZ_TRIGGERS.TRIGGER_GROUP}, true);
+    public static final ForeignKey<QrtzTriggersRecord, QrtzJobDetailsRecord> QRTZ_TRIGGERS__QRTZ_TRIGGERS_SCHED_NAME_JOB_NAME_JOB_GROUP_FKEY = Internal.createForeignKey(QrtzTriggers.QRTZ_TRIGGERS, DSL.name("qrtz_triggers_sched_name_job_name_job_group_fkey"), new TableField[]{QrtzTriggers.QRTZ_TRIGGERS.SCHED_NAME, QrtzTriggers.QRTZ_TRIGGERS.JOB_NAME, QrtzTriggers.QRTZ_TRIGGERS.JOB_GROUP}, Keys.QRTZ_JOB_DETAILS_PKEY, new TableField[]{QrtzJobDetails.QRTZ_JOB_DETAILS.SCHED_NAME, QrtzJobDetails.QRTZ_JOB_DETAILS.JOB_NAME, QrtzJobDetails.QRTZ_JOB_DETAILS.JOB_GROUP}, true);
 }
