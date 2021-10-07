@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -67,6 +68,22 @@ public class DefaultArtistServiceTest {
         when(artistRepository.findByName(name)).thenReturn(record);
         Optional<Artist> artistOpt = artistService.findByName(name);
         compareArtistRecordAndArtist(record, artistOpt.get());
+    }
+
+    @Test
+    public void findToSync_WhenSyncKeyIsNull_ThrowException() {
+        assertThrows(NullPointerException.class, () -> artistService.findToSync(null, 10));
+    }
+
+    @Test
+    public void findToSync_WhenSyncIsProvided_ReturnArtists() {
+        String syncKey = UUID.randomUUID().toString();
+        ArtistRecord record1 = newArtistRecord("id1");
+        ArtistRecord record2 = newArtistRecord("id2");
+        when(artistRepository.findToSync(syncKey, 2)).thenReturn(List.of(record1, record2));
+        List<Artist> artists = artistService.findToSync(syncKey, 2);
+        compareArtistRecordAndArtist(record1, artists.get(0));
+        compareArtistRecordAndArtist(record2, artists.get(1));
     }
 
     @Test

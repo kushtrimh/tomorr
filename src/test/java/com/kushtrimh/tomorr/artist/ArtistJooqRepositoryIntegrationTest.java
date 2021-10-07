@@ -4,6 +4,8 @@ import com.kushtrimh.tomorr.artist.repository.ArtistRepository;
 import com.kushtrimh.tomorr.configuration.TestDataSourceConfiguration;
 import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
+import org.assertj.core.api.Assertions;
+import org.jooq.DSLContext;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.List;
+import java.util.UUID;
+
+import static com.kushtrimh.tomorr.dal.Tables.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -24,10 +30,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ArtistJooqRepositoryIntegrationTest {
 
     private final ArtistRepository<ArtistRecord> artistRepository;
+    private final DSLContext create;
 
     @Autowired
-    public ArtistJooqRepositoryIntegrationTest(ArtistRepository<ArtistRecord> artistRepository) {
+    public ArtistJooqRepositoryIntegrationTest(
+            ArtistRepository<ArtistRecord> artistRepository,
+            DSLContext create) {
         this.artistRepository = artistRepository;
+        this.create = create;
     }
 
     @Test
@@ -63,6 +73,42 @@ public class ArtistJooqRepositoryIntegrationTest {
         var returnedRecord = artistRepository.findById(id);
         expectedArtist.setCreatedAt(returnedRecord.getCreatedAt());
         assertEquals(expectedArtist, returnedRecord);
+    }
+
+    @Test
+    public void findToSync_WhenSyncKeyIsTheSame_ReturnEmptyListAndDontUpdate() {
+        String syncKey = UUID.randomUUID().toString();
+        create.update(ARTIST).set(ARTIST.SYNC_KEY, syncKey).execute();
+        assertTrue(artistRepository.findToSync(syncKey, 10).isEmpty());
+    }
+
+    @Test
+    public void findToSync_WhenCountIsGivenAsZero_ReturnEmptyListAndDontUpdate() {
+        String syncKey = UUID.randomUUID().toString();
+        create.update(ARTIST).set(ARTIST.SYNC_KEY, syncKey).execute();
+
+        assertTrue(artistRepository.findToSync(syncKey, 0).isEmpty());
+    }
+
+    @Test
+    public void findToSync_WhenSyncKeyIsDifferent_ReturnArtistsAndUpdateSyncKey() {
+        String artistOldSyncKey = UUID.randomUUID().toString();
+        create.update(ARTIST).set(ARTIST.SYNC_KEY, artistOldSyncKey).execute();
+
+        String syncKey = UUID.randomUUID().toString();
+        assertEquals(3, artistRepository.findToSync(syncKey, 3).size());
+
+        List<String> updatedArtistSyncKeys = create.select(ARTIST.SYNC_KEY).from(ARTIST).fetch(ARTIST.SYNC_KEY);
+        Assertions.assertThat(updatedArtistSyncKeys).containsOnly(syncKey);
+    }
+
+    @Test
+    public void findToSync_WhenSyncKeyIsNull_ReturnArtistsAndUpdateSyncKey() {
+        String syncKey = UUID.randomUUID().toString();
+        assertEquals(3, artistRepository.findToSync(syncKey, 3).size());
+
+        List<String> updatedArtistSyncKeys = create.select(ARTIST.SYNC_KEY).from(ARTIST).fetch(ARTIST.SYNC_KEY);
+        Assertions.assertThat(updatedArtistSyncKeys).containsOnly(syncKey);
     }
 
     @Test

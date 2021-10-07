@@ -6,6 +6,7 @@ CREATE TABLE artist
     name       varchar(256) NOT NULL,
     image_href varchar(256),
     popularity integer      NOT NULL,
+    sync_key   varchar(36),
     created_at timestamp    NOT NULL DEFAULT NOW()
 );
 
