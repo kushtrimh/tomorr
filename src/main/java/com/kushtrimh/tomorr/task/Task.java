@@ -16,6 +16,11 @@ public class Task<T extends TaskData> {
     public Task() {
     }
 
+    public Task(T data) {
+        this.data = data;
+        this.createdAt = Instant.now();
+    }
+
     public Task(T data, Instant createdAt) {
         this.data = data;
         this.createdAt = createdAt;

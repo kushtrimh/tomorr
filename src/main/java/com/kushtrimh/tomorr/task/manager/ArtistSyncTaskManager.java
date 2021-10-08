@@ -39,7 +39,7 @@ public class ArtistSyncTaskManager implements TaskManager<ArtistTaskData> {
         logger.info("{} tasks to be created", dataList.size());
         List<Task<ArtistTaskData>> tasks = dataList.stream().map(data -> {
             logger.debug("Task with data {} created", data);
-            return new Task<>(data, Instant.now());
+            return new Task<>(data);
         }).toList();
         template.opsForList().rightPushAll(ARTIST_SYNC_TASK_QUEUE_KEY, tasks);
     }

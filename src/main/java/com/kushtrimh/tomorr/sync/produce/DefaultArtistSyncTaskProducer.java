@@ -34,8 +34,6 @@ public class DefaultArtistSyncTaskProducer implements ArtistSyncTaskProducer {
     private final LimitProperties limitProperties;
     private final StringRedisTemplate stringRedisTemplate;
 
-    // TODO: Add tests for this whole package, unit + integration
-
     public DefaultArtistSyncTaskProducer(
             TaskManager<ArtistTaskData> artistSyncTaskManager,
             ArtistService artistService,
@@ -63,6 +61,12 @@ public class DefaultArtistSyncTaskProducer implements ArtistSyncTaskProducer {
         var tasksToCreate = limitProperties.getSpotify() - tasksInQueue;
         logger.info("{} tasks will be produced", tasksToCreate);
 
+        if (tasksToCreate < 0) {
+            logger.warn("Tasks to create count is less than 0 ({}), limit {}, tasks in queue {}",
+                    tasksToCreate, limitProperties.getSpotify(), tasksInQueue);
+            return;
+        }
+
         String syncKey = getSyncKey();
         List<Artist> artists = artistService.findToSync(syncKey, tasksToCreate);
         // If no artists returned, update sync key. Here we assume all artists
@@ -71,7 +75,6 @@ public class DefaultArtistSyncTaskProducer implements ArtistSyncTaskProducer {
             String newSyncKey = UUID.randomUUID().toString();
             stringRedisTemplate.opsForValue().set(ARTIST_SYNC_KEY, newSyncKey);
             logger.info("Sync key updated from {} to {}", syncKey, newSyncKey);
-            return;
         }
         List<Task<ArtistTaskData>> tasksToExecute = new ArrayList<>(existingTasks);
         tasksToExecute.addAll(
