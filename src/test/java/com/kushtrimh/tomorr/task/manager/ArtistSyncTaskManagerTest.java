@@ -12,8 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.Collections;
 import java.util.List;
 
+import static com.kushtrimh.tomorr.task.manager.ArtistSyncTaskManager.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -36,17 +38,17 @@ public class ArtistSyncTaskManagerTest {
     }
 
     @Test
-    public void create_WhenCalledWithNullData_ThrowNullPointerException() {
+    public void add_WhenCalledWithNullData_ThrowNullPointerException() {
         assertThrows(NullPointerException.class, () -> manager.add((ArtistTaskData) null));
     }
 
     @Test
-    public void create_WhenCalledWithNullList_ThrowNullPointerException() {
+    public void add_WhenCalledWithNullList_ThrowNullPointerException() {
         assertThrows(NullPointerException.class, () -> manager.add((List<ArtistTaskData>) null));
     }
 
     @Test
-    public void create_WhenCalledWithValidList_CreateTasksAndAddToQueue() {
+    public void add_WhenCalledWithValidList_CreateTasksAndAddToQueue() {
         when(template.opsForList()).thenReturn(listOperations);
         List<ArtistTaskData> artistTaskData = List.of(
                 ArtistTaskData.fromArtistId("artist01", TaskType.SYNC),
@@ -58,7 +60,7 @@ public class ArtistSyncTaskManagerTest {
     }
 
     @Test
-    public void create_WhenCalledWithValidData_CreateTaskAndAddToQueue() {
+    public void add_WhenCalledWithValidData_CreateTaskAndAddToQueue() {
         when(template.opsForList()).thenReturn(listOperations);
         var taskData = ArtistTaskData.fromArtistId("artist01", TaskType.SYNC);
         manager.add(taskData);
@@ -68,7 +70,7 @@ public class ArtistSyncTaskManagerTest {
     @Test
     public void getQueuedTasksCount_WhenQueueDoesNotExists_Return0() {
         when(template.opsForList()).thenReturn(listOperations);
-        when(listOperations.size(ArtistSyncTaskManager.ARTIST_SYNC_TASK_QUEUE_KEY)).thenReturn(null);
+        when(listOperations.size(ARTIST_SYNC_TASK_QUEUE_KEY)).thenReturn(null);
         assertEquals(0, manager.getQueuedTasksCount());
     }
 
@@ -76,14 +78,33 @@ public class ArtistSyncTaskManagerTest {
     public void getQueuedTasksCount_WhenQueueExistsAndContainsTasksReturnNumberOfContainedTasks() {
         long tasksCount = 55;
         when(template.opsForList()).thenReturn(listOperations);
-        when(listOperations.size(ArtistSyncTaskManager.ARTIST_SYNC_TASK_QUEUE_KEY)).thenReturn(tasksCount);
+        when(listOperations.size(ARTIST_SYNC_TASK_QUEUE_KEY)).thenReturn(tasksCount);
         assertEquals(tasksCount, manager.getQueuedTasksCount());
+    }
+
+    @Test
+    public void getAll_WhenThereAreNoTasks_ReturnEmptyListAndDeleteEntry() {
+        when(template.opsForList()).thenReturn(listOperations);
+        when(listOperations.range(ARTIST_SYNC_TASK_QUEUE_KEY, 0, -1)).thenReturn(Collections.emptyList());
+        assertTrue(manager.getAll().isEmpty());
+        verify(template, times(1)).delete(ARTIST_SYNC_TASK_QUEUE_KEY);
+    }
+
+    @Test
+    public void getAll_WhenThereAreQueuedTasks_ReturnTasksAndDeleteEntry() {
+        List<Task<ArtistTaskData>> tasks = List.of(
+                new Task<>(ArtistTaskData.fromArtistId("artist01", TaskType.SYNC)),
+                new Task<>(ArtistTaskData.fromArtistId("artist02", TaskType.SYNC)));
+        when(template.opsForList()).thenReturn(listOperations);
+        when(listOperations.range(ARTIST_SYNC_TASK_QUEUE_KEY, 0, -1)).thenReturn(tasks);
+        assertEquals(tasks, manager.getAll());
+        verify(template, times(1)).delete(ARTIST_SYNC_TASK_QUEUE_KEY);
     }
 
     private void assertThatTasksAreCreatedSuccessfully(List<ArtistTaskData> artistTaskData) {
         ArgumentCaptor<List<Task<ArtistTaskData>>> captor = ArgumentCaptor.forClass(List.class);
         verify(listOperations, times(1)).rightPushAll(
-                eq(ArtistSyncTaskManager.ARTIST_SYNC_TASK_QUEUE_KEY),
+                eq(ARTIST_SYNC_TASK_QUEUE_KEY),
                 captor.capture()
         );
 

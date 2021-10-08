@@ -41,7 +41,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
     }
 
     @Test
-    public void create_WhenCalledWithValidList_CreateTasksAndAddToQueue() {
+    public void add_WhenCalledWithValidList_CreateTasksAndAddToQueue() {
         List<ArtistTaskData> data = List.of(
                 ArtistTaskData.fromArtistId("artist01", TaskType.SYNC),
                 ArtistTaskData.fromArtistId("artist02", TaskType.INITIAL_SYNC),
@@ -57,7 +57,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
     }
 
     @Test
-    public void create_WhenCalledWithValidData_CreateTaskAndAddToQueue() {
+    public void add_WhenCalledWithValidData_CreateTaskAndAddToQueue() {
         ArtistTaskData artistTaskData = ArtistTaskData.fromArtistId("artist04", TaskType.SYNC);
         manager.add(artistTaskData);
         Task<ArtistTaskData> returnedTask = template.opsForList().leftPop(ARTIST_SYNC_TASK_QUEUE_KEY);
