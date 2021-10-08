@@ -12,7 +12,8 @@ import java.util.Objects;
 public class GetArtistApiRequest implements SpotifyApiRequest {
     private String id;
 
-    public GetArtistApiRequest() {}
+    public GetArtistApiRequest() {
+    }
 
     public GetArtistApiRequest(Builder builder) {
         this.id = builder.id;

@@ -37,6 +37,19 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
     }
 
     @Override
+    public List<ArtistRecord> findToSync(String syncKey, int count) {
+        List<ArtistRecord> artists = create.selectFrom(ARTIST)
+                .where(ARTIST.SYNC_KEY.ne(syncKey).or(ARTIST.SYNC_KEY.isNull()))
+                .limit(count)
+                .forUpdate().fetch();
+        artists.forEach(record -> record.setSyncKey(syncKey));
+        if (!artists.isEmpty()) {
+            create.batchUpdate(artists).execute();
+        }
+        return artists;
+    }
+
+    @Override
     public List<ArtistRecord> searchByName(String name) {
         return create.fetch(ARTIST, ARTIST.NAME.startsWithIgnoreCase(name));
     }

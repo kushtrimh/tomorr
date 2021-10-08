@@ -1,11 +1,15 @@
 package com.kushtrimh.tomorr.limit;
 
 import com.kushtrimh.tomorr.properties.LimitProperties;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Objects;
 
 /**
  * @author Kushtrim Hajrizi
@@ -26,7 +30,7 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @PostConstruct
     public void init() {
-        for (LimitType limitTypes: LimitType.values()) {
+        for (LimitType limitTypes : LimitType.values()) {
             String cacheKey = limitTypes.getCacheKey();
             if (cacheKey != null) {
                 integerValueOperations.setIfAbsent(cacheKey, 0);
@@ -36,7 +40,7 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @Override
     public boolean canSendRequest(LimitType limitType) {
-        return (getLimit(limitType) - getCount(limitType))  > 0;
+        return getRemainingRequestLimit(limitType, integerValueOperations) > 0;
     }
 
     @Override
@@ -46,39 +50,56 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     @Override
     public int getRemainingRequestLimit(LimitType limitType) {
-        return getLimit(limitType) - getCount(limitType);
+        return getRemainingRequestLimit(limitType, integerValueOperations);
     }
 
     @Override
     public int getSentRequestsCounter(LimitType limitType) {
-        return getCount(limitType);
+        return getCount(limitType, integerValueOperations);
     }
 
     @Override
-    public long increment(LimitType limitType) {
-        if (limitType == LimitType.GLOBAL) {
-            return -1L;
+    public void increment(LimitType limitType) {
+        Objects.requireNonNull(limitType);
+        increment(limitType, integerValueOperations);
+    }
+
+    @Override
+    public boolean tryFor(LimitType limitType) {
+        boolean canSendRequest = getRemainingRequestLimit(limitType, integerValueOperations) > 0;
+        if (canSendRequest) {
+            increment(limitType, integerValueOperations);
+            return true;
         }
-        return integerValueOperations.increment(limitType.getCacheKey());
+        return false;
     }
 
     @Override
     public void reset(LimitType limitType) {
-        if (limitType == LimitType.GLOBAL) {
-            return;
-        }
+        Objects.requireNonNull(limitType);
         integerValueOperations.set(limitType.getCacheKey(), 0);
     }
 
-    private int getCount(LimitType limitType) {
-        if (limitType == LimitType.GLOBAL) {
-            int count = 0;
-            for (LimitType type: LimitType.getCacheableTypes()) {
-                count += integerValueOperations.get(type.getCacheKey());
+    @Override
+    public void resetAll() {
+        integerRedisTemplate.executePipelined(new SessionCallback<>() {
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
+                ValueOperations<String, Integer> valueOperations = (ValueOperations<String, Integer>) redisOperations.opsForValue();
+                for (LimitType type : LimitType.getCacheableTypes()) {
+                    valueOperations.set(type.getCacheKey(), 0);
+                }
+                return null;
             }
-            return count;
-        }
-        return integerValueOperations.get(limitType.getCacheKey());
+        });
+    }
+
+    private int getCount(LimitType limitType, ValueOperations<String, Integer> operations) {
+        return operations.get(limitType.getCacheKey());
+    }
+
+    private void increment(LimitType limitType, ValueOperations<String, Integer> operations) {
+        operations.increment(limitType.getCacheKey());
     }
 
     private int getLimit(LimitType limitType) {
@@ -87,5 +108,9 @@ public class DefaultRequestLimitService implements RequestLimitService {
             case ARTIST_SEARCH -> limitProperties.getArtistSearch();
             default -> limitProperties.getGlobal();
         };
+    }
+
+    private int getRemainingRequestLimit(LimitType limitType, ValueOperations<String, Integer> operations) {
+        return getLimit(limitType) - getCount(limitType, operations);
     }
 }

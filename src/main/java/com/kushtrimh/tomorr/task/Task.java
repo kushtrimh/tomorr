@@ -13,6 +13,19 @@ public class Task<T extends TaskData> {
     private Instant reinsertedAt;
     private T data;
 
+    public Task() {
+    }
+
+    public Task(T data) {
+        this.data = data;
+        this.createdAt = Instant.now();
+    }
+
+    public Task(T data, Instant createdAt) {
+        this.data = data;
+        this.createdAt = createdAt;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }

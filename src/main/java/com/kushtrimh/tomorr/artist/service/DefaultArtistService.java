@@ -37,6 +37,13 @@ public class DefaultArtistService implements ArtistService {
         return getArtistOptional(record);
     }
 
+    @Override
+    public List<Artist> findToSync(String syncKey, int count) {
+        Objects.requireNonNull(syncKey);
+        return artistRepository.findToSync(syncKey, count)
+                .stream().map(this::toArtist).toList();
+    }
+
     @Transactional
     @Override
     public List<Artist> searchByName(String name) {

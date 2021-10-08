@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tags(value = { @Tag("redis"), @Tag("integration") })
+@Tags(value = {@Tag("redis"), @Tag("integration")})
 @ContextConfiguration(classes = {TestSpotifyConfiguration.class,
         TestRedisConfiguration.class, TestLimitConfiguration.class})
 @ExtendWith({SpringExtension.class, MockitoExtension.class, TestRedisExtension.class})
@@ -111,5 +111,39 @@ public class DefaultRequestLimitServiceIntegrationTest {
         assertEquals(235, integerValueOperations.get(key));
         requestLimitService.reset(LimitType.SPOTIFY_EXTERNAL);
         assertEquals(0, integerValueOperations.get(key));
+    }
+
+    @Test
+    public void resetAll_WhenCalled_ResetAllCounters() {
+        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 100);
+        integerValueOperations.set(LimitType.ARTIST_SEARCH.getCacheKey(), 50);
+        assertAll(
+                () -> assertEquals(100, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())),
+                () -> assertEquals(50, integerRedisTemplate.opsForValue().get(LimitType.ARTIST_SEARCH.getCacheKey()))
+        );
+        requestLimitService.resetAll();
+        assertAll(
+                () -> assertEquals(0, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())),
+                () -> assertEquals(0, integerRedisTemplate.opsForValue().get(LimitType.ARTIST_SEARCH.getCacheKey()))
+        );
+    }
+
+    @Test
+    public void tryFor_WhenCantSendRequest_ReturnFalse() {
+        LimitType limitType = LimitType.SPOTIFY_EXTERNAL;
+        integerValueOperations.set(limitType.getCacheKey(), 450);
+        assertFalse(requestLimitService.tryFor(limitType));
+    }
+
+    @Test
+    public void tryFor_WheCanSendRequest_ReturnTrueAndIncrement() {
+        LimitType limitType = LimitType.SPOTIFY_EXTERNAL;
+        integerValueOperations.set(limitType.getCacheKey(), 350);
+        boolean canSend = requestLimitService.tryFor(limitType);
+        int count = integerValueOperations.get(limitType.getCacheKey());
+        assertAll(
+                () -> assertTrue(canSend),
+                () -> assertEquals(351, count)
+        );
     }
 }

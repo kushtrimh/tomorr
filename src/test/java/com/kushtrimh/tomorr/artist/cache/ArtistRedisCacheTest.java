@@ -105,7 +105,7 @@ public class ArtistRedisCacheTest {
         var artistId = "artist1";
         when(stringRedisTemplate.opsForZSet()).thenReturn(zSetOperations);
         when(stringRedisTemplate.opsForZSet().score(SEARCHED_ARTIST_IDS_KEY, artistId))
-            .thenReturn(null);
+                .thenReturn(null);
         assertFalse(artistRedisCache.containsArtistId(artistId));
     }
 

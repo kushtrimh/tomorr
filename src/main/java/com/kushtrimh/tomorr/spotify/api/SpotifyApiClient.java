@@ -17,19 +17,19 @@ import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
  */
 public interface SpotifyApiClient {
     GetArtistsApiResponse getMultipleArtists(GetArtistsApiRequest request)
-        throws TooManyRequestsException, SpotifyApiException;
+            throws TooManyRequestsException, SpotifyApiException;
 
     GetArtistAlbumsApiResponse getArtistAlbums(GetArtistAlbumsApiRequest request)
-        throws TooManyRequestsException, SpotifyApiException;
+            throws TooManyRequestsException, SpotifyApiException;
 
     GetArtistAlbumsApiResponse getArtistAlbums(String url)
-        throws TooManyRequestsException, SpotifyApiException;
+            throws TooManyRequestsException, SpotifyApiException;
 
     GetArtistApiResponse getArtist(GetArtistApiRequest request)
-        throws TooManyRequestsException, SpotifyApiException;
+            throws TooManyRequestsException, SpotifyApiException;
 
     SearchApiResponse search(SearchApiRequest request)
-        throws TooManyRequestsException, SpotifyApiException;
+            throws TooManyRequestsException, SpotifyApiException;
 
     TokenResponse refreshAccessToken() throws SpotifyApiException;
 }

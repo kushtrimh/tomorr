@@ -6,11 +6,10 @@ import java.util.List;
  * @author Kushtrim Hajrizi
  */
 public enum LimitType {
-    GLOBAL(null),
     SPOTIFY_EXTERNAL("spotify:requestCounter"),
     ARTIST_SEARCH("artistSearch:requestCounter");
 
-    private String cacheKey;
+    private final String cacheKey;
 
     LimitType(String cacheKey) {
         this.cacheKey = cacheKey;

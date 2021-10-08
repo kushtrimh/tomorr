@@ -7,9 +7,9 @@ import org.springframework.boot.context.ApplicationPidFileWriter;
 @SpringBootApplication
 public class TomorrApplication {
 
-	public static void main(String[] args) {
-		SpringApplication app = new SpringApplication(TomorrApplication.class);
-		app.addListeners(new ApplicationPidFileWriter(System.getenv("TOMORR_PID_FILE")));
-		app.run(args);
-	}
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(TomorrApplication.class);
+        app.addListeners(new ApplicationPidFileWriter(System.getenv("TOMORR_PID_FILE")));
+        app.run(args);
+    }
 }

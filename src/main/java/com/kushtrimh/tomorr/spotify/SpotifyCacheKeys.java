@@ -5,7 +5,8 @@ package com.kushtrimh.tomorr.spotify;
  */
 public class SpotifyCacheKeys {
 
-    private SpotifyCacheKeys() {}
+    private SpotifyCacheKeys() {
+    }
 
     public final static String ACCESS_TOKEN_KEY = "accessToken";
 }

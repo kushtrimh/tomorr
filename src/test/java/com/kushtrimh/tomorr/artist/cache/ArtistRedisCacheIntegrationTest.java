@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tags(value = { @Tag("redis"), @Tag("integration") })
+@Tags(value = {@Tag("redis"), @Tag("integration")})
 @ExtendWith({SpringExtension.class, MockitoExtension.class, TestRedisExtension.class})
 @ContextConfiguration(classes = TestRedisConfiguration.class)
 public class ArtistRedisCacheIntegrationTest {

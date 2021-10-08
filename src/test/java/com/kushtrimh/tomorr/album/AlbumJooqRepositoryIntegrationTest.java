@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@Tags(value = { @Tag("database"), @Tag("integration") })
+@Tags(value = {@Tag("database"), @Tag("integration")})
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
 @ExtendWith(TestDatabaseExtension.class)
 @JooqTest

@@ -1,13 +1,20 @@
 package com.kushtrimh.tomorr.task.manager;
 
+import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.data.TaskData;
+
+import java.util.List;
 
 /**
  * @author Kushtrim Hajrizi
  */
-public interface TaskManager {
+public interface TaskManager<T extends TaskData> {
 
-    <T extends TaskData> void create(T data);
+    void add(T data);
 
-    int getQueuedTasksCount();
+    void add(List<T> dataList);
+
+    long getQueuedTasksCount();
+
+    List<Task<T>> getAll();
 }

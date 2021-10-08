@@ -52,7 +52,6 @@ public class ApiExceptionHandler {
     }
 
     /**
-     *
      * @param messageCode
      * @param violator
      * @param violations
