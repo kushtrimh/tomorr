@@ -66,12 +66,28 @@ public class ArtistSyncTaskManagerIntegrationTest {
 
     @Test
     public void getQueuedTasksCount_WhenTasksExistInQueue_ReturnSizeOfTasksInQueue() {
-        List<ArtistTaskData> data = List.of(
-                ArtistTaskData.fromArtistId("artist01", TaskType.SYNC),
-                ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)
-        );
-        manager.add(data);
+        List<Task<ArtistTaskData>> tasks = List.of(
+                new Task<>(ArtistTaskData.fromArtistId("artist01", TaskType.SYNC)),
+                new Task<>(ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)));
+        template.opsForList().rightPushAll(ARTIST_SYNC_TASK_QUEUE_KEY, tasks);
         assertEquals(2, manager.getQueuedTasksCount());
         template.delete(ARTIST_SYNC_TASK_QUEUE_KEY);
+    }
+
+    @Test
+    public void getAll_WhenEntryDoesNotExist_ReturnEmptyList() {
+        template.delete(ARTIST_SYNC_TASK_QUEUE_KEY);
+        assertTrue(manager.getAll().isEmpty());
+    }
+
+    @Test
+    public void getAll_WhenTasksAreQueued_ReturnTasksAndDeleteEntry() {
+        List<Task<ArtistTaskData>> tasks = List.of(
+                new Task<>(ArtistTaskData.fromArtistId("artist01", TaskType.SYNC)),
+                new Task<>(ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)));
+        template.opsForList().rightPushAll(ARTIST_SYNC_TASK_QUEUE_KEY, tasks);
+        assertAll(
+                () -> assertEquals(tasks, manager.getAll()),
+                () -> assertTrue(template.opsForList().range(ARTIST_SYNC_TASK_QUEUE_KEY, 0, -1).isEmpty()));
     }
 }

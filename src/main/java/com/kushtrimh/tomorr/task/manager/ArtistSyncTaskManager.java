@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,7 +52,10 @@ public class ArtistSyncTaskManager implements TaskManager<ArtistTaskData> {
     @Override
     public List<Task<ArtistTaskData>> getAll() {
         List<Task<ArtistTaskData>> tasks = template.opsForList().range(ARTIST_SYNC_TASK_QUEUE_KEY, 0, -1);
-        template.delete(ARTIST_SYNC_TASK_QUEUE_KEY);
-        return tasks;
+        if (tasks != null && !tasks.isEmpty()) {
+            template.delete(ARTIST_SYNC_TASK_QUEUE_KEY);
+            return tasks;
+        }
+        return Collections.emptyList();
     }
 }

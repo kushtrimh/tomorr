@@ -83,11 +83,19 @@ public class ArtistSyncTaskManagerTest {
     }
 
     @Test
-    public void getAll_WhenThereAreNoTasks_ReturnEmptyListAndDeleteEntry() {
+    public void getAll_WhenTasksRangeReturnsNull_ReturnEmptyListAndDoNotDeleteEntry() {
         when(template.opsForList()).thenReturn(listOperations);
         when(listOperations.range(ARTIST_SYNC_TASK_QUEUE_KEY, 0, -1)).thenReturn(Collections.emptyList());
         assertTrue(manager.getAll().isEmpty());
-        verify(template, times(1)).delete(ARTIST_SYNC_TASK_QUEUE_KEY);
+        verify(template, never()).delete(ARTIST_SYNC_TASK_QUEUE_KEY);
+    }
+
+    @Test
+    public void getAll_WhenThereAreNoTasks_ReturnEmptyListAndDoNotDeleteEntry() {
+        when(template.opsForList()).thenReturn(listOperations);
+        when(listOperations.range(ARTIST_SYNC_TASK_QUEUE_KEY, 0, -1)).thenReturn(Collections.emptyList());
+        assertTrue(manager.getAll().isEmpty());
+        verify(template, never()).delete(ARTIST_SYNC_TASK_QUEUE_KEY);
     }
 
     @Test
@@ -105,8 +113,7 @@ public class ArtistSyncTaskManagerTest {
         ArgumentCaptor<List<Task<ArtistTaskData>>> captor = ArgumentCaptor.forClass(List.class);
         verify(listOperations, times(1)).rightPushAll(
                 eq(ARTIST_SYNC_TASK_QUEUE_KEY),
-                captor.capture()
-        );
+                captor.capture());
 
         List<Task<ArtistTaskData>> tasks = captor.getValue();
         for (var i = 0; i < tasks.size(); i++) {
