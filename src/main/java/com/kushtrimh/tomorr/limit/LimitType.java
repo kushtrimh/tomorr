@@ -6,8 +6,8 @@ import java.util.List;
  * @author Kushtrim Hajrizi
  */
 public enum LimitType {
-    SPOTIFY_EXTERNAL("spotify:requestCounter"),
-    ARTIST_SEARCH("artistSearch:requestCounter");
+    SPOTIFY_SYNC("limit:spotify:sync"),
+    SPOTIFY_SEARCH("limit:spotify:search");
 
     private final String cacheKey;
 
@@ -16,7 +16,7 @@ public enum LimitType {
     }
 
     public static List<LimitType> getCacheableTypes() {
-        return List.of(LimitType.SPOTIFY_EXTERNAL, LimitType.ARTIST_SEARCH);
+        return List.of(LimitType.SPOTIFY_SYNC, LimitType.SPOTIFY_SEARCH);
     }
 
     public String getCacheKey() {

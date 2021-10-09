@@ -58,12 +58,12 @@ public class DefaultArtistSyncTaskProducer implements ArtistSyncTaskProducer {
         var tasksInQueue = existingTasks.size();
         logger.info("{} tasks currently in queue", tasksInQueue);
 
-        var tasksToCreate = limitProperties.getSpotify() - tasksInQueue;
+        var tasksToCreate = limitProperties.getSpotifySync() - tasksInQueue;
         logger.info("{} tasks will be produced", tasksToCreate);
 
         if (tasksToCreate < 0) {
             logger.warn("Tasks to create count is less than 0 ({}), limit {}, tasks in queue {}",
-                    tasksToCreate, limitProperties.getSpotify(), tasksInQueue);
+                    tasksToCreate, limitProperties.getSpotifySync(), tasksInQueue);
             return;
         }
 

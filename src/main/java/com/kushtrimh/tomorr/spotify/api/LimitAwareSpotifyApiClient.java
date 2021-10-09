@@ -68,7 +68,7 @@ public class LimitAwareSpotifyApiClient implements SpotifyApiClient {
     }
 
     private void checkLimit() throws TooManyRequestsException {
-        if (!requestLimitService.tryFor(LimitType.SPOTIFY_EXTERNAL)) {
+        if (!requestLimitService.tryFor(LimitType.SPOTIFY_SYNC)) {
             throw new TooManyRequestsException("Reach limit for requests");
         }
     }

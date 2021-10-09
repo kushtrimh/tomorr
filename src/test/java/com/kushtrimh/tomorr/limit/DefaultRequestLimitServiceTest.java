@@ -40,57 +40,57 @@ public class DefaultRequestLimitServiceTest {
     public void init_WhenInitialized_SetRequestCounter() {
         requestLimitService.init();
         verify(integerValueOperations, times(1))
-                .setIfAbsent(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 0);
+                .setIfAbsent(LimitType.SPOTIFY_SYNC.getCacheKey(), 0);
         verify(integerValueOperations, times(1))
-                .setIfAbsent(LimitType.ARTIST_SEARCH.getCacheKey(), 0);
+                .setIfAbsent(LimitType.SPOTIFY_SEARCH.getCacheKey(), 0);
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsBiggerThanLimit_ReturnFalse() {
-        when(limitProperties.getSpotify()).thenReturn(450);
-        when(integerValueOperations.get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())).thenReturn(460);
-        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        when(limitProperties.getSpotifySync()).thenReturn(450);
+        when(integerValueOperations.get(LimitType.SPOTIFY_SYNC.getCacheKey())).thenReturn(460);
+        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsEqualsToLimit_ReturnFalse() {
-        when(limitProperties.getSpotify()).thenReturn(450);
-        when(integerValueOperations.get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())).thenReturn(450);
-        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        when(limitProperties.getSpotifySync()).thenReturn(450);
+        when(integerValueOperations.get(LimitType.SPOTIFY_SYNC.getCacheKey())).thenReturn(450);
+        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsSmallerThanLimit_ReturnTrue() {
-        when(limitProperties.getSpotify()).thenReturn(450);
-        when(integerValueOperations.get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())).thenReturn(350);
-        assertTrue(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        when(limitProperties.getSpotifySync()).thenReturn(450);
+        when(integerValueOperations.get(LimitType.SPOTIFY_SYNC.getCacheKey())).thenReturn(350);
+        assertTrue(requestLimitService.canSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsBiggerThanLimit_ReturnTrue() {
-        when(limitProperties.getSpotify()).thenReturn(450);
-        when(integerValueOperations.get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())).thenReturn(460);
-        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        when(limitProperties.getSpotifySync()).thenReturn(450);
+        when(integerValueOperations.get(LimitType.SPOTIFY_SYNC.getCacheKey())).thenReturn(460);
+        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsEqualsToLimit_ReturnTrue() {
-        when(limitProperties.getSpotify()).thenReturn(450);
-        when(integerValueOperations.get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())).thenReturn(450);
-        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        when(limitProperties.getSpotifySync()).thenReturn(450);
+        when(integerValueOperations.get(LimitType.SPOTIFY_SYNC.getCacheKey())).thenReturn(450);
+        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsSmallerThanLimit_ReturnFalse() {
-        when(limitProperties.getSpotify()).thenReturn(450);
-        when(integerValueOperations.get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())).thenReturn(350);
-        assertFalse(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        when(limitProperties.getSpotifySync()).thenReturn(450);
+        when(integerValueOperations.get(LimitType.SPOTIFY_SYNC.getCacheKey())).thenReturn(350);
+        assertFalse(requestLimitService.cantSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void getRemainingRequestLimit_WhenCalled_ReturnRemainingRequestLimit() {
-        when(limitProperties.getSpotify()).thenReturn(450);
-        var limitType = LimitType.SPOTIFY_EXTERNAL;
+        when(limitProperties.getSpotifySync()).thenReturn(450);
+        var limitType = LimitType.SPOTIFY_SYNC;
         var key = limitType.getCacheKey();
 
         when(integerValueOperations.get(key)).thenReturn(350);
@@ -111,7 +111,7 @@ public class DefaultRequestLimitServiceTest {
 
     @Test
     public void getSentRequestsCounter_WhenCalled_ReturnRequestCounter() {
-        var limitType = LimitType.SPOTIFY_EXTERNAL;
+        var limitType = LimitType.SPOTIFY_SYNC;
         var key = limitType.getCacheKey();
 
         when(integerValueOperations.get(key)).thenReturn(250);
@@ -129,8 +129,8 @@ public class DefaultRequestLimitServiceTest {
 
     @Test
     public void increment_WhenCalled_IncrementCounter() {
-        requestLimitService.increment(LimitType.SPOTIFY_EXTERNAL);
-        verify(integerValueOperations, times(1)).increment(LimitType.SPOTIFY_EXTERNAL.getCacheKey());
+        requestLimitService.increment(LimitType.SPOTIFY_SYNC);
+        verify(integerValueOperations, times(1)).increment(LimitType.SPOTIFY_SYNC.getCacheKey());
     }
 
     @Test
@@ -140,8 +140,8 @@ public class DefaultRequestLimitServiceTest {
 
     @Test
     public void reset_WhenCalled_ResetRequestCounter() {
-        requestLimitService.reset(LimitType.SPOTIFY_EXTERNAL);
-        verify(integerValueOperations, times(1)).set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 0);
+        requestLimitService.reset(LimitType.SPOTIFY_SYNC);
+        verify(integerValueOperations, times(1)).set(LimitType.SPOTIFY_SYNC.getCacheKey(), 0);
     }
 
     @Test
@@ -160,8 +160,8 @@ public class DefaultRequestLimitServiceTest {
                     return sessionCallback.execute(operations);
                 });
         requestLimitService.resetAll();
-        verify(valueOperations, times(1)).set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 0);
-        verify(valueOperations, times(1)).set(LimitType.ARTIST_SEARCH.getCacheKey(), 0);
+        verify(valueOperations, times(1)).set(LimitType.SPOTIFY_SYNC.getCacheKey(), 0);
+        verify(valueOperations, times(1)).set(LimitType.SPOTIFY_SEARCH.getCacheKey(), 0);
     }
 
     @Test
@@ -180,9 +180,9 @@ public class DefaultRequestLimitServiceTest {
     }
 
     private void assertTryFor(boolean canSendRequest, VerificationMode verificationMode, int requestCount) {
-        LimitType limitType = LimitType.SPOTIFY_EXTERNAL;
+        LimitType limitType = LimitType.SPOTIFY_SYNC;
         String cacheKey = limitType.getCacheKey();
-        when(limitProperties.getSpotify()).thenReturn(450);
+        when(limitProperties.getSpotifySync()).thenReturn(450);
         when(integerValueOperations.get(cacheKey)).thenReturn(requestCount);
         assertEquals(canSendRequest, requestLimitService.tryFor(limitType));
         verify(integerValueOperations, verificationMode).increment(cacheKey);
