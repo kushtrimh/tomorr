@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.kushtrimh.tomorr.limit.RequestLimitService;
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import com.kushtrimh.tomorr.spotify.api.DefaultSpotifyApiClient;
-import com.kushtrimh.tomorr.spotify.api.LimitAwareSpotifyApiClient;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
 import com.kushtrimh.tomorr.spotify.http.DefaultSpotifyHttpClient;
 import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
@@ -52,8 +51,6 @@ public class SpotifyConfiguration {
                 .userAgent(spotifyProperties.getUserAgent())
                 .restTemplate(restTemplate)
                 .build();
-        var apiClient = new DefaultSpotifyApiClient(httpClient, spotifyProperties, stringRedisTemplate);
-        return new LimitAwareSpotifyApiClient(apiClient, requestLimitService);
-
+        return new DefaultSpotifyApiClient(httpClient, requestLimitService, spotifyProperties, stringRedisTemplate);
     }
 }

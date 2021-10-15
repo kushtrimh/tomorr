@@ -13,8 +13,8 @@ public class TestLimitConfiguration {
     @Bean
     public LimitProperties limitProperties() {
         LimitProperties limitProperties = new LimitProperties();
-        limitProperties.setArtistSearch(100);
-        limitProperties.setSpotify(450);
+        limitProperties.setSpotifySearch(100);
+        limitProperties.setSpotifySync(450);
         return limitProperties;
     }
 }

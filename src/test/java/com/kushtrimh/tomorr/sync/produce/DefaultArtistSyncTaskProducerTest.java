@@ -65,7 +65,7 @@ class DefaultArtistSyncTaskProducerTest {
     public void produce_WhenTasksToCreateNumberIsLessThanZero_DoNotForwardTasksToSender() {
         List<Task<ArtistTaskData>> tasks = generateTasks("artist", 50);
         when(artistSyncTaskManager.getAll()).thenReturn(tasks);
-        when(limitProperties.getSpotify()).thenReturn(40);
+        when(limitProperties.getSpotifySync()).thenReturn(40);
         producer.produce();
         verify(artistService, never()).findToSync(any(String.class), any(Integer.class));
         verify(artistSyncTaskSender, never()).send(anyList());
@@ -79,7 +79,7 @@ class DefaultArtistSyncTaskProducerTest {
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(ARTIST_SYNC_KEY)).thenReturn(syncKey);
-        when(limitProperties.getSpotify()).thenReturn(600);
+        when(limitProperties.getSpotifySync()).thenReturn(600);
         when(artistSyncTaskManager.getAll()).thenReturn(existingTasks);
         when(artistService.findToSync(syncKey, 500)).thenReturn(Collections.emptyList());
         producer.produce();
@@ -98,7 +98,7 @@ class DefaultArtistSyncTaskProducerTest {
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(ARTIST_SYNC_KEY)).thenReturn(syncKey);
-        when(limitProperties.getSpotify()).thenReturn(600);
+        when(limitProperties.getSpotifySync()).thenReturn(600);
         when(artistSyncTaskManager.getAll()).thenReturn(existingTasks);
         when(artistService.findToSync(syncKey, 400)).thenReturn(newArtists);
         producer.produce();
@@ -116,7 +116,7 @@ class DefaultArtistSyncTaskProducerTest {
     public void produce_WhenRetrievedSyncKeyIsNull_GenerateAndUseNewSyncKey() {
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(ARTIST_SYNC_KEY)).thenReturn(null);
-        when(limitProperties.getSpotify()).thenReturn(600);
+        when(limitProperties.getSpotifySync()).thenReturn(600);
         when(artistSyncTaskManager.getAll()).thenReturn(generateTasks("artist", 400));
         when(artistService.findToSync(any(String.class), eq(200))).thenReturn(generateArtists(10));
         producer.produce();

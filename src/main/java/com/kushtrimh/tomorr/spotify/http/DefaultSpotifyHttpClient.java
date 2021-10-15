@@ -53,13 +53,13 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
     }
 
     @Override
-    public <Req extends SpotifyApiRequest, Res> Res get(String token, Req request, Class<Res> cls)
+    public <Req extends SpotifyApiRequest<Res>, Res> Res get(String token, Req request, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException {
         return execute(token, spotifyApiUriBuilder.getApiUri(request), HttpMethod.GET, null, cls);
     }
 
     @Override
-    public <Req extends SpotifyApiRequest, Res> Res post(String token, Req request, Class<Res> cls)
+    public <Req extends SpotifyApiRequest<Res>, Res> Res post(String token, Req request, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException {
         return execute(token, spotifyApiUriBuilder.getApiUri(request), HttpMethod.POST, request, cls);
     }
@@ -91,7 +91,7 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
         }
     }
 
-    private <Req extends SpotifyApiRequest, Res> Res execute(
+    private <Req extends SpotifyApiRequest<Res>, Res> Res execute(
             String token, String url, HttpMethod method, Req body, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException {
         Objects.requireNonNull(token);

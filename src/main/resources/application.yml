@@ -6,7 +6,7 @@ spring:
   messages:
     basename: messages/messages
   quartz:
-    jdbc-store-type: jdbc
+    job-store-type: jdbc
     startup-delay: 15s
     properties:
       org:
@@ -37,8 +37,8 @@ redis:
   host: ${TOMORR_REDIS_HOST}
   port: ${TOMORR_REDIS_PORT}
 request-limit:
-  spotify: 600
-  artist-search: 150
+  spotify-sync: 600
+  spotify-search: 150
 logging:
   level:
     com:

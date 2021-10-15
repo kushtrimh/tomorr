@@ -1,20 +1,17 @@
 package com.kushtrimh.tomorr.spotify.api;
 
+import com.kushtrimh.tomorr.limit.LimitType;
+import com.kushtrimh.tomorr.limit.RequestLimitService;
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.SpotifyCacheKeys;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
-import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
-import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
-import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistsApiRequest;
-import com.kushtrimh.tomorr.spotify.api.request.artist.SearchApiRequest;
-import com.kushtrimh.tomorr.spotify.api.response.SearchApiResponse;
+import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
-import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
-import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistApiResponse;
-import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
 import com.kushtrimh.tomorr.spotify.http.SpotifyHttpClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
+
+import java.util.Objects;
 
 /**
  * @author Kushtrim Hajrizi
@@ -22,45 +19,35 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 public class DefaultSpotifyApiClient implements SpotifyApiClient {
 
     private final SpotifyHttpClient httpClient;
+    private final RequestLimitService requestLimitService;
     private final SpotifyProperties spotifyProperties;
     private final StringRedisTemplate stringRedisTemplate;
 
-    public DefaultSpotifyApiClient(SpotifyHttpClient httpClient,
-                                   SpotifyProperties spotifyProperties,
-                                   StringRedisTemplate stringRedisTemplate) {
+    public DefaultSpotifyApiClient(
+            SpotifyHttpClient httpClient,
+            RequestLimitService requestLimitService,
+            SpotifyProperties spotifyProperties,
+            StringRedisTemplate stringRedisTemplate) {
         this.httpClient = httpClient;
+        this.requestLimitService = requestLimitService;
         this.spotifyProperties = spotifyProperties;
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
-    public GetArtistsApiResponse getMultipleArtists(GetArtistsApiRequest request)
+    public <Req extends SpotifyApiRequest<Res>, Res> Res get(Req request)
             throws TooManyRequestsException, SpotifyApiException {
-        return httpClient.get(getAccessToken(), request, GetArtistsApiResponse.class);
+        Objects.requireNonNull(request);
+        return httpClient.get(getAccessToken(), request, request.getResponseClass());
     }
 
     @Override
-    public GetArtistAlbumsApiResponse getArtistAlbums(GetArtistAlbumsApiRequest request)
+    public <Req extends SpotifyApiRequest<Res>, Res> Res get(LimitType limitType, Req request)
             throws TooManyRequestsException, SpotifyApiException {
-        return httpClient.get(getAccessToken(), request, GetArtistAlbumsApiResponse.class);
-    }
-
-    @Override
-    public GetArtistAlbumsApiResponse getArtistAlbums(String url)
-            throws TooManyRequestsException, SpotifyApiException {
-        return httpClient.get(getAccessToken(), url, GetArtistAlbumsApiResponse.class);
-    }
-
-    @Override
-    public GetArtistApiResponse getArtist(GetArtistApiRequest request)
-            throws TooManyRequestsException, SpotifyApiException {
-        return httpClient.get(getAccessToken(), request, GetArtistApiResponse.class);
-    }
-
-    @Override
-    public SearchApiResponse search(SearchApiRequest request)
-            throws TooManyRequestsException, SpotifyApiException {
-        return httpClient.get(getAccessToken(), request, SearchApiResponse.class);
+        Objects.requireNonNull(limitType);
+        Objects.requireNonNull(request);
+        checkLimit(limitType);
+        return httpClient.get(getAccessToken(), request, request.getResponseClass());
     }
 
     @Override
@@ -72,5 +59,11 @@ public class DefaultSpotifyApiClient implements SpotifyApiClient {
 
     private String getAccessToken() {
         return stringRedisTemplate.opsForValue().get(SpotifyCacheKeys.ACCESS_TOKEN_KEY);
+    }
+
+    private void checkLimit(LimitType limitType) throws TooManyRequestsException {
+        if (!requestLimitService.tryFor(limitType)) {
+            throw new TooManyRequestsException("Reached limit for requests");
+        }
     }
 }

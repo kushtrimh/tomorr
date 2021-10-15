@@ -2,6 +2,7 @@ package com.kushtrimh.tomorr.artist.service;
 
 import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.cache.ArtistCache;
+import com.kushtrimh.tomorr.limit.LimitType;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
@@ -67,7 +68,7 @@ class DefaultArtistSearchServiceTest {
         artistResponseData.setId("artist1");
         response.setArtistResponseData(artistResponseData);
 
-        when(spotifyApiClient.getArtist(request)).thenReturn(response);
+        when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request)).thenReturn(response);
         assertTrue(defaultArtistSearchService.exists(artistId));
         verify(artistCache, times(1)).putArtistIds(List.of("artist1"));
     }
@@ -85,7 +86,7 @@ class DefaultArtistSearchServiceTest {
         when(artistService.searchByName(name)).thenReturn(artists);
         List<Artist> returnedArtists = defaultArtistSearchService.search(name, false);
         assertIterableEquals(artists, returnedArtists);
-        verify(spotifyApiClient, never()).search(any(SearchApiRequest.class));
+        verify(spotifyApiClient, never()).get(eq(LimitType.SPOTIFY_SEARCH), any(SearchApiRequest.class));
     }
 
     @Test
@@ -100,7 +101,7 @@ class DefaultArtistSearchServiceTest {
                 .offset(0)
                 .types(List.of("artist"))
                 .build();
-        when(spotifyApiClient.search(request))
+        when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request))
                 .thenThrow(SpotifyApiException.class);
         List<Artist> returnedArtists = defaultArtistSearchService.search(name, true);
         Assertions.assertThat(artists).hasSameElementsAs(returnedArtists);
@@ -127,7 +128,7 @@ class DefaultArtistSearchServiceTest {
         );
         searchResponseData.setItems(artistsResponseData);
         response.setArtists(searchResponseData);
-        when(spotifyApiClient.search(request)).thenReturn(response);
+        when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request)).thenReturn(response);
         List<Artist> returnedArtists = defaultArtistSearchService.search(name, true);
 
         List<Artist> expectedArtists = new ArrayList<>(artists);
@@ -140,7 +141,7 @@ class DefaultArtistSearchServiceTest {
             throws TooManyRequestsException, SpotifyApiException {
         var artistId = "artist1";
         var request = new GetArtistApiRequest.Builder(artistId).build();
-        when(spotifyApiClient.getArtist(request)).thenThrow(exceptionCls);
+        when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request)).thenThrow(exceptionCls);
         assertFalse(defaultArtistSearchService.exists(artistId));
         verify(artistCache, never()).putArtistIds(any());
     }

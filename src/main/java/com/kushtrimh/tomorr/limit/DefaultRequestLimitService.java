@@ -104,8 +104,8 @@ public class DefaultRequestLimitService implements RequestLimitService {
 
     private int getLimit(LimitType limitType) {
         return switch (limitType) {
-            case SPOTIFY_EXTERNAL -> limitProperties.getSpotify();
-            case ARTIST_SEARCH -> limitProperties.getArtistSearch();
+            case SPOTIFY_SYNC -> limitProperties.getSpotifySync();
+            case SPOTIFY_SEARCH -> limitProperties.getSpotifySearch();
             default -> limitProperties.getGlobal();
         };
     }

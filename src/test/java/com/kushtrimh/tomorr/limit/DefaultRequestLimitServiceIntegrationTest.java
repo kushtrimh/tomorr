@@ -44,100 +44,100 @@ public class DefaultRequestLimitServiceIntegrationTest {
     @BeforeEach
     public void init() {
         requestLimitService = new DefaultRequestLimitService(limitProperties, integerRedisTemplate);
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 0);
-        integerValueOperations.set(LimitType.ARTIST_SEARCH.getCacheKey(), 0);
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 0);
+        integerValueOperations.set(LimitType.SPOTIFY_SEARCH.getCacheKey(), 0);
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsBiggerThanLimit_ReturnFalse() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 475);
-        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 475);
+        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsEqualsToLimit_ReturnFalse() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 450);
-        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 450);
+        assertFalse(requestLimitService.canSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void canSendRequest_WhenRequestCounterIsSmallerThanLimit_ReturnTrue() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 25);
-        assertTrue(requestLimitService.canSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 25);
+        assertTrue(requestLimitService.canSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsBiggerThanLimit_ReturnTrue() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 475);
-        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 475);
+        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsEqualsToLimit_ReturnTrue() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 450);
-        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 450);
+        assertTrue(requestLimitService.cantSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void cantSendRequest_WhenRequestCounterIsSmallerThanLimit_ReturnFalse() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 25);
-        assertFalse(requestLimitService.cantSendRequest(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 25);
+        assertFalse(requestLimitService.cantSendRequest(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void getRemainingRequestLimit_WhenCalled_ReturnRemainingRequestLimit() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 340);
-        assertEquals(110, requestLimitService.getRemainingRequestLimit(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 340);
+        assertEquals(110, requestLimitService.getRemainingRequestLimit(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void getSentRequestsCounter_WhenCalled_ReturnRequestCounter() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 154);
-        assertEquals(154, requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_EXTERNAL));
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 154);
+        assertEquals(154, requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_SYNC));
     }
 
     @Test
     public void increment_WhenCalled_IncrementCounter() {
-        String key = LimitType.SPOTIFY_EXTERNAL.getCacheKey();
+        String key = LimitType.SPOTIFY_SYNC.getCacheKey();
         assertEquals(0, integerValueOperations.get(key));
-        requestLimitService.increment(LimitType.SPOTIFY_EXTERNAL);
+        requestLimitService.increment(LimitType.SPOTIFY_SYNC);
         assertEquals(1, integerValueOperations.get(key));
     }
 
     @Test
     public void reset_WhenCalled_ResetCounter() {
-        String key = LimitType.SPOTIFY_EXTERNAL.getCacheKey();
+        String key = LimitType.SPOTIFY_SYNC.getCacheKey();
         integerValueOperations.set(key, 235);
         assertEquals(235, integerValueOperations.get(key));
-        requestLimitService.reset(LimitType.SPOTIFY_EXTERNAL);
+        requestLimitService.reset(LimitType.SPOTIFY_SYNC);
         assertEquals(0, integerValueOperations.get(key));
     }
 
     @Test
     public void resetAll_WhenCalled_ResetAllCounters() {
-        integerValueOperations.set(LimitType.SPOTIFY_EXTERNAL.getCacheKey(), 100);
-        integerValueOperations.set(LimitType.ARTIST_SEARCH.getCacheKey(), 50);
+        integerValueOperations.set(LimitType.SPOTIFY_SYNC.getCacheKey(), 100);
+        integerValueOperations.set(LimitType.SPOTIFY_SEARCH.getCacheKey(), 50);
         assertAll(
-                () -> assertEquals(100, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())),
-                () -> assertEquals(50, integerRedisTemplate.opsForValue().get(LimitType.ARTIST_SEARCH.getCacheKey()))
+                () -> assertEquals(100, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_SYNC.getCacheKey())),
+                () -> assertEquals(50, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_SEARCH.getCacheKey()))
         );
         requestLimitService.resetAll();
         assertAll(
-                () -> assertEquals(0, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_EXTERNAL.getCacheKey())),
-                () -> assertEquals(0, integerRedisTemplate.opsForValue().get(LimitType.ARTIST_SEARCH.getCacheKey()))
+                () -> assertEquals(0, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_SYNC.getCacheKey())),
+                () -> assertEquals(0, integerRedisTemplate.opsForValue().get(LimitType.SPOTIFY_SEARCH.getCacheKey()))
         );
     }
 
     @Test
     public void tryFor_WhenCantSendRequest_ReturnFalse() {
-        LimitType limitType = LimitType.SPOTIFY_EXTERNAL;
+        LimitType limitType = LimitType.SPOTIFY_SYNC;
         integerValueOperations.set(limitType.getCacheKey(), 450);
         assertFalse(requestLimitService.tryFor(limitType));
     }
 
     @Test
     public void tryFor_WheCanSendRequest_ReturnTrueAndIncrement() {
-        LimitType limitType = LimitType.SPOTIFY_EXTERNAL;
+        LimitType limitType = LimitType.SPOTIFY_SYNC;
         integerValueOperations.set(limitType.getCacheKey(), 350);
         boolean canSend = requestLimitService.tryFor(limitType);
         int count = integerValueOperations.get(limitType.getCacheKey());
