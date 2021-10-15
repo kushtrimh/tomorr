@@ -32,7 +32,7 @@ public class ArtistSyncJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         logger.debug("Artist sync job started...");
 
-        long taskRelatedRequests = requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_SEARCH);
+        long taskRelatedRequests = requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_SYNC);
         long artistSearchRequests = requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_SEARCH);
         logger.info("{} sync related requests for Spotify sent, limit {}", taskRelatedRequests, limitProperties.getSpotifySync());
         logger.info("{} search related requests for Spotify sent, limit {}", artistSearchRequests, limitProperties.getSpotifySearch());

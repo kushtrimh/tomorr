@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class DefaultArtistSearchService implements ArtistSearchService {
+    // TODO: Add integration tests for this
+
     private final Logger logger = LoggerFactory.getLogger(DefaultArtistSearchService.class);
 
     private final ArtistCache artistCache;
@@ -73,7 +75,7 @@ public class DefaultArtistSearchService implements ArtistSearchService {
                     .map(this::toArtist)
                     .collect(Collectors.toCollection(ArrayList::new));
             artistsFromExternalQuery.addAll(artists);
-            return artistsFromExternalQuery.stream().distinct().toList();
+            return artistsFromExternalQuery.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
         } catch (TooManyRequestsException | SpotifyApiException e) {
             logger.warn("Could not search for artists externally", e);
         }

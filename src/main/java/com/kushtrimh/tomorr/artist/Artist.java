@@ -1,14 +1,18 @@
 package com.kushtrimh.tomorr.artist;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import java.util.Objects;
 
 /**
  * @author Kushtrim Hajrizi
  */
-public record Artist(String id,
-                     String name,
-                     String imageHref,
-                     int popularity) {
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public record Artist(
+        String id,
+        String name,
+        String imageHref,
+        int popularity) {
 
     @Override
     public boolean equals(Object o) {
