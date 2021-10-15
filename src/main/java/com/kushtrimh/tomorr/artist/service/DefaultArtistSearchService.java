@@ -2,6 +2,7 @@ package com.kushtrimh.tomorr.artist.service;
 
 import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.cache.ArtistCache;
+import com.kushtrimh.tomorr.limit.LimitType;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
@@ -44,7 +45,7 @@ public class DefaultArtistSearchService implements ArtistSearchService {
     public boolean exists(String artistId) {
         var request = new GetArtistApiRequest.Builder(artistId).build();
         try {
-            GetArtistApiResponse response = spotifyApiClient.getArtist(request);
+            GetArtistApiResponse response = spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request);
             artistCache.putArtistIds(List.of(response.getArtistResponseData().getId()));
             return true;
         } catch (TooManyRequestsException | SpotifyApiException e) {
@@ -67,7 +68,7 @@ public class DefaultArtistSearchService implements ArtistSearchService {
                 .types(List.of("artist"))
                 .build();
         try {
-            SearchApiResponse response = spotifyApiClient.search(searchApiRequest);
+            SearchApiResponse response = spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, searchApiRequest);
             List<Artist> artistsFromExternalQuery = response.getArtists().getItems().stream()
                     .map(this::toArtist)
                     .collect(Collectors.toCollection(ArrayList::new));

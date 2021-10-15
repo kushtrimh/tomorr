@@ -67,8 +67,13 @@ class SpotifyApiUriBuilderTest {
         assertEquals(expectedUri, returnedUriWithEmpty);
     }
 
-    private SpotifyApiRequest buildRequest(String path, MultiValueMap<String, String> params) {
-        return new SpotifyApiRequest() {
+    private SpotifyApiRequest<Object> buildRequest(String path, MultiValueMap<String, String> params) {
+        return new SpotifyApiRequest<>() {
+            @Override
+            public Class<Object> getResponseClass() {
+                return Object.class;
+            }
+
             @Override
             public String getPath() {
                 return path;

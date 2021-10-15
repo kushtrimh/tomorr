@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.spotify.api.request.artist;
 
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistsApiResponse;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * @author Kushtrim Hajrizi
  */
-public class GetArtistsApiRequest implements SpotifyApiRequest {
+public class GetArtistsApiRequest implements SpotifyApiRequest<GetArtistsApiResponse> {
     private List<String> artists = new ArrayList<>();
 
     public GetArtistsApiRequest() {
@@ -38,6 +39,11 @@ public class GetArtistsApiRequest implements SpotifyApiRequest {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("ids", String.join(",", artists));
         return params;
+    }
+
+    @Override
+    public Class<GetArtistsApiResponse> getResponseClass() {
+        return GetArtistsApiResponse.class;
     }
 
     @Override

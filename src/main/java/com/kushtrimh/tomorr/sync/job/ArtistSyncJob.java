@@ -5,7 +5,6 @@ import com.kushtrimh.tomorr.limit.RequestLimitService;
 import com.kushtrimh.tomorr.properties.LimitProperties;
 import com.kushtrimh.tomorr.sync.produce.ArtistSyncTaskProducer;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;

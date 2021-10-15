@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.spotify.api.request.artist;
 
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.SearchApiResponse;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
 /**
  * @author Kushtrim Hajrizi
  */
-public class SearchApiRequest implements SpotifyApiRequest {
+public class SearchApiRequest implements SpotifyApiRequest<SearchApiResponse> {
     private String query;
     private List<String> types = new ArrayList<>();
     private String market;
@@ -87,6 +88,11 @@ public class SearchApiRequest implements SpotifyApiRequest {
             params.add("market", market);
         }
         return params;
+    }
+
+    @Override
+    public Class<SearchApiResponse> getResponseClass() {
+        return SearchApiResponse.class;
     }
 
     @Override

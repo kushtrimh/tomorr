@@ -5,7 +5,9 @@ import org.springframework.util.MultiValueMap;
 /**
  * @author Kushtrim Hajrizi
  */
-public interface SpotifyApiRequest {
+public interface SpotifyApiRequest<T> {
+
+    Class<T> getResponseClass();
 
     String getPath();
 

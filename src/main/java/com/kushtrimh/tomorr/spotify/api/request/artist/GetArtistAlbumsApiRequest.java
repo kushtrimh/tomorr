@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.spotify.api.request.artist;
 
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
+import com.kushtrimh.tomorr.spotify.api.response.artist.GetArtistAlbumsApiResponse;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * @author Kushtrim Hajrizi
  */
-public class GetArtistAlbumsApiRequest implements SpotifyApiRequest {
+public class GetArtistAlbumsApiRequest implements SpotifyApiRequest<GetArtistAlbumsApiResponse> {
     private String artistId;
     private List<String> includeGroups = new ArrayList<>();
     private String market;
@@ -85,6 +86,11 @@ public class GetArtistAlbumsApiRequest implements SpotifyApiRequest {
         params.add("limit", Integer.toString(limit));
         params.add("offset", Integer.toString(offset));
         return params;
+    }
+
+    @Override
+    public Class<GetArtistAlbumsApiResponse> getResponseClass() {
+        return GetArtistAlbumsApiResponse.class;
     }
 
     @Override
