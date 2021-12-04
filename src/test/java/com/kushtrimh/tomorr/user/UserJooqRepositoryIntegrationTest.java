@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
 @ExtendWith({TestDatabaseExtension.class})
 @JooqTest
+@Transactional
 public class UserJooqRepositoryIntegrationTest {
 
     private final UserRepository<AppUserRecord> userRepository;

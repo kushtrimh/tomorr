@@ -1,6 +1,8 @@
 package com.kushtrimh.tomorr.spotify.http;
 
-import com.kushtrimh.tomorr.configuration.TestSpotifyConfiguration;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
@@ -22,14 +24,15 @@ import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
@@ -47,34 +50,42 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * @author Kushtrim Hajrizi
  */
-@ContextConfiguration(classes = TestSpotifyConfiguration.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith({MockitoExtension.class})
 public class DefaultSpotifyHttpClientTest {
 
-    private final RestTemplate restTemplate;
-    private final SpotifyProperties spotifyProperties;
-    private final SpotifyApiUriBuilder spotifyApiUriBuilder;
+    private RestTemplate restTemplate;
+    private SpotifyProperties spotifyProperties;
+    private MockRestServiceServer server;
 
-    private final MockRestServiceServer server;
     private SpotifyHttpClient client;
 
-    @Autowired
-    public DefaultSpotifyHttpClientTest(RestTemplate restTemplate,
-                                        SpotifyProperties spotifyProperties,
-                                        SpotifyApiUriBuilder spotifyApiUriBuilder) {
-        this.restTemplate = restTemplate;
-        this.spotifyProperties = spotifyProperties;
-        this.spotifyApiUriBuilder = spotifyApiUriBuilder;
+    {
+        var mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(mapper);
 
-        server = MockRestServiceServer.bindTo(restTemplate).build();
+        restTemplate = new RestTemplateBuilder()
+                .additionalMessageConverters(converter)
+                .additionalMessageConverters(new FormHttpMessageConverter())
+                .build();
     }
 
     @BeforeEach
     public void init() {
+        spotifyProperties = new SpotifyProperties();
+        spotifyProperties.setClientId("client-id-value");
+        spotifyProperties.setClientSecret("client-secret-value");
+        spotifyProperties.setApiUrl("http://localhost");
+        spotifyProperties.setAuthUrl("http://localhost/auth");
+        spotifyProperties.setUserAgent("tomorr-test/0.1");
+        SpotifyApiUriBuilder spotifyApiUriBuilder = new SpotifyApiUriBuilder(spotifyProperties.getApiUrl());
+
         client = new DefaultSpotifyHttpClient.Builder(spotifyApiUriBuilder, spotifyProperties.getAuthUrl())
                 .restTemplate(restTemplate)
                 .userAgent(spotifyProperties.getUserAgent())
                 .build();
+        server = MockRestServiceServer.bindTo(restTemplate).build();
     }
 
     // General tests for the client

@@ -11,84 +11,30 @@ import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import com.kushtrimh.tomorr.properties.DataSourceProperties;
 import com.kushtrimh.tomorr.user.repository.UserJooqRepository;
 import com.kushtrimh.tomorr.user.repository.UserRepository;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.jooq.ConnectionProvider;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DataSourceConnectionProvider;
-import org.jooq.impl.DefaultConfiguration;
-import org.jooq.impl.DefaultDSLContext;
-import org.springframework.boot.autoconfigure.jooq.JooqExceptionTranslator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
-import org.springframework.transaction.TransactionManager;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.GenericContainer;
-
-import javax.sql.DataSource;
 
 /**
  * @author Kushtrim Hajrizi
  */
 @Configuration
+@TestPropertySource(inheritProperties = false, inheritLocations = false)
+@Import({DataAccessConfiguration.class})
 public class TestDataSourceConfiguration {
-    private final DataSourceProperties dataSourceProperties;
 
-    public TestDataSourceConfiguration() {
+    @Bean
+    public DataSourceProperties dataSourceProperties() {
         var dataSourceProperties = new DataSourceProperties();
         GenericContainer<?> container = TestDatabaseExtension.getPostgreSQLContainer();
         dataSourceProperties.setUrl(String.format("jdbc:postgresql://%s:%d/tomorrtest",
                 container.getHost(), container.getFirstMappedPort()));
         dataSourceProperties.setUsername("postgres");
         dataSourceProperties.setPassword("postgres");
-        this.dataSourceProperties = dataSourceProperties;
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setDriverClassName("org.postgresql.Driver");
-        config.setJdbcUrl(dataSourceProperties.getUrl());
-        config.setUsername(dataSourceProperties.getUsername());
-        config.setPassword(dataSourceProperties.getPassword());
-        return new HikariDataSource(config);
-    }
-
-    @Bean
-    public TransactionManager dataSourceTransactionManager(DataSource dataSource) {
-        return new DataSourceTransactionManager(dataSource);
-    }
-
-    @Bean
-    public TransactionAwareDataSourceProxy transactionAwareDataSourceProxy(DataSource dataSource) {
-        return new TransactionAwareDataSourceProxy(dataSource);
-    }
-
-    @Bean
-    public ConnectionProvider connectionProvider(TransactionAwareDataSourceProxy transactionAwareDataSourceProxy) {
-        return new DataSourceConnectionProvider(transactionAwareDataSourceProxy);
-    }
-
-    @Bean
-    public JooqExceptionTranslator exceptionTranslator() {
-        return new JooqExceptionTranslator();
-    }
-
-    @Bean
-    public DefaultConfiguration config(ConnectionProvider connectionProvider,
-                                       JooqExceptionTranslator exceptionTranslator) {
-        DefaultConfiguration jooqConfiguration = new DefaultConfiguration();
-        jooqConfiguration.setSQLDialect(SQLDialect.POSTGRES);
-        jooqConfiguration.setConnectionProvider(connectionProvider);
-        jooqConfiguration.setExecuteListener(exceptionTranslator);
-        return jooqConfiguration;
-    }
-
-    @Bean
-    public DSLContext dsl(DefaultConfiguration config) {
-        return new DefaultDSLContext(config);
+        return dataSourceProperties;
     }
 
     @Bean

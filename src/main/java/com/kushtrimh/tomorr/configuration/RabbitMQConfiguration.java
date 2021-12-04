@@ -2,7 +2,6 @@ package com.kushtrimh.tomorr.configuration;
 
 import com.kushtrimh.tomorr.properties.RabbitMQProperties;
 import com.kushtrimh.tomorr.task.Task;
-import com.kushtrimh.tomorr.task.data.ArtistTaskData;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

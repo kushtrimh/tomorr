@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ExtendWith({MockitoExtension.class})
 @ContextConfiguration(classes = {TestSpotifyConfiguration.class})
 public class DefaultSpotifyApiClientTest {
 
@@ -40,17 +40,12 @@ public class DefaultSpotifyApiClientTest {
     private StringRedisTemplate stringRedisTemplate;
     @Mock
     private ValueOperations<String, String> valueOperations;
-
-    private final SpotifyProperties spotifyProperties;
+    @Mock
+    private SpotifyProperties spotifyProperties;
 
     private SpotifyApiClient client;
 
     private final String accessTokenValue = "access-token-value-tsg6523dstw5";
-
-    @Autowired
-    public DefaultSpotifyApiClientTest(SpotifyProperties spotifyProperties) {
-        this.spotifyProperties = spotifyProperties;
-    }
 
     @BeforeEach
     public void init() {
