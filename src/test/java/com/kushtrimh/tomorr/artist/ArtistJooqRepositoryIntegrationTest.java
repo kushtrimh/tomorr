@@ -2,8 +2,8 @@ package com.kushtrimh.tomorr.artist;
 
 import com.kushtrimh.tomorr.artist.repository.ArtistRepository;
 import com.kushtrimh.tomorr.configuration.TestDataSourceConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
+import com.kushtrimh.tomorr.extension.TestDatabaseExtension;
 import org.assertj.core.api.Assertions;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Tag;

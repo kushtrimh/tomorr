@@ -1,4 +1,4 @@
-package com.kushtrimh.tomorr.dal.extension;
+package com.kushtrimh.tomorr.extension;
 
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

@@ -1,7 +1,7 @@
 package com.kushtrimh.tomorr.task.manager;
 
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
+import com.kushtrimh.tomorr.extension.TestRedisExtension;
 import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.TaskType;
 import com.kushtrimh.tomorr.task.data.ArtistTaskData;

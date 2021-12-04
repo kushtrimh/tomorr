@@ -1,7 +1,8 @@
 package com.kushtrimh.tomorr.artist.cache;
 
+import com.kushtrimh.tomorr.configuration.RedisConfiguration;
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
+import com.kushtrimh.tomorr.extension.TestRedisExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Tags(value = {@Tag("redis"), @Tag("integration")})
 @ExtendWith({SpringExtension.class, MockitoExtension.class, TestRedisExtension.class})
-@ContextConfiguration(classes = TestRedisConfiguration.class)
+@ContextConfiguration(classes = {TestRedisConfiguration.class, RedisConfiguration.class})
 public class ArtistRedisCacheIntegrationTest {
 
     private final StringRedisTemplate stringRedisTemplate;

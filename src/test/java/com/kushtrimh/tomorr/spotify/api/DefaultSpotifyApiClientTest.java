@@ -15,11 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.kushtrimh.tomorr.spotify.SpotifyCacheKeys.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +26,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author Kushtrim Hajrizi
  */
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ExtendWith({MockitoExtension.class})
 @ContextConfiguration(classes = {TestSpotifyConfiguration.class})
 public class DefaultSpotifyApiClientTest {
 
@@ -40,17 +38,12 @@ public class DefaultSpotifyApiClientTest {
     private StringRedisTemplate stringRedisTemplate;
     @Mock
     private ValueOperations<String, String> valueOperations;
-
-    private final SpotifyProperties spotifyProperties;
+    @Mock
+    private SpotifyProperties spotifyProperties;
 
     private SpotifyApiClient client;
 
     private final String accessTokenValue = "access-token-value-tsg6523dstw5";
-
-    @Autowired
-    public DefaultSpotifyApiClientTest(SpotifyProperties spotifyProperties) {
-        this.spotifyProperties = spotifyProperties;
-    }
 
     @BeforeEach
     public void init() {

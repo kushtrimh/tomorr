@@ -36,6 +36,9 @@ spotify:
 redis:
   host: ${TOMORR_REDIS_HOST}
   port: ${TOMORR_REDIS_PORT}
+rabbitmq:
+  host: ${TOMORR_RABBITMQ_HOST}
+  port: ${TOMORR_RABBITMQ_PORT}
 request-limit:
   spotify-sync: 600
   spotify-search: 150

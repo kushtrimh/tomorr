@@ -35,9 +35,10 @@ public class DefaultArtistSearchService implements ArtistSearchService {
     private final ArtistService artistService;
     private final SpotifyApiClient spotifyApiClient;
 
-    public DefaultArtistSearchService(ArtistCache artistCache,
-                                      ArtistService artistService,
-                                      SpotifyApiClient spotifyApiClient) {
+    public DefaultArtistSearchService(
+            ArtistCache artistCache,
+            ArtistService artistService,
+            SpotifyApiClient spotifyApiClient) {
         this.artistCache = artistCache;
         this.artistService = artistService;
         this.spotifyApiClient = spotifyApiClient;
