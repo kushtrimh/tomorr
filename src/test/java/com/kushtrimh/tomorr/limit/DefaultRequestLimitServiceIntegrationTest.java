@@ -3,7 +3,7 @@ package com.kushtrimh.tomorr.limit;
 import com.kushtrimh.tomorr.configuration.TestLimitConfiguration;
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
 import com.kushtrimh.tomorr.configuration.TestSpotifyConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
+import com.kushtrimh.tomorr.extension.TestRedisExtension;
 import com.kushtrimh.tomorr.properties.LimitProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;

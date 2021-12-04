@@ -1,7 +1,7 @@
 package com.kushtrimh.tomorr.spotify.api;
 
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
+import com.kushtrimh.tomorr.extension.TestRedisExtension;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.SpotifyCacheKeys;
 import org.junit.jupiter.api.BeforeEach;

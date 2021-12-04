@@ -1,8 +1,8 @@
 package com.kushtrimh.tomorr.user;
 
 import com.kushtrimh.tomorr.configuration.TestDataSourceConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
+import com.kushtrimh.tomorr.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.user.repository.UserRepository;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;

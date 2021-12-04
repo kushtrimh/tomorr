@@ -25,7 +25,7 @@ public class TestLimitConfiguration {
 
     @Bean
     public RequestLimitService requestLimitService(
-            LimitProperties limitProperties,  RedisTemplate<String, Integer> template) {
+            LimitProperties limitProperties, RedisTemplate<String, Integer> template) {
         return new DefaultRequestLimitService(limitProperties, template);
     }
 }

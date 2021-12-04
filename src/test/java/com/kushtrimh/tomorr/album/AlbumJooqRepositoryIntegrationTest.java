@@ -2,8 +2,8 @@ package com.kushtrimh.tomorr.album;
 
 import com.kushtrimh.tomorr.album.repository.AlbumRepository;
 import com.kushtrimh.tomorr.configuration.TestDataSourceConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
+import com.kushtrimh.tomorr.extension.TestDatabaseExtension;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;

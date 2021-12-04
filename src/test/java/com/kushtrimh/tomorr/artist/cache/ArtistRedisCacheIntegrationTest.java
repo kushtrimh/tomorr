@@ -2,7 +2,7 @@ package com.kushtrimh.tomorr.artist.cache;
 
 import com.kushtrimh.tomorr.configuration.RedisConfiguration;
 import com.kushtrimh.tomorr.configuration.TestRedisConfiguration;
-import com.kushtrimh.tomorr.dal.extension.TestRedisExtension;
+import com.kushtrimh.tomorr.extension.TestRedisExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
