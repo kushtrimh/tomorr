@@ -1,4 +1,6 @@
 FROM openjdk:17
-EXPOSE 8098
+
 COPY target/*.jar tomorr.jar
-CMD ["java", "-jar", "./tomorr.jar"]
+EXPOSE 8098
+
+CMD ["java", "-jar", "./tomorr.jar", "--spring.config.additional-location=optional:/config/application.yml"]

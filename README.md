@@ -35,3 +35,10 @@ rabbitmq:
   host: ${TOMORR_RABBITMQ_HOST}
   port: ${TOMORR_RABBITMQ_PORT}
 ```
+
+## Using Docker
+
+When using *docker*, use `TOMORR_ADDITIONAL_CONFIG` environment variable in addition, to specify the location of other `application.yml` files.
+
+### Running the container
+`docker container run -p 8098:8098 -d --name tomorr -v /home/config/application.yml:/config/application.yml kushtrimh/tomorr`
