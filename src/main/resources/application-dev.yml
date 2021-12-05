@@ -1,9 +1,0 @@
-server:
-  port: 8098
-spring:
-  application:
-    name: tomorr
-datasource:
-  url: ${TOMORR_DB_URL}
-  username: ${TOMORR_DB_USERNAME}
-  password: ${TOMORR_DB_PASSWORD}

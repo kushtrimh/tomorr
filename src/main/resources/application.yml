@@ -3,6 +3,9 @@ server:
 spring:
   application:
     name: tomorr
+  pid:
+    file: ${TOMORR_PID_FILE}
+    fail-on-write-error: true
   messages:
     basename: messages/messages
   quartz:
@@ -23,6 +26,17 @@ spring:
             misfireThreshold: 60000
             isClustered: true
             clusterCheckinInterval: 10000
+  mail:
+    host: ${TOMORR_MAIL_HOST:localhost}
+    username: ${TOMORR_MAIL_USERNAME:mailusername}
+    password: ${TOMORR_MAIL_PASSWORD:mailpassword}
+    port: ${TOMORR_MAIL_PORT:25}
+    properties:
+      mail:
+        smtp:
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 datasource:
   url: ${TOMORR_DB_URL}
   username: ${TOMORR_DB_USERNAME}
@@ -34,11 +48,11 @@ spotify:
   auth-url: https://accounts.spotify.com/api/token
   api-url: https://api.spotify.com/v1
 redis:
-  host: ${TOMORR_REDIS_HOST}
-  port: ${TOMORR_REDIS_PORT}
+  host: ${TOMORR_REDIS_HOST:localhost}
+  port: ${TOMORR_REDIS_PORT:6379}
 rabbitmq:
-  host: ${TOMORR_RABBITMQ_HOST}
-  port: ${TOMORR_RABBITMQ_PORT}
+  host: ${TOMORR_RABBITMQ_HOST:localhost}
+  port: ${TOMORR_RABBITMQ_PORT:5672}
 request-limit:
   spotify-sync: 600
   spotify-search: 150

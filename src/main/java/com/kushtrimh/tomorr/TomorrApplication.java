@@ -9,7 +9,7 @@ public class TomorrApplication {
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(TomorrApplication.class);
-        app.addListeners(new ApplicationPidFileWriter(System.getenv("TOMORR_PID_FILE")));
+        app.addListeners(new ApplicationPidFileWriter());
         app.run(args);
     }
 }
