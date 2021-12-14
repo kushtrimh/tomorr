@@ -24,7 +24,7 @@ public class TestDatabaseExtension implements BeforeAllCallback {
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         if (!started) {
-            postgreSQLContainer = new PostgreSQLContainer<>("postgres:13.2")
+            postgreSQLContainer = new PostgreSQLContainer<>("postgres:14.1")
                     .withDatabaseName("tomorrtest")
                     .withUsername("postgres")
                     .withPassword("postgres")

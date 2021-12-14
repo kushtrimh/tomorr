@@ -33,6 +33,10 @@ spring:
     port: ${TOMORR_MAIL_PORT:25}
     properties:
       mail:
+        auth: false
+        starttls:
+          enable: false
+          required: false
         smtp:
           connectiontimeout: 5000
           timeout: 5000

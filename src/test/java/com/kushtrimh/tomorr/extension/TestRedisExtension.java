@@ -24,7 +24,7 @@ public class TestRedisExtension implements BeforeAllCallback {
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         if (!started) {
-            redisContainer = new GenericContainer<>(DockerImageName.parse("redis:6.2.3"))
+            redisContainer = new GenericContainer<>(DockerImageName.parse("redis:6.2.6"))
                     .withExposedPorts(6379);
             redisContainer.start();
             logger.info("Started Redis container at {}/{}",
