@@ -1,44 +1,100 @@
 # tomorr
 [![build](https://github.com/kushtrimh/tomorr/actions/workflows/maven.yml/badge.svg)](https://github.com/kushtrimh/tomorr/actions/workflows/maven.yml)
 
-## Required environment variables/properties
+## Running the project
 
-It is required either to define the environment variables specified below, or use the properties below to create a new `application.yml` and use it as external configuration.
-Some files as well, that do not require environment should be updated.
+### Using Docker
+
+#### Building the image
+
+Run `docker build -t kushtrimh/tomorr .` inside the project directory to build the image.
+
+#### Running the container
+
+Run
+
+`docker container run -p 8098:8098 -d --name tomorr kushtrimh/tomorr`
+
+or
+
+`docker container run -p 8098:8098 -d --name tomorr -v /home/config/application.yml:/etc/tomorr/application.yml kushtrimh/tomorr`
+
+in case you want to use an externalized configuration file.
+
+#### Running with `docker-compose`
+
+When running with `docker-compose`, create an `.env` file in the project directory, and add the environment variables specified below.
+
+```shell
+TOMORR_EXTERNAL_CONFIG=<DIRECTORY-TO-EXTERNAL-CONFIG>/application.yml
+```
+
+The external `application.yml` properties should contain the properties to needed to run the application when using `docker-compose`.
+Please check [external configuration](#external-configuration) for a ready-to-use configuration file for this case.
+
+### Without `docker`
+
+It is required either to define the environment variables specified below, or create a new `application.yml` and use it as external configuration.
+For an example of how the external configuration file should look like, please check [external configuration](#external-configuration) section.
+
+#### Environment variables
+
+| Environment variable           | Description            |
+|--------------------------------|------------------------|
+| `TOMORR_PID_FILE`              | PID file location.     |
+| `TOMORR_MAIL_HOST`             | Mail host.             |
+| `TOMORR_MAIL_USERNAME`         | Mail username.         |
+| `TOMORR_MAIL_PASSWORD`         | Mail password.         |
+| `TOMORR_MAIL_PORT`             | Mail port.             |
+| `TOMORR_DB_URL`                | Database URL.          |
+| `TOMORR_DB_USERNAME`           | Database username.     |
+| `TOMORR_DB_PASSWORD`           | Database password.     |
+| `TOMORR_SPOTIFY_CLIENT_ID`     | Spotify client id.     |
+| `TOMORR_SPOTIFY_CLIENT_SECRET` | Spotify client secret. |
+| `TOMORR_REDIS_HOST`            | Redis host.            |
+| `TOMORR_REDIS_PORT`            | Redis port.            |
+| `TOMORR_RABBITMQ_HOST`         | RabbitMQ host.         |
+| `TOMORR_RABBITMQ_PORT`         | RabbitMQ port.         |
+
+## External configuration
+
+The `application.yml` below shows an example of an external configuration file, and it also serves as a ready-to-use external configuration
+when using `docker-compose`. Please keep in mind updating `client-id` and `client-secret`.
 
 ```yaml
 spring:
   pid:
-    file: ${TOMORR_PID_FILE}
+    file: /var/run/tomorr.pid
   mail:
-    host: ${TOMORR_MAIL_HOST}
-    username: ${TOMORR_MAIL_USERNAME}
-    password: ${TOMORR_MAIL_PASSWORD}
-    port: ${TOMORR_MAIL_PORT}
+    host: mail
+    port: 1025
+datasource:
+  url: jdbc:postgresql://postgres:5432/tomorr
+  username: postgres
+  password: tomorrpostgres
+spotify:
+  client-id: <SPOTIFY_CLIENT_ID>
+  client-secret: <SPOTIFY_CLIENT_SECRET>
+redis:
+  host: redis
+  port: 6379
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+```
+
+### Additional configuration for other environments
+
+Properties below are properties which either are missing on the local/development environment, or their values needs to be changed
+in order to work as intended in production environments.
+
+```yaml
+spring:
+  mail:
     properties:
       mail:
         auth: true
         starttls:
           enable: true
           required: true
-datasource:
-  url: ${TOMORR_DB_URL}
-  username: ${TOMORR_DB_USERNAME}
-  password: ${TOMORR_DB_PASSWORD}
-spotify:
-  client-id: ${TOMORR_SPOTIFY_CLIENT_ID}
-  client-secret: ${TOMORR_SPOTIFY_CLIENT_SECRET}
-redis:
-  host: ${TOMORR_REDIS_HOST}
-  port: ${TOMORR_REDIS_PORT}
-rabbitmq:
-  host: ${TOMORR_RABBITMQ_HOST}
-  port: ${TOMORR_RABBITMQ_PORT}
 ```
-
-## Using Docker
-
-When using *docker*, use `TOMORR_ADDITIONAL_CONFIG` environment variable in addition, to specify the location of other `application.yml` files.
-
-### Running the container
-`docker container run -p 8098:8098 -d --name tomorr -v /home/config/application.yml:/config/application.yml kushtrimh/tomorr`
