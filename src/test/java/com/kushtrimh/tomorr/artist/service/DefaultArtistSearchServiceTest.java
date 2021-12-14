@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,13 +50,13 @@ class DefaultArtistSearchServiceTest {
     @Test
     public void exists_WhenApiCallThrowsTooManyRequestsException_ReturnFalse()
             throws TooManyRequestsException, SpotifyApiException {
-        assertThatThrowsException(TooManyRequestsException.class);
+        assertThatThrowsExceptionOnExists(TooManyRequestsException.class);
     }
 
     @Test
     public void exists_WhenApiCallThrowsSpotifyApiException_ReturnFalse()
             throws TooManyRequestsException, SpotifyApiException {
-        assertThatThrowsException(SpotifyApiException.class);
+        assertThatThrowsExceptionOnExists(SpotifyApiException.class);
     }
 
     @Test
@@ -63,13 +64,37 @@ class DefaultArtistSearchServiceTest {
             throws TooManyRequestsException, SpotifyApiException {
         var artistId = "artist1";
         var request = new GetArtistApiRequest.Builder(artistId).build();
-        var response = new GetArtistApiResponse();
-        var artistResponseData = new ArtistResponseData();
-        artistResponseData.setId("artist1");
-        response.setArtistResponseData(artistResponseData);
+        GetArtistApiResponse response = createGetArtistApiResponse(artistId, "artist-name");
 
         when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request)).thenReturn(response);
         assertTrue(defaultArtistSearchService.exists(artistId));
+        verify(artistCache, times(1)).putArtistIds(List.of("artist1"));
+    }
+
+    @Test
+    public void get_WhenApiCallThrowsTooManyRequestsException_ReturnEmptyOptional()
+            throws TooManyRequestsException, SpotifyApiException {
+        assertThatThrowsExceptionOnGet(TooManyRequestsException.class);
+    }
+
+    @Test
+    public void get_WhenApiCallThrowsSpotifyApiException_ReturnEmptyOptional()
+            throws TooManyRequestsException, SpotifyApiException {
+        assertThatThrowsExceptionOnGet(SpotifyApiException.class);
+    }
+
+    @Test
+    public void get_WhenApiCallReturnArtist_ReturnArtistAndCacheArtistId()
+            throws TooManyRequestsException, SpotifyApiException {
+        var artistId = "artist1";
+        var expectedArtist = new Artist(artistId, "artist-name", null, 0);
+
+        var request = new GetArtistApiRequest.Builder(artistId).build();
+        GetArtistApiResponse response = createGetArtistApiResponse(artistId, "artist-name");
+
+        when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request)).thenReturn(response);
+        var returnedArtist = defaultArtistSearchService.get(artistId).get();
+        assertEquals(expectedArtist, returnedArtist);
         verify(artistCache, times(1)).putArtistIds(List.of("artist1"));
     }
 
@@ -137,12 +162,32 @@ class DefaultArtistSearchServiceTest {
         Assertions.assertThat(expectedArtists).hasSameElementsAs(returnedArtists);
     }
 
-    private <T extends Exception> void assertThatThrowsException(Class<T> exceptionCls)
+    private <T extends Exception> void assertThatThrowsExceptionOnExists(Class<T> exceptionCls)
             throws TooManyRequestsException, SpotifyApiException {
         var artistId = "artist1";
         var request = new GetArtistApiRequest.Builder(artistId).build();
         when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request)).thenThrow(exceptionCls);
         assertFalse(defaultArtistSearchService.exists(artistId));
         verify(artistCache, never()).putArtistIds(any());
+    }
+
+    private <T extends Exception> void assertThatThrowsExceptionOnGet(Class<T> exceptionCls)
+            throws TooManyRequestsException, SpotifyApiException {
+        var artistId = "artist1";
+        var request = new GetArtistApiRequest.Builder(artistId).build();
+        when(spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request)).thenThrow(exceptionCls);
+        assertTrue(defaultArtistSearchService.get(artistId).isEmpty());
+        verify(artistCache, never()).putArtistIds(any());
+    }
+
+
+    private GetArtistApiResponse createGetArtistApiResponse(String id, String name) {
+        var response = new GetArtistApiResponse();
+        var artistResponseData = new ArtistResponseData();
+        artistResponseData.setId(id);
+        artistResponseData.setName(name);
+        artistResponseData.setImages(Collections.emptyList());
+        response.setArtistResponseData(artistResponseData);
+        return response;
     }
 }

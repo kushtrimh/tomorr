@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -46,15 +47,21 @@ public class DefaultArtistSearchService implements ArtistSearchService {
 
     @Override
     public boolean exists(String artistId) {
+        return get(artistId).isPresent();
+    }
+
+    @Override
+    public Optional<Artist> get(String artistId) {
         var request = new GetArtistApiRequest.Builder(artistId).build();
         try {
             GetArtistApiResponse response = spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, request);
-            artistCache.putArtistIds(List.of(response.getArtistResponseData().getId()));
-            return true;
+            ArtistResponseData artistResponseData = response.getArtistResponseData();
+            artistCache.putArtistIds(List.of(artistResponseData.getId()));
+            return Optional.of(toArtist(artistResponseData));
         } catch (TooManyRequestsException | SpotifyApiException e) {
-            logger.debug("Could not check if artists exists", e);
-            return false;
+            logger.debug("Could not get artist with id " + artistId, e);
         }
+        return Optional.empty();
     }
 
     @Override
