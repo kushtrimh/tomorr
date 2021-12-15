@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.spotify.http;
 
+import com.kushtrimh.tomorr.spotify.AuthorizationException;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
@@ -48,20 +49,17 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
     }
 
     @Override
-    public <Res> Res get(String token, String url, Class<Res> cls) throws SpotifyApiException, TooManyRequestsException {
-        return execute(token, url, HttpMethod.GET, null, cls);
+    public <Res> Res execute(HttpMethod httpMethod, String token, String url, Class<Res> cls)
+            throws SpotifyApiException, TooManyRequestsException, AuthorizationException {
+        return execute(token, url, httpMethod, null, cls);
     }
 
     @Override
-    public <Req extends SpotifyApiRequest<Res>, Res> Res get(String token, Req request, Class<Res> cls)
-            throws SpotifyApiException, TooManyRequestsException {
-        return execute(token, spotifyApiUriBuilder.getApiUri(request), HttpMethod.GET, null, cls);
-    }
-
-    @Override
-    public <Req extends SpotifyApiRequest<Res>, Res> Res post(String token, Req request, Class<Res> cls)
-            throws SpotifyApiException, TooManyRequestsException {
-        return execute(token, spotifyApiUriBuilder.getApiUri(request), HttpMethod.POST, request, cls);
+    public <Req extends SpotifyApiRequest<Res>, Res> Res execute(
+            HttpMethod httpMethod, String token, Req request, Class<Res> cls)
+            throws SpotifyApiException, TooManyRequestsException, AuthorizationException {
+        Req body = httpMethod == HttpMethod.GET ? null : request;
+        return execute(token, spotifyApiUriBuilder.getApiUri(request), httpMethod, body, cls);
     }
 
     @Override
@@ -93,7 +91,7 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
 
     private <Req extends SpotifyApiRequest<Res>, Res> Res execute(
             String token, String url, HttpMethod method, Req body, Class<Res> cls)
-            throws SpotifyApiException, TooManyRequestsException {
+            throws SpotifyApiException, TooManyRequestsException, AuthorizationException {
         Objects.requireNonNull(token);
         Objects.requireNonNull(url);
         Objects.requireNonNull(method);
@@ -116,10 +114,14 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
             logger.info("{} Received response {}", traceId, response);
             return response;
         } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+            HttpStatus statusCode = e.getStatusCode();
+            if (statusCode == HttpStatus.TOO_MANY_REQUESTS) {
                 int retryAfter = getRetryAfter(e.getResponseHeaders());
                 logger.warn("{} 429 received for request at {}", traceId, url);
                 throw new TooManyRequestsException(retryAfter);
+            } else if (statusCode == HttpStatus.UNAUTHORIZED) {
+                logger.warn("{} token has expired for request at {}", traceId, url);
+                throw new AuthorizationException();
             }
             logger.error("{} Client error for request {}", traceId, e);
             throw new SpotifyApiException(e);

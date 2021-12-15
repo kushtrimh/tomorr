@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.kushtrimh.tomorr.properties.SpotifyProperties;
+import com.kushtrimh.tomorr.spotify.AuthorizationException;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
@@ -91,51 +92,32 @@ public class DefaultSpotifyHttpClientTest {
     // General tests for the client
 
     @Test
-    public void get_WhenAccessTokenIsNull_ThrowException() {
+    public void execute_WhenAccessTokenIsNull_ThrowException() {
         assertThrows(NullPointerException.class,
-                () -> client.get(null, new GetArtistsApiRequest.Builder().build(), GetArtistsApiResponse.class));
+                () -> client.execute(HttpMethod.GET, null, new GetArtistsApiRequest.Builder().build(), GetArtistsApiResponse.class));
     }
 
     @Test
-    public void get_WhenRequestIsNull_ThrowException() {
+    public void execute_WhenRequestIsNull_ThrowException() {
         assertThrows(NullPointerException.class,
-                () -> client.get("token", (SpotifyApiRequest) null, GetArtistsApiResponse.class));
+                () -> client.execute(HttpMethod.GET, "token", (SpotifyApiRequest) null, GetArtistsApiResponse.class));
     }
 
     @Test
-    public void get_WhenUrlIsNull_ThrowException() {
+    public void execute_WhenUrlIsNull_ThrowException() {
         assertThrows(NullPointerException.class,
-                () -> client.get("token", (String) null, GetArtistsApiResponse.class));
+                () -> client.execute(HttpMethod.GET, "token", (String) null, GetArtistsApiResponse.class));
     }
 
     @Test
-    public void get_WhenResponseClassIsNull_ThrowException() {
+    public void execute_WhenResponseClassIsNull_ThrowException() {
         assertThrows(NullPointerException.class,
-                () -> client.get("token", "http://localhost/api/artists", null));
+                () -> client.execute(HttpMethod.GET, "token", "http://localhost/api/artists", null));
     }
 
     @Test
-    public void post_WhenAccessTokenIsNull_ThrowException() {
-        assertThrows(NullPointerException.class,
-                () -> client.post(null, new GetArtistsApiRequest.Builder().build(), GetArtistsApiResponse.class));
-    }
-
-    @Test
-    public void post_WhenRequestIsNull_ThrowException() {
-        assertThrows(NullPointerException.class,
-                () -> client.post("token", null, GetArtistsApiResponse.class));
-    }
-
-
-    @Test
-    public void post_WhenResponseClassIsNull_ThrowException() {
-        assertThrows(NullPointerException.class,
-                () -> client.post("token", new GetArtistsApiRequest.Builder().build(), null));
-    }
-
-    @Test
-    public void get_WhenRequestSentSuccessfully_RequestHeadersSentCorrectly()
-            throws TooManyRequestsException, SpotifyApiException {
+    public void execute_WhenRequestSentSuccessfully_RequestHeadersSentCorrectly()
+            throws TooManyRequestsException, SpotifyApiException, AuthorizationException {
         var token = "token";
         var request = new GetArtistsApiRequest.Builder().artists(List.of("artist1", "artist2")).build();
         server.expect(requestTo(getApiUrl("/artists?ids=artist1,artist2")))
@@ -146,32 +128,42 @@ public class DefaultSpotifyHttpClientTest {
                 .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
                 .andRespond(withSuccess());
-        client.get(token, request, GetArtistsApiResponse.class);
+        client.execute(HttpMethod.GET, token, request, GetArtistsApiResponse.class);
         server.verify();
     }
 
     @Test
-    public void get_WhenRestClientExceptionThrown_ThrowSpotifyApiException() {
+    public void execute_WhenRestClientExceptionThrown_ThrowSpotifyApiException() {
         String url = getApiUrl("/artists");
         server.expect(requestTo(url))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServerError());
         assertThrows(SpotifyApiException.class, () ->
-                client.get("token", url, GetArtistsApiResponse.class));
+                client.execute(HttpMethod.GET, "token", url, GetArtistsApiResponse.class));
     }
 
     @Test
-    public void get_WhenTooManyRequestsResponseCodeReturned_ThrowTooManyRequestsExceptionWithDefaultTime() {
+    public void execute_WhenTooManyRequestsResponseCodeReturned_ThrowTooManyRequestsExceptionWithDefaultTime() {
         TooManyRequestsException ex = sendRequestForTooManyRequestsException(new HttpHeaders());
         assertEquals(ex.getRetryAfter(), 60);
     }
 
     @Test
-    public void get_WhenTooManyRequestsResponseCodeReturned_ThrowTooManyRequestsExceptionWithTimeFromHeaders() {
+    public void execute_WhenTooManyRequestsResponseCodeReturned_ThrowTooManyRequestsExceptionWithTimeFromHeaders() {
         var responseHeaders = new HttpHeaders();
         responseHeaders.add("Retry-After", "30");
         TooManyRequestsException ex = sendRequestForTooManyRequestsException(responseHeaders);
         assertEquals(ex.getRetryAfter(), 30);
+    }
+
+    @Test
+    public void execute_WhenTokenIsExpired_ThrowAuthorizationException() {
+        String url = getApiUrl("/artists");
+        server.expect(requestTo(url))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
+        assertThrows(AuthorizationException.class, () ->
+                client.execute(HttpMethod.GET, "token", url, GetArtistsApiResponse.class));
     }
 
     // Request specific tests
@@ -179,27 +171,27 @@ public class DefaultSpotifyHttpClientTest {
     // GetArtistsApiRequest tests
 
     @Test
-    public void get_WhenGetArtistsApiRequestSentSuccessfully_ReturnResponse()
-            throws IOException, TooManyRequestsException, SpotifyApiException {
+    public void execute_WhenGetArtistsApiRequestSentSuccessfully_ReturnResponse()
+            throws IOException, TooManyRequestsException, SpotifyApiException, AuthorizationException {
         var request = new GetArtistsApiRequest.Builder().artists(List.of("artist1", "artist2")).build();
         assertSuccessfulGetArtistsApiRequest(request, null);
     }
 
     @Test
-    public void get_WhenGetArtistsApiRequestSentSuccessfullyWithUrl_ReturnResponse()
-            throws IOException, TooManyRequestsException, SpotifyApiException {
+    public void execute_WhenGetArtistsApiRequestSentSuccessfullyWithUrl_ReturnResponse()
+            throws IOException, TooManyRequestsException, SpotifyApiException, AuthorizationException {
         var url = getApiUrl("/artists?ids=artist1,artist2");
         assertSuccessfulGetArtistsApiRequest(null, url);
     }
 
     private void assertSuccessfulGetArtistsApiRequest(GetArtistsApiRequest request, String url)
-            throws TooManyRequestsException, SpotifyApiException, IOException {
+            throws TooManyRequestsException, SpotifyApiException, IOException, AuthorizationException {
         var token = "token";
         setupServerExpectation("spotifyapi/get-artists-response.json", "/artists?ids=artist1,artist2");
 
         GetArtistsApiResponse response = request == null
-                ? client.get(token, url, GetArtistsApiResponse.class)
-                : client.get(token, request, GetArtistsApiResponse.class);
+                ? client.execute(HttpMethod.GET, token, url, GetArtistsApiResponse.class)
+                : client.execute(HttpMethod.GET, token, request, GetArtistsApiResponse.class);
 
         server.verify();
         List<ArtistResponseData> artists = response.getArtists();
@@ -217,27 +209,27 @@ public class DefaultSpotifyHttpClientTest {
     // GetArtistAlbumsApiRequest tests
 
     @Test
-    public void get_GetArtistAlbumsApiRequestSentSuccessfully_ReturnResponse()
-            throws TooManyRequestsException, SpotifyApiException, IOException {
+    public void execute_GetArtistAlbumsApiRequestSentSuccessfully_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException, AuthorizationException {
         var request = new GetArtistAlbumsApiRequest.Builder("artist1")
                 .build();
         assertSuccessfulGetArtistAlbumsApiRequest(request, null);
     }
 
     @Test
-    public void get_GetArtistAlbumsApiRequestSentSuccessfullyWithUrl_ReturnResponse()
-            throws TooManyRequestsException, SpotifyApiException, IOException {
+    public void execute_GetArtistAlbumsApiRequestSentSuccessfullyWithUrl_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException, AuthorizationException {
         var url = getApiUrl("/artists/artist1/albums?include_groups=album,single&limit=50&offset=0");
         assertSuccessfulGetArtistAlbumsApiRequest(null, url);
     }
 
     private void assertSuccessfulGetArtistAlbumsApiRequest(GetArtistAlbumsApiRequest request, String url)
-            throws IOException, TooManyRequestsException, SpotifyApiException {
+            throws IOException, TooManyRequestsException, SpotifyApiException, AuthorizationException {
         setupServerExpectation("spotifyapi/get-artists-albums-response.json", "/artists/artist1/albums?include_groups=album,single&limit=50&offset=0");
 
         GetArtistAlbumsApiResponse response = request == null
-                ? client.get("token", url, GetArtistAlbumsApiResponse.class)
-                : client.get("token", request, GetArtistAlbumsApiResponse.class);
+                ? client.execute(HttpMethod.GET, "token", url, GetArtistAlbumsApiResponse.class)
+                : client.execute(HttpMethod.GET, "token", request, GetArtistAlbumsApiResponse.class);
 
         server.verify();
         List<AlbumResponseData> albums = response.getItems();
@@ -264,8 +256,8 @@ public class DefaultSpotifyHttpClientTest {
     // GetArtistApiRequest tests
 
     @Test
-    public void get_GetArtistApiRequestSentSuccessfully_ReturnResponse()
-            throws TooManyRequestsException, SpotifyApiException, IOException {
+    public void execute_GetArtistApiRequestSentSuccessfully_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException, AuthorizationException {
         String artistId = "artist1";
         var request = new GetArtistApiRequest.Builder(artistId)
                 .build();
@@ -273,20 +265,20 @@ public class DefaultSpotifyHttpClientTest {
     }
 
     @Test
-    public void get_GetArtistApiRequestSentSuccessfullyWithUrl_ReturnResponse()
-            throws TooManyRequestsException, SpotifyApiException, IOException {
+    public void execute_GetArtistApiRequestSentSuccessfullyWithUrl_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException, AuthorizationException {
         var artistId = "artist1";
         var url = getApiUrl("/artists/" + artistId);
         assertSuccessfulGetArtistApiRequest(artistId, null, url);
     }
 
     private void assertSuccessfulGetArtistApiRequest(String artistId, GetArtistApiRequest request, String url)
-            throws IOException, TooManyRequestsException, SpotifyApiException {
+            throws IOException, TooManyRequestsException, SpotifyApiException, AuthorizationException {
         setupServerExpectation("spotifyapi/get-artist-response.json", "/artists/" + artistId);
 
         GetArtistApiResponse response = request == null ?
-                client.get("token", url, GetArtistApiResponse.class) :
-                client.get("token", request, GetArtistApiResponse.class);
+                client.execute(HttpMethod.GET, "token", url, GetArtistApiResponse.class) :
+                client.execute(HttpMethod.GET, "token", request, GetArtistApiResponse.class);
 
         server.verify();
         assertNotNull(response.getArtistResponseData());
@@ -299,8 +291,8 @@ public class DefaultSpotifyHttpClientTest {
 
     // SearchApiRequest tests
     @Test
-    public void get_SearchApiRequestSentSuccessfully_ReturnResponse()
-            throws TooManyRequestsException, SpotifyApiException, IOException {
+    public void execute_SearchApiRequestSentSuccessfully_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException, AuthorizationException {
         var request = new SearchApiRequest.Builder("artist")
                 .limit(2)
                 .types(List.of("artist", "track"))
@@ -309,19 +301,19 @@ public class DefaultSpotifyHttpClientTest {
     }
 
     @Test
-    public void get_SearchApiRequestSentSuccessfullyWithUrl_ReturnResponse()
-            throws TooManyRequestsException, SpotifyApiException, IOException {
+    public void execute_SearchApiRequestSentSuccessfullyWithUrl_ReturnResponse()
+            throws TooManyRequestsException, SpotifyApiException, IOException, AuthorizationException {
         var url = getApiUrl("/search?q=artist&limit=2&offset=0&type=artist,track");
         assertSuccessfulSearchApiRequest(null, url);
     }
 
     private void assertSuccessfulSearchApiRequest(SearchApiRequest request, String url)
-            throws IOException, TooManyRequestsException, SpotifyApiException {
+            throws IOException, TooManyRequestsException, SpotifyApiException, AuthorizationException {
         setupServerExpectation("spotifyapi/search-response.json", "/search?q=artist&limit=2&offset=0&type=artist,track");
 
         SearchApiResponse response = request == null ?
-                client.get("token", url, SearchApiResponse.class) :
-                client.get("token", request, SearchApiResponse.class);
+                client.execute(HttpMethod.GET, "token", url, SearchApiResponse.class) :
+                client.execute(HttpMethod.GET, "token", request, SearchApiResponse.class);
 
         server.verify();
 
@@ -403,7 +395,7 @@ public class DefaultSpotifyHttpClientTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(responseHeaders));
         return assertThrows(TooManyRequestsException.class, () ->
-                client.get("token", url, GetArtistsApiResponse.class));
+                client.execute(HttpMethod.GET, "token", url, GetArtistsApiResponse.class));
     }
 
     private String getApiUrl(String pathAndParams) {

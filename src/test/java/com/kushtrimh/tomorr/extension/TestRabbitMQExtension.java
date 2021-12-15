@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
@@ -24,7 +25,7 @@ public class TestRabbitMQExtension implements BeforeAllCallback {
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         if (!started) {
-            rabbitMQContainer = new GenericContainer<>(DockerImageName.parse("rabbitmq:3.9.11"))
+            rabbitMQContainer = new RabbitMQContainer(DockerImageName.parse("rabbitmq:3.9.11"))
                     .withExposedPorts(5672);
             rabbitMQContainer.start();
             logger.info("Started RabbitMQ container at {}/{}",
