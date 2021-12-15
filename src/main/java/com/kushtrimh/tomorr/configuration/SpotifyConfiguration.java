@@ -36,11 +36,12 @@ public class SpotifyConfiguration {
     }
 
     @Bean
-    public SpotifyApiClient spotifyApiClient(SpotifyProperties spotifyProperties,
-                                             SpotifyApiUriBuilder spotifyApiUriBuilder,
-                                             MappingJackson2HttpMessageConverter mappingConverter,
-                                             StringRedisTemplate stringRedisTemplate,
-                                             RequestLimitService requestLimitService) {
+    public SpotifyApiClient spotifyApiClient(
+            SpotifyProperties spotifyProperties,
+            SpotifyApiUriBuilder spotifyApiUriBuilder,
+            MappingJackson2HttpMessageConverter mappingConverter,
+            StringRedisTemplate stringRedisTemplate,
+            RequestLimitService requestLimitService) {
         var restTemplate = new RestTemplateBuilder()
                 .additionalMessageConverters(mappingConverter)
                 .additionalMessageConverters(new FormHttpMessageConverter())
