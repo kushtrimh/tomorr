@@ -10,6 +10,8 @@ import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.http.SpotifyHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpMethod;
 
@@ -19,6 +21,8 @@ import java.util.Objects;
  * @author Kushtrim Hajrizi
  */
 public class DefaultSpotifyApiClient implements SpotifyApiClient {
+
+    private final Logger logger = LoggerFactory.getLogger(DefaultSpotifyApiClient.class);
 
     private final SpotifyHttpClient httpClient;
     private final RequestLimitService requestLimitService;
@@ -64,6 +68,7 @@ public class DefaultSpotifyApiClient implements SpotifyApiClient {
                     throw new SpotifyApiException(e);
                 }
                 refreshAccessToken();
+                logger.info("Request failed because of authorization, token refreshed", e);
             }
         }
     }
