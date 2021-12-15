@@ -7,10 +7,12 @@ services:
       - ${TOMORR_EXTERNAL_CONFIG}:/etc/tomorr/application.yml
     ports:
       - "8098:8098"
+      - "5005:5005"
     depends_on:
-      - tomorr-postgres
-      - tomorr-redis
-      - tomorr-rabbitmq
+      - postgres
+      - redis
+      - rabbitmq
+    command: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./tomorr.jar --spring.config.additional-location=optional:/etc/tomorr/application.yml
   postgres:
     image: postgres:14.1
     environment:
