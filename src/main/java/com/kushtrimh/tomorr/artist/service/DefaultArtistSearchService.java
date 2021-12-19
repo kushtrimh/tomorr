@@ -69,25 +69,24 @@ public class DefaultArtistSearchService implements ArtistSearchService {
     public List<Artist> search(String name, boolean external) {
         Objects.requireNonNull(name);
         List<Artist> artists = artistService.searchByName(name);
-        if (!external) {
-            return artists;
+        if (external) {
+            SearchApiRequest searchApiRequest = new SearchApiRequest.Builder(name)
+                    .limit(50)
+                    .offset(0)
+                    .types(List.of("artist"))
+                    .build();
+            try {
+                SearchApiResponse response = spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, searchApiRequest);
+                List<Artist> artistsFromExternalQuery = response.getArtists().getItems().stream()
+                        .map(this::toArtist)
+                        .collect(Collectors.toCollection(ArrayList::new));
+                artistsFromExternalQuery.addAll(artists);
+                return artistsFromExternalQuery.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
+            } catch (TooManyRequestsException | SpotifyApiException e) {
+                logger.warn("Could not search for artists externally", e);
+            }
         }
-        SearchApiRequest searchApiRequest = new SearchApiRequest.Builder(name)
-                .limit(50)
-                .offset(0)
-                .types(List.of("artist"))
-                .build();
-        try {
-            SearchApiResponse response = spotifyApiClient.get(LimitType.SPOTIFY_SEARCH, searchApiRequest);
-            List<Artist> artistsFromExternalQuery = response.getArtists().getItems().stream()
-                    .map(this::toArtist)
-                    .collect(Collectors.toCollection(ArrayList::new));
-            artistsFromExternalQuery.addAll(artists);
-            return artistsFromExternalQuery.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
-        } catch (TooManyRequestsException | SpotifyApiException e) {
-            logger.warn("Could not search for artists externally", e);
-        }
-        return artists;
+        return new ArrayList<>(artists);
     }
 
     private Artist toArtist(ArtistResponseData artistResponseData) {

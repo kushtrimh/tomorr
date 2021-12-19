@@ -123,7 +123,7 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
                 logger.warn("{} token has expired for request at {}", traceId, url);
                 throw new AuthorizationException();
             }
-            logger.error("{} Client error for request {}", traceId, e);
+            logger.error("{} Client error for request", traceId, e);
             throw new SpotifyApiException(e);
         } catch (RestClientException e) {
             logger.error("{} Error while sending request", traceId, e);

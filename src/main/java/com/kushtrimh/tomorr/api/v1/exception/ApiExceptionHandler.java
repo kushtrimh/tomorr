@@ -1,25 +1,30 @@
 package com.kushtrimh.tomorr.api.v1.exception;
 
 import com.kushtrimh.tomorr.api.v1.exception.data.ApiError;
+import com.kushtrimh.tomorr.api.v1.exception.data.ApiErrorResponse;
 import com.kushtrimh.tomorr.exception.AlreadyExistsException;
 import com.kushtrimh.tomorr.exception.DoesNotExistException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * @author Kushtrim Hajrizi
  */
 @ControllerAdvice
 public class ApiExceptionHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     private final MessageSource messageSource;
 
@@ -28,44 +33,48 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(value = DoesNotExistException.class)
-    public ResponseEntity<ApiError> handleDoesNotExistException(DoesNotExistException e) {
-        return createApiError("api.error.does-not-exist", e.getResource(), Collections.emptyList(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ApiErrorResponse> handleDoesNotExistException(DoesNotExistException e) {
+        return createApiError(HttpStatus.NOT_FOUND, "api.error.does-not-exist", e.getResource(), null);
     }
 
     @ExceptionHandler(value = AlreadyExistsException.class)
-    public ResponseEntity<ApiError> handleAlreadyExistsException(AlreadyExistsException e) {
-        return createApiError("api.error.already-exists", null, Collections.emptyList(), HttpStatus.CONFLICT);
-
+    public ResponseEntity<ApiErrorResponse> handleAlreadyExistsException(AlreadyExistsException e) {
+        return createApiError(HttpStatus.CONFLICT, "api.error.already-exists", null, null);
     }
 
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException e) {
-        List<String> violations = e.getConstraintViolations().stream()
-                .map(ConstraintViolation::getMessage).toList();
-        return createApiError("api.error.invalid-data", null, violations, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        List<ApiError> errors = e.getBindingResult().getFieldErrors()
+                .stream().map(err -> ApiError.fromParameterAndMessage(
+                        err.getField(), "validation." + err.getCode())).toList();
+        return createApiError(HttpStatus.BAD_REQUEST, "api.error.validation-error", null, errors);
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ApiError> handleException() {
-        return createApiError("api.error.general-problem", null,
-                Collections.emptyList(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ApiErrorResponse> handleException(Exception e) {
+        logger.error("General error during API request", e);
+        return createApiError(HttpStatus.INTERNAL_SERVER_ERROR, "api.error.general-problem", null, null);
     }
 
     /**
-     * @param messageCode
-     * @param violator
-     * @param violations
      * @param status
+     * @param message
+     * @param violator
+     * @param errors
      * @return
      */
-    private ResponseEntity<ApiError> createApiError(String messageCode,
-                                                    String violator,
-                                                    List<String> violations,
-                                                    HttpStatus status) {
-        var apiError = new ApiError();
-        apiError.setError(messageSource.getMessage(messageCode, null, LocaleContextHolder.getLocale()));
-        apiError.setViolator(violator);
-        apiError.setViolations(violations);
-        return new ResponseEntity<>(apiError, status);
+    private ResponseEntity<ApiErrorResponse> createApiError(
+            HttpStatus status,
+            String message,
+            String violator,
+            List<ApiError> errors) {
+        Locale locale = LocaleContextHolder.getLocale();
+        Optional.ofNullable(errors).ifPresent(errs -> errs.forEach(error -> error.setMessage(
+                messageSource.getMessage(error.getMessage(), null, locale))));
+        var apiErrorResponse = new ApiErrorResponse();
+        apiErrorResponse.setMessage(messageSource.getMessage(message, null, locale));
+        apiErrorResponse.setViolator(violator);
+        apiErrorResponse.setErrors(errors);
+        return new ResponseEntity<>(apiErrorResponse, status);
     }
 }

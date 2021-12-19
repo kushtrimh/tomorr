@@ -24,7 +24,7 @@ public class FollowController {
         this.followService = followService;
     }
 
-    @PostMapping("/v1/follow")
+    @PostMapping("/api/v1/follow")
     public ResponseEntity<?> follow(@RequestBody @Valid FollowRequest followRequest) {
         User user = new User(followRequest.getUser(), UserType.EMAIL);
         boolean followed = followService.follow(user, followRequest.getArtistId());

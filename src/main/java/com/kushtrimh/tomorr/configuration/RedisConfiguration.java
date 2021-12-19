@@ -91,8 +91,8 @@ public class RedisConfiguration {
 
     private GenericJackson2JsonRedisSerializer newGenericJacksonSerializer() {
         var typeValidator = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType("com.kushtrimh.tomorr")
-                .allowIfSubType("java")
+                .allowIfSubType("com.kushtrimh.tomorr.")
+                .allowIfSubType("java.")
                 .allowIfSubTypeIsArray()
                 .build();
         var mapper = new ObjectMapper();

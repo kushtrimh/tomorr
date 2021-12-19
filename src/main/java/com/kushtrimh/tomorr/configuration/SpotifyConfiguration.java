@@ -22,7 +22,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 @Configuration
 public class SpotifyConfiguration {
 
-    @Bean
     public MappingJackson2HttpMessageConverter mappingConverter() {
         var mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -39,11 +38,10 @@ public class SpotifyConfiguration {
     public SpotifyApiClient spotifyApiClient(
             SpotifyProperties spotifyProperties,
             SpotifyApiUriBuilder spotifyApiUriBuilder,
-            MappingJackson2HttpMessageConverter mappingConverter,
             StringRedisTemplate stringRedisTemplate,
             RequestLimitService requestLimitService) {
         var restTemplate = new RestTemplateBuilder()
-                .additionalMessageConverters(mappingConverter)
+                .additionalMessageConverters(mappingConverter())
                 .additionalMessageConverters(new FormHttpMessageConverter())
                 .build();
 

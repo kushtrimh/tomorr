@@ -42,7 +42,7 @@ public class ArtistControllerTest {
     public void search_WhenRequestLimitIsExceeded_ReturnTooManyRequestsCode() throws Exception {
         var artistName = " artist-name";
         when(requestLimitService.cantSendRequest(LimitType.SPOTIFY_SEARCH)).thenReturn(true);
-        mockMvc.perform(get("/v1/artist/search")
+        mockMvc.perform(get("/api/v1/artist/search")
                         .param("name", artistName))
                 .andExpect(status().isTooManyRequests());
     }
@@ -51,7 +51,7 @@ public class ArtistControllerTest {
     public void search_WhenReturnedDataIsEmpty_ReturnEmptyResponse() throws Exception {
         var artistName = "artist-name";
         when(requestLimitService.tryFor(LimitType.SPOTIFY_SEARCH)).thenReturn(true);
-        String response = mockMvc.perform(get("/v1/artist/search")
+        String response = mockMvc.perform(get("/api/v1/artist/search")
                         .param("name", artistName))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -79,7 +79,7 @@ public class ArtistControllerTest {
         );
 
         when(artistSearchService.search(artistName, external)).thenReturn(artists);
-        String response = mockMvc.perform(get("/v1/artist/search")
+        String response = mockMvc.perform(get("/api/v1/artist/search")
                         .param("name", artistName)
                         .param("external", String.valueOf(external)))
                 .andExpect(status().isOk())

@@ -1,48 +1,46 @@
 package com.kushtrimh.tomorr.api.v1.exception.data;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import java.util.List;
-
 /**
  * @author Kushtrim Hajrizi
  */
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ApiError {
-    private String error;
-    private String violator;
-    private List<String> violations;
+    private String parameter;
+    private String message;
 
-    public String getError() {
-        return error;
+    private ApiError(String parameter, String message) {
+        this.parameter = parameter;
+        this.message = message;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public static ApiError fromMessage(String message) {
+        return new ApiError(null, message);
     }
 
-    public String getViolator() {
-        return violator;
+    public static ApiError fromParameterAndMessage(String parameter, String message) {
+        return new ApiError(parameter, message);
     }
 
-    public void setViolator(String violator) {
-        this.violator = violator;
+    public String getParameter() {
+        return parameter;
     }
 
-    public List<String> getViolations() {
-        return violations;
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
     }
 
-    public void setViolations(List<String> violations) {
-        this.violations = violations;
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     @Override
     public String toString() {
         return "ApiError{" +
-                "error='" + error + '\'' +
-                ", violator='" + violator + '\'' +
-                ", violations=" + violations +
+                "parameter='" + parameter + '\'' +
+                ", message='" + message + '\'' +
                 '}';
     }
 }
