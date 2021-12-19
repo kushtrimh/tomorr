@@ -38,7 +38,6 @@ class DefaultArtistSearchServiceIntegrationTest {
     @Autowired
     private ArtistSearchService artistSearchService;
 
-
     @Test
     public void search_WhenSameArtistsAreSearchedTwice_ReturnCachedArtists() {
         var name = "artist";
