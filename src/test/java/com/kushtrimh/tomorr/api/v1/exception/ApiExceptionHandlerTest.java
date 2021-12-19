@@ -1,6 +1,6 @@
 package com.kushtrimh.tomorr.api.v1.exception;
 
-import com.kushtrimh.tomorr.api.v1.exception.data.ApiError;
+import com.kushtrimh.tomorr.api.v1.exception.data.ApiErrorResponse;
 import com.kushtrimh.tomorr.exception.AlreadyExistsException;
 import com.kushtrimh.tomorr.exception.DoesNotExistException;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,12 +12,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Path;
-import javax.validation.metadata.ConstraintDescriptor;
-import java.util.Set;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,13 +40,15 @@ public class ApiExceptionHandlerTest {
         var message = "Does not exist";
         when(messageSource.getMessage("api.error.does-not-exist", null, LocaleContextHolder.getLocale()))
                 .thenReturn(message);
-        ResponseEntity<ApiError> apiErrorResponseEntity = apiExceptionHandler.handleDoesNotExistException(
+        ResponseEntity<ApiErrorResponse> apiErrorResponseEntity = apiExceptionHandler.handleDoesNotExistException(
                 new DoesNotExistException(resource));
         assertEquals(HttpStatus.NOT_FOUND, apiErrorResponseEntity.getStatusCode());
-        ApiError apiError = apiErrorResponseEntity.getBody();
-        assertEquals(message, apiError.getError());
-        assertEquals(resource, apiError.getViolator());
-        assertTrue(apiError.getViolations().isEmpty());
+        ApiErrorResponse apiError = apiErrorResponseEntity.getBody();
+        assertAll(
+                () -> assertEquals(message, apiError.getMessage()),
+                () -> assertEquals(resource, apiError.getViolator()),
+                () -> assertNull(apiError.getErrors())
+        );
     }
 
     @Test
@@ -55,35 +56,42 @@ public class ApiExceptionHandlerTest {
         var message = "Already exists";
         when(messageSource.getMessage("api.error.already-exists", null, LocaleContextHolder.getLocale()))
                 .thenReturn(message);
-        ResponseEntity<ApiError> apiErrorResponseEntity = apiExceptionHandler.handleAlreadyExistsException(
+        ResponseEntity<ApiErrorResponse> apiErrorResponseEntity = apiExceptionHandler.handleAlreadyExistsException(
                 new AlreadyExistsException());
         assertEquals(HttpStatus.CONFLICT, apiErrorResponseEntity.getStatusCode());
-        ApiError apiError = apiErrorResponseEntity.getBody();
-        assertEquals(message, apiError.getError());
-        assertNull(apiError.getViolator());
-        assertTrue(apiError.getViolations().isEmpty());
+        ApiErrorResponse apiError = apiErrorResponseEntity.getBody();
+        assertAll(
+                () -> assertEquals(message, apiError.getMessage()),
+                () -> assertNull(apiError.getViolator()),
+                () -> assertNull(apiError.getErrors())
+        );
     }
 
     @Test
-    public void handleConstraintViolationException_WhenExceptionHappens_ReturnApiErrorResponse() {
-        var message = "Invalid data";
-        var invalidArtistId = "Invalid artist id";
-        var invalidUserId = "Invalid user id";
-        when(messageSource.getMessage("api.error.invalid-data", null, LocaleContextHolder.getLocale()))
+    public void handleMethodArgumentNotValidException_WhenExceptionHappens_ReturnApiErrorResponse() {
+        var mainMessage = "Validation error";
+        var message = "Parameter is required";
+        var bindingResult = mock(BindingResult.class);
+        var fieldError = mock(FieldError.class);
+
+        when(fieldError.getField()).thenReturn("artistId");
+        when(fieldError.getCode()).thenReturn("NotBlank");
+        when(bindingResult.getFieldErrors()).thenReturn(Collections.singletonList(fieldError));
+        when(messageSource.getMessage("api.error.validation-error", null, LocaleContextHolder.getLocale()))
+                .thenReturn(mainMessage);
+        when(messageSource.getMessage("validation.NotBlank", null, LocaleContextHolder.getLocale()))
                 .thenReturn(message);
-        Set<ConstraintViolation<?>> violations = Set.of(
-                new ConstraintViolationStub(invalidArtistId),
-                new ConstraintViolationStub(invalidUserId)
+        MethodArgumentNotValidException e = new MethodArgumentNotValidException(null, bindingResult);
+        ResponseEntity<ApiErrorResponse> apiErrorResponseEntity = apiExceptionHandler.handleMethodArgumentNotValidException(e);
+        ApiErrorResponse apiErrorResponse = apiErrorResponseEntity.getBody();
+        assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, apiErrorResponseEntity.getStatusCode()),
+                () -> assertEquals(mainMessage, apiErrorResponse.getMessage()),
+                () -> assertEquals(1, apiErrorResponse.getErrors().size()),
+                () -> assertNull(apiErrorResponse.getViolator()),
+                () -> assertEquals(message, apiErrorResponse.getErrors().get(0).getMessage()),
+                () -> assertEquals("artistId", apiErrorResponse.getErrors().get(0).getParameter())
         );
-        var ex = new ConstraintViolationException(message, violations);
-        ResponseEntity<ApiError> apiErrorResponseEntity = apiExceptionHandler.handleConstraintViolationException(ex);
-        assertEquals(HttpStatus.BAD_REQUEST, apiErrorResponseEntity.getStatusCode());
-        ApiError apiError = apiErrorResponseEntity.getBody();
-        assertEquals(message, apiError.getError());
-        assertNull(apiError.getViolator());
-        assertEquals(2, apiError.getViolations().size());
-        assertTrue(apiError.getViolations().contains(invalidArtistId));
-        assertTrue(apiError.getViolations().contains(invalidUserId));
     }
 
     @Test
@@ -91,70 +99,14 @@ public class ApiExceptionHandlerTest {
         var message = "Something wrong happened, please try again";
         when(messageSource.getMessage("api.error.general-problem", null, LocaleContextHolder.getLocale()))
                 .thenReturn(message);
-        ResponseEntity<ApiError> apiErrorResponseEntity = apiExceptionHandler.handleException();
+        ResponseEntity<ApiErrorResponse> apiErrorResponseEntity = apiExceptionHandler.handleException(new Exception());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, apiErrorResponseEntity.getStatusCode());
-        ApiError apiError = apiErrorResponseEntity.getBody();
-        assertEquals(message, apiError.getError());
-        assertNull(apiError.getViolator());
-        assertTrue(apiError.getViolations().isEmpty());
-    }
-
-    private record ConstraintViolationStub(String message) implements ConstraintViolation<Object> {
-
-        @Override
-        public String getMessage() {
-            return message;
-        }
-
-        @Override
-        public String getMessageTemplate() {
-            return null;
-        }
-
-        @Override
-        public Object getRootBean() {
-            return null;
-        }
-
-        @Override
-        public Class<Object> getRootBeanClass() {
-            return null;
-        }
-
-        @Override
-        public Object getLeafBean() {
-            return null;
-        }
-
-        @Override
-        public Object[] getExecutableParameters() {
-            return new Object[0];
-        }
-
-        @Override
-        public Object getExecutableReturnValue() {
-            return null;
-        }
-
-        @Override
-        public Path getPropertyPath() {
-            return null;
-        }
-
-        @Override
-        public Object getInvalidValue() {
-            return null;
-        }
-
-        @Override
-        public ConstraintDescriptor<?> getConstraintDescriptor() {
-            return null;
-        }
-
-        @Override
-        public <U> U unwrap(Class<U> type) {
-            return null;
-        }
+        ApiErrorResponse apiError = apiErrorResponseEntity.getBody();
+        assertAll(
+                () -> assertEquals(message, apiError.getMessage()),
+                () -> assertNull(apiError.getViolator()),
+                () -> assertNull(apiError.getErrors())
+        );
     }
 
 }

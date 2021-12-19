@@ -3,6 +3,8 @@ version: "3.8"
 services:
   tomorr:
     image: kushtrimh/tomorr
+    build:
+      dockerfile: ./Dockerfile
     volumes:
       - ${TOMORR_EXTERNAL_CONFIG}:/etc/tomorr/application.yml
     ports:

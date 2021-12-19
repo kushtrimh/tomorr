@@ -47,7 +47,7 @@ public class FollowControllerTest {
 
     @Test
     public void follow_WhenRequestBodyIsEmpty_ReturnBadRequest() throws Exception {
-        mockMvc.perform(post("/v1/follow"))
+        mockMvc.perform(post("/api/v1/follow"))
                 .andExpect(status().isBadRequest());
         verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
@@ -57,7 +57,7 @@ public class FollowControllerTest {
     public void follow_WhenUserIsMissing_ReturnBadRequest() throws Exception {
         FollowRequest followRequest = new FollowRequest();
         followRequest.setArtistId("artist-id");
-        mockMvc.perform(postWith("/v1/follow", followRequest))
+        mockMvc.perform(postWith("/api/v1/follow", followRequest))
                 .andExpect(status().isBadRequest());
         verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
@@ -67,7 +67,7 @@ public class FollowControllerTest {
     public void follow_WhenArtistIsMissing_ReturnBadRequest() throws Exception {
         FollowRequest followRequest = new FollowRequest();
         followRequest.setUser("user-id");
-        mockMvc.perform(postWith("/v1/follow", followRequest))
+        mockMvc.perform(postWith("/api/v1/follow", followRequest))
                 .andExpect(status().isBadRequest());
         verify(followService, times(0))
                 .follow(any(User.class), any(String.class));
@@ -94,7 +94,7 @@ public class FollowControllerTest {
         ResultMatcher status = success ? status().isOk() : status().isNotFound();
 
         when(followService.follow(user, artistId)).thenReturn(success);
-        mockMvc.perform(postWith("/v1/follow", followRequest))
+        mockMvc.perform(postWith("/api/v1/follow", followRequest))
                 .andExpect(status);
         verify(followService, times(1))
                 .follow(user, artistId);

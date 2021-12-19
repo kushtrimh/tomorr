@@ -91,12 +91,12 @@ public class RedisConfiguration {
 
     private GenericJackson2JsonRedisSerializer newGenericJacksonSerializer() {
         var typeValidator = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType("com.kushtrimh.tomorr")
-                .allowIfSubType("java")
+                .allowIfSubType("com.kushtrimh.tomorr.")
+                .allowIfSubType("java.")
                 .allowIfSubTypeIsArray()
                 .build();
         var mapper = new ObjectMapper();
-        mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.EVERYTHING, JsonTypeInfo.As.PROPERTY);
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new ParameterNamesModule());
         return new GenericJackson2JsonRedisSerializer(mapper);

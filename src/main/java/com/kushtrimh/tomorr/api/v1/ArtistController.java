@@ -19,7 +19,7 @@ import java.util.List;
  * @author Kushtrim Hajrizi
  */
 @RestController
-@RequestMapping("/v1/artist")
+@RequestMapping("/api/v1/artist")
 public class ArtistController {
 
     private final ArtistSearchService artistSearchService;
@@ -31,8 +31,9 @@ public class ArtistController {
     }
 
     @GetMapping("/search")
-    private ResponseEntity<ArtistSearchResponse> search(@RequestParam String name,
-                                                        @RequestParam(required = false, defaultValue = "false") boolean external) {
+    private ResponseEntity<ArtistSearchResponse> search(
+            @RequestParam String name,
+            @RequestParam(required = false, defaultValue = "false") boolean external) {
         if (!requestLimitService.tryFor(LimitType.SPOTIFY_SEARCH)) {
             return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
