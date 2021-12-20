@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    JAVA_HOME: "/usr/lib/jvm/custom/jdk-16.0.1"
+    JAVA_HOME: "/usr/lib/jvm/custom/jdk-17.0.1"
 
 phases:
   install:
@@ -10,15 +10,16 @@ phases:
       java: corretto11
     commands:
       - echo Started installing dependenccies
-      - echo Installing Java 16
-      - wget https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz
+      - echo Installing Java 17
+      - wget https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_linux-x64_bin.tar.gz
       - mkdir /usr/lib/jvm/custom/
-      - tar -xf openjdk-16.0.1_linux-x64_bin.tar.gz --directory /usr/lib/jvm/custom
+      - tar -xf openjdk-17.0.1_linux-x64_bin.tar.gz --directory /usr/lib/jvm/custom
   build:
     commands:
       - mvn clean package
-  artifacts:
-    files:
-      - target/*.jar
-      - appspec.yml
-      - scripts/*
+artifacts:
+  files:
+    - target/*.jar
+    - appspec.yml
+    - scripts/*
+  name: tomorr-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-$(date +%Y-%m-%d)

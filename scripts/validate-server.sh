@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sleep 10
+sleep 20
 health_check_res=$(curl http://localhost:8098/actuator/health)
 if [[ $health_check_res =~ ^.*"UP".*$ ]]; then
   exit 0

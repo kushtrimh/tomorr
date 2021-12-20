@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -f $TOMORR_PID_FILE ]; then
-  tomorrpid=$(cat $TOMORR_PID_FILE)
+if [ -f /var/run/tomorr/tomorr.pid ]; then
+  tomorrpid=$(cat /var/run/tomorr/tomorr.pid)
   kill -15 $tomorrpid
 fi
