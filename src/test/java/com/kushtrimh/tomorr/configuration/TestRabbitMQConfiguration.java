@@ -18,6 +18,8 @@ public class TestRabbitMQConfiguration {
         RabbitMQProperties properties = new RabbitMQProperties();
         properties.setHost(TestRabbitMQExtension.getRabbitMQContainer().getHost());
         properties.setPort(TestRabbitMQExtension.getRabbitMQContainer().getFirstMappedPort());
+        properties.setUsername("guest");
+        properties.setPassword("guest");
         return properties;
     }
 }
