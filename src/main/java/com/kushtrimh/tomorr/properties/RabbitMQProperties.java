@@ -13,6 +13,9 @@ import java.util.Objects;
 public class RabbitMQProperties {
     private String host;
     private int port;
+    private String username;
+    private String password;
+    private boolean useSsl;
 
     public String getHost() {
         return host;
@@ -28,6 +31,30 @@ public class RabbitMQProperties {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isUseSsl() {
+        return useSsl;
+    }
+
+    public void setUseSsl(boolean useSsl) {
+        this.useSsl = useSsl;
     }
 
     @Override
@@ -48,6 +75,8 @@ public class RabbitMQProperties {
         return "RabbitMQProperties{" +
                 "host='" + host + '\'' +
                 ", port=" + port +
+                ", username='" + username + '\'' +
+                ", useSsl=" + useSsl +
                 '}';
     }
 }

@@ -57,6 +57,9 @@ redis:
 rabbitmq:
   host: ${TOMORR_RABBITMQ_HOST:localhost}
   port: ${TOMORR_RABBITMQ_PORT:5672}
+  username: guest
+  password: guest
+  use-ssl: false
 request-limit:
   spotify-sync: 600
   spotify-search: 150

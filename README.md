@@ -81,6 +81,9 @@ redis:
 rabbitmq:
   host: rabbitmq
   port: 5672
+  username: guest
+  password: guest
+  use-ssl: false
 ```
 
 ### Additional configuration for other environments

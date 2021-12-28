@@ -5,6 +5,7 @@ import com.kushtrimh.tomorr.task.Task;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.ClassMapper;
@@ -23,7 +24,13 @@ public class RabbitMQConfiguration {
 
     @Bean
     public CachingConnectionFactory connectionFactory(RabbitMQProperties properties) {
-        return new CachingConnectionFactory(properties.getHost(), properties.getPort());
+        RabbitConnectionFactoryBean rabbitConnectionFactory = new RabbitConnectionFactoryBean();
+        rabbitConnectionFactory.setHost(properties.getHost());
+        rabbitConnectionFactory.setPort(properties.getPort());
+        rabbitConnectionFactory.setUsername(properties.getUsername());
+        rabbitConnectionFactory.setPassword(properties.getPassword());
+        rabbitConnectionFactory.setUseSSL(properties.isUseSsl());
+        return new CachingConnectionFactory(rabbitConnectionFactory.getRabbitConnectionFactory());
     }
 
     @Bean
