@@ -1,11 +1,12 @@
 package com.kushtrimh.tomorr.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kushtrimh.tomorr.properties.RabbitMQProperties;
 import com.kushtrimh.tomorr.task.Task;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.ClassMapper;
@@ -14,6 +15,8 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 /**
@@ -23,14 +26,17 @@ import java.util.Map;
 public class RabbitMQConfiguration {
 
     @Bean
-    public CachingConnectionFactory connectionFactory(RabbitMQProperties properties) {
-        RabbitConnectionFactoryBean rabbitConnectionFactory = new RabbitConnectionFactoryBean();
-        rabbitConnectionFactory.setHost(properties.getHost());
-        rabbitConnectionFactory.setPort(properties.getPort());
-        rabbitConnectionFactory.setUsername(properties.getUsername());
-        rabbitConnectionFactory.setPassword(properties.getPassword());
-        rabbitConnectionFactory.setUseSSL(properties.isUseSsl());
-        return new CachingConnectionFactory(rabbitConnectionFactory.getRabbitConnectionFactory());
+    public CachingConnectionFactory connectionFactory(RabbitMQProperties properties)
+            throws NoSuchAlgorithmException, KeyManagementException {
+        com.rabbitmq.client.ConnectionFactory cf = new com.rabbitmq.client.ConnectionFactory();
+        cf.setHost(properties.getHost());
+        cf.setPort(properties.getPort());
+        cf.setUsername(properties.getUsername());
+        cf.setPassword(properties.getPassword());
+        if (properties.isUseSsl()) {
+            cf.useSslProtocol();
+        }
+        return new CachingConnectionFactory(cf);
     }
 
     @Bean
@@ -55,7 +61,9 @@ public class RabbitMQConfiguration {
 
     @Bean
     public Jackson2JsonMessageConverter jsonMessageConverter(ClassMapper classMapper) {
-        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        var mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(mapper);
         converter.setClassMapper(classMapper);
         return converter;
     }
