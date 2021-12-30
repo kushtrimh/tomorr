@@ -1,7 +1,7 @@
 package com.kushtrimh.tomorr.configuration;
 
 import com.kushtrimh.tomorr.spotify.job.SpotifyAuthenticationJob;
-import com.kushtrimh.tomorr.sync.job.SyncJob;
+import com.kushtrimh.tomorr.sync.job.ArtistSyncJob;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
@@ -46,7 +46,7 @@ public class QuartzConfiguration {
     // Artist Sync Job
     @Bean
     public JobDetailFactoryBean artistSyncJobDetailFactoryBean() {
-        return createJobDetailFactoryBean(SyncJob.class);
+        return createJobDetailFactoryBean(ArtistSyncJob.class);
     }
 
     @Bean

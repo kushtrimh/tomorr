@@ -1,6 +1,8 @@
 package com.kushtrimh.tomorr.configuration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kushtrimh.tomorr.properties.RabbitMQProperties;
 import com.kushtrimh.tomorr.task.Task;
@@ -64,13 +66,13 @@ public class RabbitMQConfiguration {
 
     @Bean
     public Jackson2JsonMessageConverter rabbitJsonMessageConverter(ClassMapper classMapper) {
-//        var typeValidator = BasicPolymorphicTypeValidator.builder()
-//                .allowIfSubType("com.kushtrimh.tomorr.")
-//                .allowIfSubType("java.")
-//                .allowIfSubTypeIsArray()
-//                .build();
+        var typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.kushtrimh.tomorr.")
+                .allowIfSubType("java.")
+                .allowIfSubTypeIsArray()
+                .build();
         var mapper = new ObjectMapper();
-        // mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         mapper.registerModule(new JavaTimeModule());
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(mapper);
         converter.setClassMapper(classMapper);

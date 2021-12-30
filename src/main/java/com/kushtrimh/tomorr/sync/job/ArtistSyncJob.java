@@ -12,14 +12,14 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 /**
  * @author Kushtrim Hajrizi
  */
-public class SyncJob extends QuartzJobBean {
-    private final Logger logger = LoggerFactory.getLogger(SyncJob.class);
+public class ArtistSyncJob extends QuartzJobBean {
+    private final Logger logger = LoggerFactory.getLogger(ArtistSyncJob.class);
 
     private final ArtistSyncTaskProducer artistSyncTaskProducer;
     private final LimitProperties limitProperties;
     private final RequestLimitService requestLimitService;
 
-    public SyncJob(
+    public ArtistSyncJob(
             ArtistSyncTaskProducer artistSyncTaskProducer,
             LimitProperties limitProperties,
             RequestLimitService requestLimitService) {

@@ -6,6 +6,7 @@ services:
     volumes:
       - ${TOMORR_EXTERNAL_CONFIG}:/etc/tomorr/application.yml
       - ./:/tomorr/
+      - ~/.m2/:/root/.m2/
     ports:
       - "8098:8098"
       - "5005:5005"
