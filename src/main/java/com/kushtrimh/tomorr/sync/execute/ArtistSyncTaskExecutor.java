@@ -1,7 +1,13 @@
 package com.kushtrimh.tomorr.sync.execute;
 
+import com.kushtrimh.tomorr.task.Task;
+import com.kushtrimh.tomorr.task.data.ArtistTaskData;
+
 /**
  * @author Kushtrim Hajrizi
  */
-public interface ArtistSyncTaskExecuter {
+@FunctionalInterface
+public interface ArtistSyncTaskExecutor {
+
+    void execute(Task<ArtistTaskData> task);
 }

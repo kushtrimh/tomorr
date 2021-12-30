@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
  * @author Kushtrim Hajrizi
  */
 @ExtendWith(MockitoExtension.class)
-class ArtistSyncJobTest {
+class SyncJobTest {
 
     @Mock
     private ArtistSyncTaskProducer artistSyncTaskProducer;
@@ -26,17 +26,17 @@ class ArtistSyncJobTest {
     @Mock
     private RequestLimitService requestLimitService;
 
-    private ArtistSyncJob artistSyncJob;
+    private SyncJob syncJob;
 
     @BeforeEach
     public void init() {
-        artistSyncJob = new ArtistSyncJob(artistSyncTaskProducer, limitProperties, requestLimitService);
+        syncJob = new SyncJob(artistSyncTaskProducer, limitProperties, requestLimitService);
     }
 
     @Test
     public void executeInternal_WhenJobIsExecuted_ResetLimitsAndStartTaskProducer() throws JobExecutionException {
         JobExecutionContext context = mock(JobExecutionContext.class);
-        artistSyncJob.executeInternal(context);
+        syncJob.executeInternal(context);
         verify(requestLimitService, times(1)).resetAll();
         verify(artistSyncTaskProducer, times(1)).produce();
     }
