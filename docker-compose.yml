@@ -2,11 +2,10 @@ version: "3.8"
 
 services:
   tomorr:
-    image: kushtrimh/tomorr
-    build:
-      dockerfile: ./Dockerfile
+    image: maven:3.8.4-openjdk-17
     volumes:
       - ${TOMORR_EXTERNAL_CONFIG}:/etc/tomorr/application.yml
+      - ./:/tomorr/
     ports:
       - "8098:8098"
       - "5005:5005"
@@ -14,7 +13,8 @@ services:
       - postgres
       - redis
       - rabbitmq
-    command: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./tomorr.jar --spring.config.additional-location=optional:/etc/tomorr/application.yml
+    working_dir: /tomorr
+    command: mvn spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005" -Dspring-boot.run.arguments=--spring.config.additional-location=optional:/etc/tomorr/application.yml
   postgres:
     image: postgres:14.1
     environment:
