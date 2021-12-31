@@ -30,6 +30,8 @@ import java.util.Map;
 @Configuration
 public class RabbitMQConfiguration {
 
+    public static final String ARTIST_SYNC_QUEUE = "artistSync";
+
     @Bean
     public CachingConnectionFactory connectionFactory(RabbitMQProperties properties)
             throws NoSuchAlgorithmException, KeyManagementException {
@@ -55,13 +57,13 @@ public class RabbitMQConfiguration {
             Jackson2JsonMessageConverter rabbitJsonMessageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(rabbitJsonMessageConverter);
-        rabbitTemplate.setRoutingKey("artistSync");
+        rabbitTemplate.setRoutingKey(ARTIST_SYNC_QUEUE);
         return rabbitTemplate;
     }
 
     @Bean
     public Queue queue() {
-        return new Queue("artistSync", true);
+        return new Queue(ARTIST_SYNC_QUEUE, true);
     }
 
     @Bean
