@@ -4,6 +4,7 @@
 ## Associated projects
 
 Tomorr Terraform (for provisioning the resources on AWS) - https://github.com/kushtrimh/tomorr-terraform
+
 Tomorr AMI (for making the AMI requested by tomorr instances on AWS) - https://github.com/kushtrimh/tomorr-ami
 
 ## Running the project
