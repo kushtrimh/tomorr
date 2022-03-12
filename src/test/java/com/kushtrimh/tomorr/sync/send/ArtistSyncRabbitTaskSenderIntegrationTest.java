@@ -52,7 +52,7 @@ class ArtistSyncRabbitTaskSenderIntegrationTest {
             return new Task<>(artistTaskData);
         });
         var nextNodeTasks = IntStream.range(0, half).mapToObj(i -> {
-            var artistTaskData = ArtistTaskData.fromNextNode("http://localhost:2424/next/node" + i, TaskType.INITIAL_SYNC);
+            var artistTaskData = ArtistTaskData.fromNextNode("artist-" + i, "http://localhost:2424/next/node" + i, TaskType.INITIAL_SYNC);
             return new Task<>(artistTaskData);
         });
         return Stream.concat(artistIdTasks, nextNodeTasks).toList();

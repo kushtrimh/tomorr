@@ -25,8 +25,8 @@ public class ArtistTaskData implements TaskData {
         return new ArtistTaskData(artistId, null, taskType);
     }
 
-    public static ArtistTaskData fromNextNode(String nextNode, TaskType taskType) {
-        return new ArtistTaskData(null, nextNode, taskType);
+    public static ArtistTaskData fromNextNode(String artistId, String nextNode, TaskType taskType) {
+        return new ArtistTaskData(artistId, nextNode, taskType);
     }
 
     public String getArtistId() {

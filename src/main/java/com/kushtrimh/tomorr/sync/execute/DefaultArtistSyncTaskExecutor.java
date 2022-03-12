@@ -64,7 +64,6 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
 
         // TODO: Integration test rabbitmq configuration, if it works to send and receive messages
         // TODO: Unit test for this class
-        // TODO: Save artist id to the next task, no matter if its a next node
 
         SpotifyApiRequest<GetArtistAlbumsApiResponse> request = artistData.getNextNode() != null ?
                 new NextNodeRequest<>(artistData.getNextNode(), GetArtistAlbumsApiResponse.class) :
@@ -105,7 +104,7 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
             // TODO: Send email to all of them
         }
         if (count > (responseCount + newAlbums.size()) && artistData.getNextNode() != null) {
-            artistSyncTaskManager.add(ArtistTaskData.fromNextNode(artistData.getNextNode(), TaskType.SYNC));
+            artistSyncTaskManager.add(ArtistTaskData.fromNextNode(artistData.getArtistId(), artistData.getNextNode(), TaskType.SYNC));
         }
     }
 
