@@ -7,6 +7,7 @@ import com.kushtrimh.tomorr.properties.SpotifyProperties;
 import com.kushtrimh.tomorr.spotify.AuthorizationException;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
+import com.kushtrimh.tomorr.spotify.api.request.NextNodeRequest;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistAlbumsApiRequest;
 import com.kushtrimh.tomorr.spotify.api.request.artist.GetArtistApiRequest;
@@ -337,6 +338,37 @@ public class DefaultSpotifyHttpClientTest {
         assertEquals("Track One", tracks.getItems().get(0).getAlbum().getName());
     }
 
+    // NextNode tests
+
+    @Test
+    public void execute_NextNodeApiRequestWithPostHttpMethod_ThrowException() {
+        var nextNode = new NextNodeRequest<>("http://localhost:8080/api", GetArtistAlbumsApiResponse.class);
+        assertThrows(IllegalArgumentException.class, () -> client.execute(HttpMethod.POST, "token", nextNode, GetArtistAlbumsApiResponse.class));
+    }
+
+    @Test
+    public void execute_NextNodeApiRequestSentSuccessfully_ReturnResponse()
+            throws IOException, TooManyRequestsException, AuthorizationException, SpotifyApiException {
+        var artistId = "artist1";
+        var request = new NextNodeRequest<>("http://localhost/artists/" + artistId, GetArtistApiResponse.class);
+        assertSuccessfulNextNodeApiRequest(artistId, request);
+    }
+
+    private void assertSuccessfulNextNodeApiRequest(String artistId, NextNodeRequest<GetArtistApiResponse> request)
+            throws IOException, TooManyRequestsException, SpotifyApiException, AuthorizationException {
+        setupServerExpectation("spotifyapi/get-artist-response.json", "/artists/" + artistId);
+
+        GetArtistApiResponse response = client.execute(HttpMethod.GET, "token", request, GetArtistApiResponse.class);
+
+        server.verify();
+        assertNotNull(response.getArtistResponseData());
+        ArtistResponseData artistResponseData = response.getArtistResponseData();
+        assertEquals("artist1", artistResponseData.getId());
+        assertEquals("Artist Name", artistResponseData.getName());
+        assertEquals(36, artistResponseData.getPopularity());
+        assertFalse(artistResponseData.getImages().isEmpty());
+    }
+
     // Auth tests
 
     @Test
@@ -401,7 +433,6 @@ public class DefaultSpotifyHttpClientTest {
     private String getApiUrl(String pathAndParams) {
         return spotifyProperties.getApiUrl() + pathAndParams;
     }
-
 
     private void setupServerExpectation(String responseResource, String query) throws IOException {
         String responseBody = Files.readString(new ClassPathResource(responseResource)
