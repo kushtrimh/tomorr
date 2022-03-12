@@ -63,8 +63,6 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
         Objects.requireNonNull(artistData);
 
         // TODO: Integration test rabbitmq configuration, if it works to send and receive messages
-        // TODO: Unit test for NextNodeRequest on client
-        // TODO: Unit test for NextNodeRequest support on SpotifyApiUriBuilder
         // TODO: Unit test for this class
         // TODO: Save artist id to the next task, no matter if its a next node
 
