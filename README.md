@@ -1,11 +1,8 @@
 # tomorr
-[![build](https://github.com/kushtrimh/tomorr/actions/workflows/maven.yml/badge.svg)](https://github.com/kushtrimh/tomorr/actions/workflows/maven.yml)
 
 ## Associated projects
 
-Tomorr Terraform (for provisioning the resources on AWS) - https://github.com/kushtrimh/tomorr-terraform
-
-Tomorr AMI (for making the AMI requested by tomorr instances on AWS) - https://github.com/kushtrimh/tomorr-ami
+*Tomorr Terraform (_for provisioning the resources on AWS_)* - https://github.com/kushtrimh/tomorr-terraform
 
 ## Running the project
 
@@ -13,59 +10,64 @@ Tomorr AMI (for making the AMI requested by tomorr instances on AWS) - https://g
 
 #### Building the image
 
-Run `docker build -t kushtrimh/tomorr .` inside the project directory to build the image.
+Run `docker build -t <IDENTIFIER>/tomorr:<TAG> .` inside the project directory to build the image.
 
 #### Running the container
 
 Run
 
-`docker container run -p 8098:8098 -d --name tomorr kushtrimh/tomorr`
+`docker container run -p 8098:8098 -d --name tomorr <IDENTIFIER>/tomorr:<TAG>`
 
 or
 
-`docker container run -p 8098:8098 -d --name tomorr -v /home/config/application.yml:/etc/tomorr/application.yml kushtrimh/tomorr`
+`docker container run -p 8098:8098 -d --name tomorr -v /home/config/application.yml:/etc/tomorr/application.yml <IDENTIFIER>/tomorr:<TAG>`
 
 in case you want to use an externalized configuration file.
 
 #### Running with `docker-compose`
 
-When running with `docker-compose`, create an `.env` file in the project directory, and add the environment variables specified below.
+When running with `docker-compose`, create an `.env` file in the project directory, and add the environment variables
+specified below.
 
 ```shell
 TOMORR_EXTERNAL_CONFIG=<DIRECTORY-TO-EXTERNAL-CONFIG>/application.yml
 ```
 
-The external `application.yml` properties should contain the properties to needed to run the application when using `docker-compose`.
-Please check [external configuration](#external-configuration) for a ready-to-use configuration file for this case.
+The external `application.yml` properties should contain the properties to needed to run the application when
+using `docker-compose`. Please check [external configuration](#external-configuration) for a ready-to-use configuration
+file for this case.
 
-### Without `docker`
+### Environment variables
 
-It is required either to define the environment variables specified below, or create a new `application.yml` and use it as external configuration.
-For an example of how the external configuration file should look like, please check [external configuration](#external-configuration) section.
+If you do not plan on using an external `application.yml` file, 
+then you can use environment variables to configure the application.
 
-#### Environment variables
-
-| Environment variable           | Description            |
-|--------------------------------|------------------------|
-| `TOMORR_PID_FILE`              | PID file location.     |
-| `TOMORR_MAIL_HOST`             | Mail host.             |
-| `TOMORR_MAIL_USERNAME`         | Mail username.         |
-| `TOMORR_MAIL_PASSWORD`         | Mail password.         |
-| `TOMORR_MAIL_PORT`             | Mail port.             |
-| `TOMORR_DB_URL`                | Database URL.          |
-| `TOMORR_DB_USERNAME`           | Database username.     |
-| `TOMORR_DB_PASSWORD`           | Database password.     |
-| `TOMORR_SPOTIFY_CLIENT_ID`     | Spotify client id.     |
-| `TOMORR_SPOTIFY_CLIENT_SECRET` | Spotify client secret. |
-| `TOMORR_REDIS_HOST`            | Redis host.            |
-| `TOMORR_REDIS_PORT`            | Redis port.            |
-| `TOMORR_RABBITMQ_HOST`         | RabbitMQ host.         |
-| `TOMORR_RABBITMQ_PORT`         | RabbitMQ port.         |
+| Environment variable           | Description                     | Type    |
+|--------------------------------|---------------------------------|---------|
+| `TOMORR_PID_FILE`              | PID file location.              | string  |
+| `TOMORR_MAIL_HOST`             | Mail host.                      | string  |
+| `TOMORR_MAIL_USERNAME`         | Mail username.                  | string  |
+| `TOMORR_MAIL_PASSWORD`         | Mail password.                  | string  |
+| `TOMORR_MAIL_AUTH`             | Enable authentication for mail. | boolean |
+| `TOMORR_MAIL_TLS`              | Enable TLS for mail.            | boolean |
+| `TOMORR_MAIL_PORT`             | Mail port.                      | integer |
+| `TOMORR_DB_URL`                | Database URL.                   | string  |
+| `TOMORR_DB_USERNAME`           | Database username.              | string  |
+| `TOMORR_DB_PASSWORD`           | Database password.              | string  |
+| `TOMORR_SPOTIFY_CLIENT_ID`     | Spotify client id.              | string  |
+| `TOMORR_SPOTIFY_CLIENT_SECRET` | Spotify client secret.          | string  |
+| `TOMORR_REDIS_HOST`            | Redis host.                     | string  |
+| `TOMORR_REDIS_PORT`            | Redis port.                     | integer |
+| `TOMORR_RABBITMQ_HOST`         | RabbitMQ host.                  | string  |
+| `TOMORR_RABBITMQ_PORT`         | RabbitMQ port.                  | integer |
+| `TOMORR_RABBITMQ_USERNAME`     | RabbitMQ username.              | string  |
+| `TOMORR_RABBITMQ_PASSWORD`     | RabbitMQ password.              | string  |
+| `TOMORR_RABBITMQ_SSL`          | RabbitMQ SSL status.            | boolean |
 
 ## External configuration
 
-The `application.yml` below shows an example of an external configuration file, and it also serves as a ready-to-use external configuration
-when using `docker-compose`. Please keep in mind updating `client-id` and `client-secret`.
+The `application.yml` below shows an example of an external configuration file, and it also serves as a ready-to-use
+external configuration when using `docker-compose`. Please keep in mind updating `client-id` and `client-secret`.
 
 ```yaml
 spring:
@@ -74,6 +76,14 @@ spring:
   mail:
     host: mail
     port: 1025
+    username: 
+    password: 
+    properties:
+      mail:
+        auth: false
+        starttls:
+          enable: false
+          required: false
 datasource:
   url: jdbc:postgresql://postgres:5432/tomorr
   username: postgres
@@ -90,20 +100,4 @@ rabbitmq:
   username: guest
   password: guest
   use-ssl: false
-```
-
-### Additional configuration for other environments
-
-Properties below are properties which either are missing on the local/development environment, or their values needs to be changed
-in order to work as intended in production environments.
-
-```yaml
-spring:
-  mail:
-    properties:
-      mail:
-        auth: true
-        starttls:
-          enable: true
-          required: true
 ```
