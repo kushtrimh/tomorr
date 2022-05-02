@@ -33,10 +33,10 @@ spring:
     port: ${TOMORR_MAIL_PORT:25}
     properties:
       mail:
-        auth: false
+        auth: ${TOMORR_MAIL_AUTH:false}
         starttls:
-          enable: false
-          required: false
+          enable: ${TOMORR_MAIL_TLS:false}
+          required: ${TOMORR_MAIL_TLS:false}
         smtp:
           connectiontimeout: 5000
           timeout: 5000
@@ -57,9 +57,9 @@ redis:
 rabbitmq:
   host: ${TOMORR_RABBITMQ_HOST:localhost}
   port: ${TOMORR_RABBITMQ_PORT:5672}
-  username: guest
-  password: guest
-  use-ssl: false
+  username: ${TOMORR_RABBITMQ_USERNAME:guest}
+  password: ${TOMORR_RABBITMQ_PASSWORD:guest}
+  use-ssl: ${TOMORR_RABBITMQ_SSL:false}
 request-limit:
   spotify-sync: 600
   spotify-search: 150
