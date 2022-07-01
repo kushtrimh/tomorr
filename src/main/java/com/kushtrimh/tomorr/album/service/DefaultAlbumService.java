@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.album.Album;
 import com.kushtrimh.tomorr.album.AlbumType;
 import com.kushtrimh.tomorr.album.repository.AlbumRepository;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,12 @@ public class DefaultAlbumService implements AlbumService {
             return Optional.empty();
         }
         return Optional.of(toAlbum(record));
+    }
+
+    @Override
+    @Cacheable(value = "artistAlbumsCount", key = "'albumsCount:' + #artistId", unless = "#result != null")
+    public Optional<Integer> findCountByArtistId(String artistId) {
+        return Optional.ofNullable(albumRepository.findCountByArtistId(artistId));
     }
 
     @Transactional

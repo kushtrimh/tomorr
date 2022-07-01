@@ -37,6 +37,7 @@ public class DefaultArtistService implements ArtistService {
         return getArtistOptional(record);
     }
 
+    @Transactional
     @Override
     public List<Artist> findToSync(String syncKey, int count) {
         Objects.requireNonNull(syncKey);

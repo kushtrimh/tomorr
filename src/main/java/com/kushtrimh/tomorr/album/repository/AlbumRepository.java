@@ -11,6 +11,8 @@ public interface AlbumRepository<T> {
 
     T findById(String id);
 
+    Integer findCountByArtistId(String artistId);
+
     List<T> findByArtist(String artistId);
 
     T save(T album);

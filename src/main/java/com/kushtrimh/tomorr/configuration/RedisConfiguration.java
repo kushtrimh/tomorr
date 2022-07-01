@@ -57,7 +57,13 @@ public class RedisConfiguration {
                         .computePrefixWith(CacheKeyPrefix.prefixed("artist:search"))
                         .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
                         .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                        .entryTtl(Duration.ofMinutes(5))
+                        .entryTtl(Duration.ofMinutes(5)),
+                "artistAlbumsCount", RedisCacheConfiguration.defaultCacheConfig()
+                        .disableCachingNullValues()
+                        .computePrefixWith(CacheKeyPrefix.prefixed("artistAlbums"))
+                        .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
+                        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                        .entryTtl(Duration.ofDays(3))
         );
         // Configure Redis cache manager
         return RedisCacheManager.builder(redisConnectionFactory)

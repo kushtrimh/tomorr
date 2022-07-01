@@ -32,6 +32,13 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     }
 
     @Override
+    public Integer findCountByArtistId(String artistId) {
+        return create.selectCount().from(ARTIST_ALBUM)
+                .where(ARTIST_ALBUM.ARTIST_ID.eq(artistId))
+                .fetchOne(0, Integer.class);
+    }
+
+    @Override
     public List<AlbumRecord> findByArtist(String artistId) {
         return create.select().from(ALBUM)
                 .innerJoin(ARTIST_ALBUM)

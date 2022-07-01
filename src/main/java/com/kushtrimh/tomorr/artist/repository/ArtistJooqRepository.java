@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.artist.repository;
 
+import com.kushtrimh.tomorr.artist.ArtistStatus;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -38,10 +39,16 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
 
     @Override
     public List<ArtistRecord> findToSync(String syncKey, int count) {
-        List<ArtistRecord> artists = create.selectFrom(ARTIST)
+        // TODO: Modify tests to fit this query
+        List<ArtistRecord> artists = create
+                .select()
+                .distinctOn(ARTIST.ID)
+                .from(ARTIST)
+                .innerJoin(ARTIST_ALBUM).on(ARTIST.ID.eq(ARTIST_ALBUM.ARTIST_ID))
                 .where(ARTIST.SYNC_KEY.ne(syncKey).or(ARTIST.SYNC_KEY.isNull()))
+                .and(ARTIST.STATUS.ne(ArtistStatus.INITIAL_SYNC.name()))
                 .limit(count)
-                .forUpdate().fetch();
+                .forUpdate().fetchInto(ARTIST);
         artists.forEach(record -> record.setSyncKey(syncKey));
         if (!artists.isEmpty()) {
             create.batchUpdate(artists).execute();

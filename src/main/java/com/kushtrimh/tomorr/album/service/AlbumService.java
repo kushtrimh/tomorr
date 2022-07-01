@@ -13,6 +13,8 @@ public interface AlbumService {
 
     Optional<Album> findById(String id);
 
+    Optional<Integer> findCountByArtistId(String artistId);
+
     List<Album> findByArtist(String artistId);
 
     void save(Album album);
