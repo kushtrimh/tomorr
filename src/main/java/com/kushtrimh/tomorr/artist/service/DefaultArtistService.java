@@ -67,6 +67,13 @@ public class DefaultArtistService implements ArtistService {
 
     @Transactional
     @Override
+    public void activateArtist(String artistId) {
+        Objects.requireNonNull(artistId);
+        artistRepository.activateArtist(artistId);
+    }
+
+    @Transactional
+    @Override
     public void deleteById(String id) {
         artistRepository.deleteById(id);
     }

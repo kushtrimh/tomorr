@@ -169,6 +169,19 @@ public class ArtistJooqRepositoryIntegrationTest {
     }
 
     @Test
+    public void activateArtist_WhenArtistIdIsValid_ActivateArtistSuccessfully() {
+        String artistId = "artist-to-activate";
+        var artistRecord = newArtistRecord(artistId);
+        artistRecord.setStatus(ArtistStatus.INITIAL_SYNC.name());
+        artistRepository.save(artistRecord);
+
+        artistRepository.activateArtist(artistId);
+
+        var artist = artistRepository.findById(artistId);
+        assertEquals(ArtistStatus.ACTIVE.name(), artist.getStatus());
+    }
+
+    @Test
     public void deleteById_WhenArtistIdIsNull_DoesNotDelete() {
         var initialCount = artistRepository.count();
         artistRepository.deleteById(null);

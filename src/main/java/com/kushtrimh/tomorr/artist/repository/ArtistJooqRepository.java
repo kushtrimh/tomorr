@@ -68,6 +68,12 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
     }
 
     @Override
+    public void activateArtist(String artistId) {
+        create.update(ARTIST).set(ARTIST.STATUS, ArtistStatus.ACTIVE.name())
+                .where(ARTIST.ID.eq(artistId)).execute();
+    }
+
+    @Override
     public void deleteById(String id) {
         create.delete(ARTIST)
                 .where(ARTIST.ID.eq(id))

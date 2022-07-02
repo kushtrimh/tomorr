@@ -126,6 +126,18 @@ public class DefaultArtistServiceTest {
     }
 
     @Test
+    public void activateArtist_WhenArtistIdIsNull_ThrowException() {
+        assertThrows(NullPointerException.class, () -> artistService.activateArtist(null));
+    }
+
+    @Test
+    public void activateArtist_WhenArtistIdIsValid_ActivateArtistSuccessfully() {
+        var artistId = "artist1";
+        artistService.activateArtist(artistId);
+        verify(artistRepository, times(1)).activateArtist(artistId);
+    }
+
+    @Test
     public void deleteById_WhenIdIsValid_DeleteSuccessfully() {
         var id = "id252";
         artistRepository.deleteById(id);

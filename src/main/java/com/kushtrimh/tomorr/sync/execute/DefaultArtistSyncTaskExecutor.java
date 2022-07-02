@@ -3,6 +3,7 @@ package com.kushtrimh.tomorr.sync.execute;
 import com.kushtrimh.tomorr.album.Album;
 import com.kushtrimh.tomorr.album.AlbumType;
 import com.kushtrimh.tomorr.album.service.AlbumService;
+import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.configuration.RabbitMQConfiguration;
 import com.kushtrimh.tomorr.limit.LimitType;
 import com.kushtrimh.tomorr.mail.spotify.SpotifyMailService;
@@ -41,6 +42,7 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     private final UserService userService;
     private final ArtistSyncTaskManager artistSyncTaskManager;
     private final AlbumService albumService;
+    private final ArtistService artistService;
     private final SpotifyApiClient spotifyApiClient;
     private final SpotifyMailService spotifyMailService;
 
@@ -48,11 +50,13 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
             UserService userService,
             ArtistSyncTaskManager artistSyncTaskManager,
             AlbumService albumService,
+            ArtistService artistService,
             SpotifyApiClient spotifyApiClient,
             SpotifyMailService spotifyMailService) {
         this.userService = userService;
         this.artistSyncTaskManager = artistSyncTaskManager;
         this.albumService = albumService;
+        this.artistService = artistService;
         this.spotifyApiClient = spotifyApiClient;
         this.spotifyMailService = spotifyMailService;
     }
@@ -114,8 +118,13 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     }
 
     private void initialSync(ArtistTaskData artistData, GetArtistAlbumsApiResponse response) {
-        List<Album> albums = albumsFromResponse(response.getItems());
-
+        albumService.saveAll(artistData.getArtistId(), albumsFromResponse(response.getItems()));
+        var next = response.getNext();
+        if (next == null || next.isBlank()) {
+            artistService.activateArtist(artistData.getArtistId());
+        } else {
+            artistSyncTaskManager.add(ArtistTaskData.fromNextNode(artistData.getArtistId(), next, TaskType.INITIAL_SYNC));
+        }
     }
 
     private List<Album> albumsFromResponse(List<AlbumResponseData> newAlbums) {
