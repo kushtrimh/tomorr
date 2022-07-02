@@ -15,9 +15,9 @@ public interface AlbumRepository<T> {
 
     List<T> findByArtist(String artistId);
 
-    T save(T album);
+    T save(String artistId, T album);
 
-    void saveAll(List<T> albums);
+    void saveAll(String artistId, List<T> albums);
 
     void deleteById(String id);
 }

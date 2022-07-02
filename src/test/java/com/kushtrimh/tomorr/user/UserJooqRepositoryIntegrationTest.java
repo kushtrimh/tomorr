@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.configuration.TestDataSourceConfiguration;
 import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import com.kushtrimh.tomorr.extension.TestDatabaseExtension;
 import com.kushtrimh.tomorr.user.repository.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
@@ -83,6 +84,22 @@ public class UserJooqRepositoryIntegrationTest {
         var returnedRecord = userRepository.findByAddress(address);
         expectedUser.setCreatedAt(returnedRecord.getCreatedAt());
         assertEquals(expectedUser, returnedRecord);
+    }
+
+    @Test
+    public void findByFollowedArtist_WhenArtistIdIsNullOrEmpty_ReturnEmptyList() {
+        assertAll(
+                () -> assertTrue(userRepository.findByFollowedArtist(null).isEmpty()),
+                () -> assertTrue(userRepository.findByFollowedArtist("").isEmpty())
+        );
+    }
+
+    @Test
+    public void findByFollowedArtist_WhenArtistIdIsValid_ReturnUsersThatFollowArtist() {
+        var artistId = "artist1";
+        var users = userRepository.findByFollowedArtist(artistId);
+        Assertions.assertThat(users.stream().map(AppUserRecord::getId))
+                .containsExactlyInAnyOrder("user1", "user2");
     }
 
     @Test

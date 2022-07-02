@@ -18,6 +18,7 @@ import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.TaskType;
 import com.kushtrimh.tomorr.task.data.ArtistTaskData;
 import com.kushtrimh.tomorr.task.manager.ArtistSyncTaskManager;
+import com.kushtrimh.tomorr.user.User;
 import com.kushtrimh.tomorr.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,9 +104,8 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
         List<AlbumResponseData> newAlbums = response.getItems().stream()
                 .filter(item -> !artistAlbumIds.contains(item.getId())).toList();
         if (!newAlbums.isEmpty()) {
-            albumService.saveAll(albumsFromResponse(newAlbums));
-            //List<User> users = userService.findByFollowedArtist(artistData.getArtistId());
-            // spotifyMailService.send();
+            albumService.saveAll(artistData.getArtistId(), albumsFromResponse(newAlbums));
+            List<User> users = userService.findByFollowedArtist(artistData.getArtistId());
             // TODO: Send email to all of them
         }
         if (count > (responseCount + newAlbums.size()) && artistData.getNextNode() != null) {
@@ -114,8 +114,8 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     }
 
     private void initialSync(ArtistTaskData artistData, GetArtistAlbumsApiResponse response) {
-        // TODO: Convert to response items to albums, and save them on database for the given artist
-        // TODO: if there's a next, add the task to the task manager with initial sync type
+        List<Album> albums = albumsFromResponse(response.getItems());
+
     }
 
     private List<Album> albumsFromResponse(List<AlbumResponseData> newAlbums) {

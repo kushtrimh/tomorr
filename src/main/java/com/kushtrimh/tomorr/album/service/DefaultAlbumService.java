@@ -49,18 +49,20 @@ public class DefaultAlbumService implements AlbumService {
 
     @Transactional
     @Override
-    public void save(Album album) {
+    public void save(String artistId, Album album) {
         Objects.requireNonNull(album);
-        albumRepository.save(toAlbumRecord(album));
+        Objects.requireNonNull(artistId);
+        albumRepository.save(artistId, toAlbumRecord(album));
     }
 
     @Transactional
     @Override
-    public void saveAll(List<Album> albums) {
+    public void saveAll(String artistId, List<Album> albums) {
+        Objects.requireNonNull(artistId);
         if (albums == null || albums.isEmpty()) {
             return;
         }
-        albumRepository.saveAll(albums.stream().map(this::toAlbumRecord).toList());
+        albumRepository.saveAll(artistId, albums.stream().map(this::toAlbumRecord).toList());
     }
 
     @Transactional
