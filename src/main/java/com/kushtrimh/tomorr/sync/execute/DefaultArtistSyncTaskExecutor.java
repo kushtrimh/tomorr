@@ -62,7 +62,6 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
         ArtistTaskData artistData = task.getData();
         Objects.requireNonNull(artistData);
 
-        // TODO: Integration test rabbitmq configuration, if it works to send and receive messages
         // TODO: Unit test for this class
 
         SpotifyApiRequest<GetArtistAlbumsApiResponse> request = artistData.getNextNode() != null ?
