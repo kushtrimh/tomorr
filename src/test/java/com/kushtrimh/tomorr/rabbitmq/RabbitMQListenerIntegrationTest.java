@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.test.TestRabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,7 +30,7 @@ public class RabbitMQListenerIntegrationTest {
     @Test
     public void convertSendAndReceive_WhenSendingArtistUsingRabbitMQ_SendAndReceiveSuccessfully() {
         Task<ArtistTaskData> artistTask = new Task<>(ArtistTaskData.fromArtistId("artistId", TaskType.SYNC));
-        Object response = testRabbitTemplate.convertSendAndReceive("artistSync", artistTask);
+        Object response = testRabbitTemplate.convertSendAndReceive("artistSyncTest", artistTask);
         assertEquals(artistTask.getData().getArtistId(), response);
     }
 }

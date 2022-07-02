@@ -19,5 +19,7 @@ public interface AlbumService {
 
     void save(Album album);
 
+    void saveAll(List<Album> albums);
+
     void deleteById(String id);
 }

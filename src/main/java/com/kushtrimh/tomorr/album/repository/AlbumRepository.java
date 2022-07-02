@@ -17,5 +17,7 @@ public interface AlbumRepository<T> {
 
     T save(T album);
 
+    void saveAll(List<T> albums);
+
     void deleteById(String id);
 }

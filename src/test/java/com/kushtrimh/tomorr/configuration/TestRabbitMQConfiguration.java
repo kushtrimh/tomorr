@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.extension.TestRabbitMQExtension;
 import com.kushtrimh.tomorr.properties.RabbitMQProperties;
 import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.data.ArtistTaskData;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.test.TestRabbitTemplate;
@@ -30,15 +31,21 @@ public class TestRabbitMQConfiguration {
     }
 
     @Bean
-    public TestRabbitTemplate artistTaskRabbitTemplate(
+    public TestRabbitTemplate artistTaskTestRabbitTemplate(
             ConnectionFactory connectionFactory,
             Jackson2JsonMessageConverter rabbitJsonMessageConverter) {
         TestRabbitTemplate rabbitTemplate = new TestRabbitTemplate(connectionFactory);
+        rabbitTemplate.setRoutingKey("artistSyncTest");
         rabbitTemplate.setMessageConverter(rabbitJsonMessageConverter);
         return rabbitTemplate;
     }
 
-    @RabbitListener(queues = "artistSync")
+    @Bean
+    public Queue testQueue() {
+        return new Queue("artistSyncTest", true);
+    }
+
+    @RabbitListener(queues = "artistSyncTest")
     public String artistSyncListener(Task<ArtistTaskData> artistTask) {
         return artistTask.getData().getArtistId();
     }

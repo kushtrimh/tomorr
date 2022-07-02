@@ -30,13 +30,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class ArtistSyncRabbitTaskSenderIntegrationTest {
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private RabbitTemplate artistTaskRabbitTemplate;
 
     private ArtistSyncRabbitTaskSender artistSyncRabbitTaskSender;
 
     @BeforeEach
     public void init() {
-        artistSyncRabbitTaskSender = new ArtistSyncRabbitTaskSender(rabbitTemplate);
+        artistSyncRabbitTaskSender = new ArtistSyncRabbitTaskSender(artistTaskRabbitTemplate);
     }
 
     @Test

@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -114,6 +118,13 @@ public class AlbumJooqRepositoryIntegrationTest {
     }
 
     @Test
+    public void save_WhenAlbumTotalTracksIsNull_SaveAlbumSuccessfully() {
+        var album = newAlbumRecord("album-15254");
+        album.setTotalTracks(null);
+        assertDoesNotThrow(() -> albumRepository.save(album));
+    }
+
+    @Test
     public void save_WhenAlbumIsValid_SaveSuccessfully() {
         var initialCount = albumRepository.count();
         var id = "new-al";
@@ -129,6 +140,23 @@ public class AlbumJooqRepositoryIntegrationTest {
         // we assign it to the expected album
         album.setCreatedAt(returnedAlbum.getCreatedAt());
         assertEquals(album, returnedAlbum);
+    }
+
+    @Test
+    public void saveAll_WhenAlbumsListIsEmpty_DoNothing() {
+        var initialCount = albumRepository.count();
+        albumRepository.saveAll(Collections.emptyList());
+        assertEquals(initialCount, albumRepository.count());
+    }
+
+    @Test
+    public void saveAll_WhenAlbumListIsFilled_SaveAlbumsSuccessfully() {
+        var initialCount = albumRepository.count();
+        List<AlbumRecord> newAlbums = IntStream.range(0, 10)
+                .mapToObj(i -> newAlbumRecord("batch-album-" + i))
+                .toList();
+        albumRepository.saveAll(newAlbums);
+        assertEquals(initialCount + newAlbums.size(), albumRepository.count());
     }
 
     @Test

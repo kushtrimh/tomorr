@@ -56,6 +56,15 @@ public class DefaultAlbumService implements AlbumService {
 
     @Transactional
     @Override
+    public void saveAll(List<Album> albums) {
+        if (albums == null || albums.isEmpty()) {
+            return;
+        }
+        albumRepository.saveAll(albums.stream().map(this::toAlbumRecord).toList());
+    }
+
+    @Transactional
+    @Override
     public void deleteById(String id) {
         albumRepository.deleteById(id);
     }

@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.sync.execute;
 
 import com.kushtrimh.tomorr.album.Album;
+import com.kushtrimh.tomorr.album.AlbumType;
 import com.kushtrimh.tomorr.album.service.AlbumService;
 import com.kushtrimh.tomorr.configuration.RabbitMQConfiguration;
 import com.kushtrimh.tomorr.limit.LimitType;
@@ -86,7 +87,11 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     }
 
     private void sync(ArtistTaskData artistData, GetArtistAlbumsApiResponse response) {
-        int count = 0; // TODO: Get count of artist albums (cache supported) -> albumService.findCountByArtistId();
+        int count = albumService.findCountByArtistId(artistData.getArtistId()).orElseGet(() -> {
+            logger.warn("Could not find count for artist {}", artistData.getArtistId());
+            return 0;
+        });
+
         int responseCount = response.getTotal();
         if (count == responseCount) {
             logger.debug("Total albums count ({}) matches the count from the response ({}) for artist task data {}",
@@ -98,8 +103,9 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
         List<AlbumResponseData> newAlbums = response.getItems().stream()
                 .filter(item -> !artistAlbumIds.contains(item.getId())).toList();
         if (!newAlbums.isEmpty()) {
-            // TODO: Save albums in database
-            // TODO: Get all users that follow this artist
+            albumService.saveAll(albumsFromResponse(newAlbums));
+            //List<User> users = userService.findByFollowedArtist(artistData.getArtistId());
+            // spotifyMailService.send();
             // TODO: Send email to all of them
         }
         if (count > (responseCount + newAlbums.size()) && artistData.getNextNode() != null) {
@@ -110,5 +116,23 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     private void initialSync(ArtistTaskData artistData, GetArtistAlbumsApiResponse response) {
         // TODO: Convert to response items to albums, and save them on database for the given artist
         // TODO: if there's a next, add the task to the task manager with initial sync type
+    }
+
+    private List<Album> albumsFromResponse(List<AlbumResponseData> newAlbums) {
+        return newAlbums.stream().map(item -> {
+            AlbumType type = AlbumType.fromApiType(item.getAlbumType()).orElseGet(() -> {
+                logger.warn("Could not find album type for album {}, {}. Using {} as default.",
+                        item.getId(), item.getAlbumType(), AlbumType.ALBUM);
+                return AlbumType.ALBUM;
+            });
+            return new Album(
+                    item.getId(),
+                    item.getName(),
+                    type,
+                    null,
+                    item.getReleaseDate(),
+                    item.getImages().get(0).getUrl()
+            );
+        }).collect(Collectors.toList());
     }
 }

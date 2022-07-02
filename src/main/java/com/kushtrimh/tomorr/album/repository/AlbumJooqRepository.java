@@ -58,6 +58,15 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     }
 
     @Override
+    public void saveAll(List<AlbumRecord> albums) {
+        if (albums.isEmpty()) {
+            return;
+        }
+        var result = create.batchInsert(albums);
+        result.execute();
+    }
+
+    @Override
     public void deleteById(String id) {
         create.delete(ALBUM)
                 .where(ALBUM.ID.eq(id))

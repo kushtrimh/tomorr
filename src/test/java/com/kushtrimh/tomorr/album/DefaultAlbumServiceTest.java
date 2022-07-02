@@ -74,6 +74,26 @@ public class DefaultAlbumServiceTest {
     }
 
     @Test
+    public void findCountByArtistId_WhenArtistDoesNotHaveAlbums_ReturnEmptyOptional() {
+        var artistId = "invalid-id";
+        when(albumRepository.findCountByArtistId(artistId)).thenReturn(null);
+        Optional<Integer> count = albumService.findCountByArtistId(artistId);
+        assertTrue(count.isEmpty());
+    }
+
+    @Test
+    public void findCountByArtistId_WhenArtistHasAlbums_ReturnArtistAlbumsCount() {
+        var artistId = "artist1";
+        var count = 10;
+        when(albumRepository.findCountByArtistId(artistId)).thenReturn(count);
+        Optional<Integer> albumCount = albumService.findCountByArtistId(artistId);
+        assertAll(
+                () -> assertFalse(albumCount.isEmpty()),
+                () -> assertEquals(count, albumCount.get())
+        );
+    }
+
+    @Test
     public void save_WhenAlbumIsNull_ThrowException() {
         assertThrows(NullPointerException.class, () -> {
             albumService.save(null);
@@ -93,6 +113,33 @@ public class DefaultAlbumServiceTest {
         );
         albumService.save(album);
         verify(albumRepository, times(1)).save(record);
+    }
+
+    @Test
+    public void saveAll_WhenAlbumsListIsNull_DoNothing() {
+        albumService.saveAll(null);
+        verify(albumRepository, times(0)).saveAll(any());
+    }
+
+    @Test
+    public void saveAll_WhenAlbumsListIsEmpty_DoNothing() {
+        albumService.saveAll(List.of());
+        verify(albumRepository, times(0)).saveAll(any());
+    }
+
+    @Test
+    public void saveAll_WhenAlbumsListIsFilled_SaveAlbumsSuccessfully() {
+        var records = List.of(newAlbumRecord("id1"), newAlbumRecord("id2"));
+        var albums = records.stream().map(record -> new Album(
+                record.getId(),
+                record.getName(),
+                AlbumType.valueOf(record.getType()),
+                record.getTotalTracks(),
+                record.getReleaseDate(),
+                record.getImageHref()
+        )).toList();
+        albumService.saveAll(albums);
+        verify(albumRepository, times(1)).saveAll(records);
     }
 
     @Test
