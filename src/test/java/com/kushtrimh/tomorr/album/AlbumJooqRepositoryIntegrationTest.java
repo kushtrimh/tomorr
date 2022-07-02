@@ -79,9 +79,31 @@ public class AlbumJooqRepositoryIntegrationTest {
 
     @Test
     public void findByArtist_WhenArtistIdIsValid_ReturnArtistAlbums() {
-        assertEquals(2, albumRepository.findByArtist("artist2").size());
-        assertEquals(1, albumRepository.findByArtist("artist1").size());
-        assertEquals(0, albumRepository.findByArtist("artist424").size());
+        assertAll(
+                () -> assertEquals(2, albumRepository.findByArtist("artist2").size()),
+                () -> assertEquals(1, albumRepository.findByArtist("artist1").size()),
+                () -> assertEquals(0, albumRepository.findByArtist("artist424").size())
+        );
+
+    }
+
+    @Test
+    public void findCountByArtistId_WhenArtistIdIsNull_ReturnZero() {
+        assertEquals(0, albumRepository.findCountByArtistId(null));
+    }
+
+    @Test
+    public void findCountByArtistId_WhenArtistIdIsInvalid_ReturnZero() {
+        assertEquals(0, albumRepository.findCountByArtistId("invalid-artist-id"));
+    }
+
+    @Test
+    public void findCountByArtistId_WhenArtistIdIsValid_ReturnArtistAlbumsCount() {
+        assertAll(
+                () -> assertEquals(2, albumRepository.findCountByArtistId("artist2")),
+                () -> assertEquals(1, albumRepository.findCountByArtistId("artist1")),
+                () -> assertEquals(0, albumRepository.findCountByArtistId("artist424"))
+        );
     }
 
     @Test
