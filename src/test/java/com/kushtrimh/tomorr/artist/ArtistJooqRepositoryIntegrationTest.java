@@ -4,7 +4,6 @@ import com.kushtrimh.tomorr.artist.repository.ArtistRepository;
 import com.kushtrimh.tomorr.configuration.TestDataSourceConfiguration;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import com.kushtrimh.tomorr.extension.TestDatabaseExtension;
-import org.assertj.core.api.Assertions;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.kushtrimh.tomorr.dal.Tables.*;
@@ -70,6 +68,7 @@ public class ArtistJooqRepositoryIntegrationTest {
         expectedArtist.setName("Artist One");
         expectedArtist.setImageHref("artist-one-image");
         expectedArtist.setPopularity(50);
+        expectedArtist.setStatus(ArtistStatus.ACTIVE.name());
         var returnedRecord = artistRepository.findById(id);
         expectedArtist.setCreatedAt(returnedRecord.getCreatedAt());
         assertEquals(expectedArtist, returnedRecord);
@@ -98,8 +97,8 @@ public class ArtistJooqRepositoryIntegrationTest {
         String syncKey = UUID.randomUUID().toString();
         assertEquals(3, artistRepository.findToSync(syncKey, 3).size());
 
-        List<String> updatedArtistSyncKeys = create.select(ARTIST.SYNC_KEY).from(ARTIST).fetch(ARTIST.SYNC_KEY);
-        Assertions.assertThat(updatedArtistSyncKeys).containsOnly(syncKey);
+        assertEquals(3, create.select(ARTIST.SYNC_KEY).from(ARTIST)
+                .where(ARTIST.SYNC_KEY.eq(syncKey)).fetch(ARTIST.SYNC_KEY).size());
     }
 
     @Test
@@ -107,8 +106,8 @@ public class ArtistJooqRepositoryIntegrationTest {
         String syncKey = UUID.randomUUID().toString();
         assertEquals(3, artistRepository.findToSync(syncKey, 3).size());
 
-        List<String> updatedArtistSyncKeys = create.select(ARTIST.SYNC_KEY).from(ARTIST).fetch(ARTIST.SYNC_KEY);
-        Assertions.assertThat(updatedArtistSyncKeys).containsOnly(syncKey);
+        assertEquals(3, create.select(ARTIST.SYNC_KEY).from(ARTIST)
+                .where(ARTIST.SYNC_KEY.eq(syncKey)).fetch(ARTIST.SYNC_KEY).size());
     }
 
     @Test
@@ -126,6 +125,7 @@ public class ArtistJooqRepositoryIntegrationTest {
         expectedArtist.setName("Artist One");
         expectedArtist.setImageHref("artist-one-image");
         expectedArtist.setPopularity(50);
+        expectedArtist.setStatus(ArtistStatus.ACTIVE.name());
         var returnRecord = artistRepository.findByName(name);
         expectedArtist.setCreatedAt(returnRecord.getCreatedAt());
         assertEquals(expectedArtist, returnRecord);
@@ -141,8 +141,8 @@ public class ArtistJooqRepositoryIntegrationTest {
     public void searchByName_WhenSearchQueryIsValid_ReturnArtists() {
         assertEquals(2, artistRepository.searchByName("Artist T").size());
         assertEquals(1, artistRepository.searchByName("Artist One").size());
-        assertEquals(3, artistRepository.searchByName("Artist").size());
-        assertEquals(3, artistRepository.searchByName("A").size());
+        assertEquals(5, artistRepository.searchByName("Artist").size());
+        assertEquals(5, artistRepository.searchByName("A").size());
     }
 
     @Test
@@ -204,6 +204,7 @@ public class ArtistJooqRepositoryIntegrationTest {
         artist.setName("album-name-" + id);
         artist.setPopularity(100);
         artist.setImageHref("album-image-href-" + id);
+        artist.setStatus(ArtistStatus.ACTIVE.name());
         return artist;
     }
 }

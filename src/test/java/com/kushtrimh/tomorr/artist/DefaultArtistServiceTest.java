@@ -120,6 +120,7 @@ public class DefaultArtistServiceTest {
                 record.getName(),
                 record.getImageHref(),
                 record.getPopularity());
+        record.setStatus(ArtistStatus.INITIAL_SYNC.name());
         artistService.save(artist);
         verify(artistRepository, times(1)).save(record);
     }

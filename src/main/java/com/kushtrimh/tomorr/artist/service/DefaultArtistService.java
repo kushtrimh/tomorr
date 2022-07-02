@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.artist.service;
 
 import com.kushtrimh.tomorr.artist.Artist;
+import com.kushtrimh.tomorr.artist.ArtistStatus;
 import com.kushtrimh.tomorr.artist.repository.ArtistRepository;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,7 @@ public class DefaultArtistService implements ArtistService {
     public void save(Artist artist) {
         Objects.requireNonNull(artist);
         ArtistRecord record = toArtistRecord(artist);
+        record.setStatus(ArtistStatus.INITIAL_SYNC.name());
         artistRepository.save(record);
     }
 

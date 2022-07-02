@@ -39,14 +39,12 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
 
     @Override
     public List<ArtistRecord> findToSync(String syncKey, int count) {
-        // TODO: Modify tests to fit this query
         List<ArtistRecord> artists = create
                 .select()
-                .distinctOn(ARTIST.ID)
                 .from(ARTIST)
-                .innerJoin(ARTIST_ALBUM).on(ARTIST.ID.eq(ARTIST_ALBUM.ARTIST_ID))
                 .where(ARTIST.SYNC_KEY.ne(syncKey).or(ARTIST.SYNC_KEY.isNull()))
-                .and(ARTIST.STATUS.ne(ArtistStatus.INITIAL_SYNC.name()))
+                .and(ARTIST.STATUS.eq(ArtistStatus.ACTIVE.name()))
+                .andExists(create.selectOne().from(ARTIST_ALBUM).where(ARTIST_ALBUM.ARTIST_ID.eq(ARTIST.ID)))
                 .limit(count)
                 .forUpdate().fetchInto(ARTIST);
         artists.forEach(record -> record.setSyncKey(syncKey));
