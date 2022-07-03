@@ -19,5 +19,7 @@ public interface ArtistRepository<T> {
 
     T save(T artist);
 
+    void activateArtist(String artistId);
+
     void deleteById(String id);
 }

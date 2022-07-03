@@ -45,7 +45,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
         List<ArtistTaskData> data = List.of(
                 ArtistTaskData.fromArtistId("artist01", TaskType.SYNC),
                 ArtistTaskData.fromArtistId("artist02", TaskType.INITIAL_SYNC),
-                ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)
+                ArtistTaskData.fromNextNode("artist01", "https://nextnode.node.next.tomorr/artist01", TaskType.SYNC)
         );
         manager.add(data);
         List<ArtistTaskData> retrievedData = Stream.of(
@@ -68,7 +68,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
     public void getQueuedTasksCount_WhenTasksExistInQueue_ReturnSizeOfTasksInQueue() {
         List<Task<ArtistTaskData>> tasks = List.of(
                 new Task<>(ArtistTaskData.fromArtistId("artist01", TaskType.SYNC)),
-                new Task<>(ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)));
+                new Task<>(ArtistTaskData.fromNextNode("artist01", "https://nextnode.node.next.tomorr/artist01", TaskType.SYNC)));
         template.opsForList().rightPushAll(ARTIST_SYNC_TASK_QUEUE_KEY, tasks);
         assertEquals(2, manager.getQueuedTasksCount());
         template.delete(ARTIST_SYNC_TASK_QUEUE_KEY);
@@ -84,7 +84,7 @@ public class ArtistSyncTaskManagerIntegrationTest {
     public void getAll_WhenTasksAreQueued_ReturnTasksAndDeleteEntry() {
         List<Task<ArtistTaskData>> tasks = List.of(
                 new Task<>(ArtistTaskData.fromArtistId("artist01", TaskType.SYNC)),
-                new Task<>(ArtistTaskData.fromArtistId("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC)));
+                new Task<>(ArtistTaskData.fromNextNode("artist01", "https://nextnode.node.next.tomorr/artist01", TaskType.SYNC)));
         template.opsForList().rightPushAll(ARTIST_SYNC_TASK_QUEUE_KEY, tasks);
         assertAll(
                 () -> assertEquals(tasks, manager.getAll()),

@@ -8,6 +8,6 @@ import java.util.Map;
  */
 public interface SpotifyMailService {
 
-    void send(String from, String subject, String templateName, Map<String, Object> additionalData, String... to)
+    void send(String from, String subject, String templateName, Map<String, Object> contextData, String... to)
             throws MessagingException;
 }

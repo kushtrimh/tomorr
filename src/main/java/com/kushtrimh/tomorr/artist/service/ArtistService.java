@@ -20,6 +20,8 @@ public interface ArtistService {
 
     void save(Artist artist);
 
+    void activateArtist(String artistId);
+
     void deleteById(String id);
 
     boolean exists(String id);

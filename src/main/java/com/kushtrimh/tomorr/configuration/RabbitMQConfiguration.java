@@ -1,10 +1,14 @@
 package com.kushtrimh.tomorr.configuration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kushtrimh.tomorr.properties.RabbitMQProperties;
 import com.kushtrimh.tomorr.task.Task;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -22,8 +26,11 @@ import java.util.Map;
 /**
  * @author Kushtrim Hajrizi
  */
+@EnableRabbit
 @Configuration
 public class RabbitMQConfiguration {
+
+    public static final String ARTIST_SYNC_QUEUE = "artistSync";
 
     @Bean
     public CachingConnectionFactory connectionFactory(RabbitMQProperties properties)
@@ -47,21 +54,27 @@ public class RabbitMQConfiguration {
     @Bean
     public RabbitTemplate artistTaskRabbitTemplate(
             ConnectionFactory connectionFactory,
-            Jackson2JsonMessageConverter jsonMessageConverter) {
+            Jackson2JsonMessageConverter rabbitJsonMessageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(jsonMessageConverter);
-        rabbitTemplate.setRoutingKey("artistSync");
+        rabbitTemplate.setMessageConverter(rabbitJsonMessageConverter);
+        rabbitTemplate.setRoutingKey(ARTIST_SYNC_QUEUE);
         return rabbitTemplate;
     }
 
     @Bean
     public Queue queue() {
-        return new Queue("artistSync", true);
+        return new Queue(ARTIST_SYNC_QUEUE, true);
     }
 
     @Bean
-    public Jackson2JsonMessageConverter jsonMessageConverter(ClassMapper classMapper) {
+    public Jackson2JsonMessageConverter rabbitJsonMessageConverter(ClassMapper classMapper) {
+        var typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.kushtrimh.tomorr.")
+                .allowIfSubType("java.")
+                .allowIfSubTypeIsArray()
+                .build();
         var mapper = new ObjectMapper();
+        mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         mapper.registerModule(new JavaTimeModule());
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(mapper);
         converter.setClassMapper(classMapper);
@@ -76,5 +89,18 @@ public class RabbitMQConfiguration {
         );
         defaultClassMapper.setIdClassMapping(classMapping);
         return defaultClassMapper;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            CachingConnectionFactory connectionFactory,
+            Jackson2JsonMessageConverter rabbitJsonMessageConverter) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setConcurrentConsumers(5);
+        factory.setBatchListener(true);
+        factory.setMaxConcurrentConsumers(25);
+        factory.setMessageConverter(rabbitJsonMessageConverter);
+        return factory;
     }
 }

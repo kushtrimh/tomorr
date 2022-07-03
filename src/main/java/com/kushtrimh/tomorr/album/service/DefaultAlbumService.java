@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.album.Album;
 import com.kushtrimh.tomorr.album.AlbumType;
 import com.kushtrimh.tomorr.album.repository.AlbumRepository;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,12 @@ public class DefaultAlbumService implements AlbumService {
         return Optional.of(toAlbum(record));
     }
 
+    @Override
+    @Cacheable(value = "artistAlbumsCount", key = "'albumsCount:' + #artistId", unless = "#result != null")
+    public Optional<Integer> findCountByArtistId(String artistId) {
+        return Optional.ofNullable(albumRepository.findCountByArtistId(artistId));
+    }
+
     @Transactional
     @Override
     public List<Album> findByArtist(String artistId) {
@@ -42,9 +49,20 @@ public class DefaultAlbumService implements AlbumService {
 
     @Transactional
     @Override
-    public void save(Album album) {
+    public void save(String artistId, Album album) {
         Objects.requireNonNull(album);
-        albumRepository.save(toAlbumRecord(album));
+        Objects.requireNonNull(artistId);
+        albumRepository.save(artistId, toAlbumRecord(album));
+    }
+
+    @Transactional
+    @Override
+    public void saveAll(String artistId, List<Album> albums) {
+        Objects.requireNonNull(artistId);
+        if (albums == null || albums.isEmpty()) {
+            return;
+        }
+        albumRepository.saveAll(artistId, albums.stream().map(this::toAlbumRecord).toList());
     }
 
     @Transactional

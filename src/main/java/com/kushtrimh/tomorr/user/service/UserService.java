@@ -2,6 +2,7 @@ package com.kushtrimh.tomorr.user.service;
 
 import com.kushtrimh.tomorr.user.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -12,6 +13,8 @@ public interface UserService {
     Optional<User> findById(String id);
 
     Optional<User> findByAddress(String address);
+
+    List<User> findByFollowedArtist(String artistId);
 
     void save(User user);
 

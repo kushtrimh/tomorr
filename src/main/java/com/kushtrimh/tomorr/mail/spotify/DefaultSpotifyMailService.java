@@ -23,12 +23,12 @@ public class DefaultSpotifyMailService implements SpotifyMailService {
         this.mailTemplateEngine = mailTemplateEngine;
     }
 
-    public void send(String from, String subject, String templateName, Map<String, Object> additionalData, String... to)
+    public void send(String from, String subject, String templateName, Map<String, Object> contextData, String... to)
             throws MessagingException {
         var context = new Context(Locale.ENGLISH);
         context.setVariable("subject", subject);
         context.setVariable("from", from);
-        context.setVariables(additionalData);
+        context.setVariables(contextData);
 
         String content = mailTemplateEngine.process(templateName, context);
         mailService.send(from, subject, content, to);

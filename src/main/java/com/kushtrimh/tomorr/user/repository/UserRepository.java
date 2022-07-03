@@ -1,5 +1,7 @@
 package com.kushtrimh.tomorr.user.repository;
 
+import java.util.List;
+
 /**
  * @author Kushtrim Hajrizi
  */
@@ -10,6 +12,8 @@ public interface UserRepository<T> {
     T findById(String id);
 
     T findByAddress(String address);
+
+    List<T> findByFollowedArtist(String artistId);
 
     T save(T user);
 

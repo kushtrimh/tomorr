@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.artist.repository;
 
+import com.kushtrimh.tomorr.artist.ArtistStatus;
 import com.kushtrimh.tomorr.dal.tables.records.ArtistRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -38,10 +39,14 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
 
     @Override
     public List<ArtistRecord> findToSync(String syncKey, int count) {
-        List<ArtistRecord> artists = create.selectFrom(ARTIST)
+        List<ArtistRecord> artists = create
+                .select()
+                .from(ARTIST)
                 .where(ARTIST.SYNC_KEY.ne(syncKey).or(ARTIST.SYNC_KEY.isNull()))
+                .and(ARTIST.STATUS.eq(ArtistStatus.ACTIVE.name()))
+                .andExists(create.selectOne().from(ARTIST_ALBUM).where(ARTIST_ALBUM.ARTIST_ID.eq(ARTIST.ID)))
                 .limit(count)
-                .forUpdate().fetch();
+                .forUpdate().fetchInto(ARTIST);
         artists.forEach(record -> record.setSyncKey(syncKey));
         if (!artists.isEmpty()) {
             create.batchUpdate(artists).execute();
@@ -60,6 +65,12 @@ public class ArtistJooqRepository implements ArtistRepository<ArtistRecord> {
         var record = create.newRecord(ARTIST, artist);
         record.store();
         return record;
+    }
+
+    @Override
+    public void activateArtist(String artistId) {
+        create.update(ARTIST).set(ARTIST.STATUS, ArtistStatus.ACTIVE.name())
+                .where(ARTIST.ID.eq(artistId)).execute();
     }
 
     @Override

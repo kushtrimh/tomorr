@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.spotify.util;
 
+import com.kushtrimh.tomorr.spotify.api.request.NextNodeRequest;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,13 @@ class SpotifyApiUriBuilderTest {
 
         var returnedUriWithEmpty = builder.getApiUri(buildRequest(path, new LinkedMultiValueMap<>()));
         assertEquals(expectedUri, returnedUriWithEmpty);
+    }
+
+    @Test
+    public void getApiUri_WhenRequestIsNextNodeRequest_ReturnUriThatNextNodeContains() {
+        String uri = "http://localhost/api/nextnode";
+        var request = new NextNodeRequest<>(uri, Object.class);
+        assertEquals(uri, builder.getApiUri(request));
     }
 
     private SpotifyApiRequest<Object> buildRequest(String path, MultiValueMap<String, String> params) {

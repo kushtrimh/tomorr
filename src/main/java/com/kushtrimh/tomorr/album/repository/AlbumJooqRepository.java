@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.album.repository;
 
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
+import com.kushtrimh.tomorr.dal.tables.records.ArtistAlbumRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
@@ -32,6 +33,13 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     }
 
     @Override
+    public Integer findCountByArtistId(String artistId) {
+        return create.selectCount().from(ARTIST_ALBUM)
+                .where(ARTIST_ALBUM.ARTIST_ID.eq(artistId))
+                .fetchOne(0, Integer.class);
+    }
+
+    @Override
     public List<AlbumRecord> findByArtist(String artistId) {
         return create.select().from(ALBUM)
                 .innerJoin(ARTIST_ALBUM)
@@ -43,10 +51,37 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     }
 
     @Override
-    public AlbumRecord save(AlbumRecord album) {
+    public AlbumRecord save(String artistId, AlbumRecord album) {
         Objects.requireNonNull(album);
-        var record = create.newRecord(ALBUM, album);
-        record.store();
+        var albumRecord = create.newRecord(ALBUM, album);
+        albumRecord.store();
+
+        create.insertInto(ARTIST_ALBUM)
+                .set(newArtistAlbumRecord(artistId, albumRecord))
+                .execute();
+        return albumRecord;
+    }
+
+    @Override
+    public void saveAll(String artistId, List<AlbumRecord> albums) {
+        if (albums.isEmpty()) {
+            return;
+        }
+        var batchAlbumsOperation = create.batchInsert(albums);
+        batchAlbumsOperation.execute();
+
+        List<ArtistAlbumRecord> artistAlbums = albums.stream()
+                .map(album -> newArtistAlbumRecord(artistId, album))
+                .toList();
+
+        var batchArtistAlbumsOperation = create.batchInsert(artistAlbums);
+        batchArtistAlbumsOperation.execute();
+    }
+
+    private ArtistAlbumRecord newArtistAlbumRecord(String artistId, AlbumRecord album) {
+        var record = new ArtistAlbumRecord();
+        record.setArtistId(artistId);
+        record.setAlbumId(album.getId());
         return record;
     }
 

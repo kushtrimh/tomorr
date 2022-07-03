@@ -1,5 +1,8 @@
 package com.kushtrimh.tomorr.album;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * @author Kushtrim Hajrizi
  */
@@ -16,5 +19,10 @@ public enum AlbumType {
 
     public String getApiType() {
         return apiType;
+    }
+
+    public static Optional<AlbumType> fromApiType(String apiType) {
+        return Arrays.stream(values()).filter(type -> type.apiType.equals(apiType))
+                .findFirst();
     }
 }

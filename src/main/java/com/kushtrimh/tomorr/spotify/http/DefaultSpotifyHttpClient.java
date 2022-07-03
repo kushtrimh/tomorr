@@ -3,6 +3,7 @@ package com.kushtrimh.tomorr.spotify.http;
 import com.kushtrimh.tomorr.spotify.AuthorizationException;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
+import com.kushtrimh.tomorr.spotify.api.request.NextNodeRequest;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import com.kushtrimh.tomorr.spotify.api.response.TokenResponse;
 import com.kushtrimh.tomorr.spotify.util.SpotifyApiUriBuilder;
@@ -58,6 +59,9 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
     public <Req extends SpotifyApiRequest<Res>, Res> Res execute(
             HttpMethod httpMethod, String token, Req request, Class<Res> cls)
             throws SpotifyApiException, TooManyRequestsException, AuthorizationException {
+        if (request instanceof NextNodeRequest<?> && httpMethod != HttpMethod.GET) {
+            throw new IllegalArgumentException("Next node requests are valid only when sent as a HTTP GET request");
+        }
         Req body = httpMethod == HttpMethod.GET ? null : request;
         return execute(token, spotifyApiUriBuilder.getApiUri(request), httpMethod, body, cls);
     }

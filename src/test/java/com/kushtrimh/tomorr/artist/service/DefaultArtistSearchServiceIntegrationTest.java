@@ -84,6 +84,11 @@ class DefaultArtistSearchServiceIntegrationTest {
                 }
 
                 @Override
+                public void activateArtist(String artistId) {
+
+                }
+
+                @Override
                 public void deleteById(String id) {
 
                 }

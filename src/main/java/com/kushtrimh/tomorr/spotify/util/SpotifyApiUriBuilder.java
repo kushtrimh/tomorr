@@ -1,5 +1,6 @@
 package com.kushtrimh.tomorr.spotify.util;
 
+import com.kushtrimh.tomorr.spotify.api.request.NextNodeRequest;
 import com.kushtrimh.tomorr.spotify.api.request.SpotifyApiRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,15 +19,18 @@ public class SpotifyApiUriBuilder {
         this.apiUri = apiUri;
     }
 
-    public <Req extends SpotifyApiRequest> String getApiUri(Req request) {
+    public <Req extends SpotifyApiRequest<Res>, Res> String getApiUri(Req request) {
         Objects.requireNonNull(request);
-
-        MultiValueMap<String, String> params = request.getQueryParams();
-        // params.replaceAll((key, value) -> List.of(URLEncoder.encode(String.join(",", value), StandardCharsets.UTF_8)));
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
-                .uri(URI.create(apiUri))
-                .path(request.getPath())
-                .queryParams(params);
-        return uriBuilder.build().toUriString();
+        if (request instanceof NextNodeRequest<?> nextNode) {
+            return nextNode.getUri();
+        } else {
+            MultiValueMap<String, String> params = request.getQueryParams();
+            // params.replaceAll((key, value) -> List.of(URLEncoder.encode(String.join(",", value), StandardCharsets.UTF_8)));
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
+                    .uri(URI.create(apiUri))
+                    .path(request.getPath())
+                    .queryParams(params);
+            return uriBuilder.build().toUriString();
+        }
     }
 }

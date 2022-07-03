@@ -30,7 +30,7 @@ public class ArtistSyncJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        logger.debug("Artist sync job started...");
+        logger.debug("Sync job started...");
 
         long taskRelatedRequests = requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_SYNC);
         long artistSearchRequests = requestLimitService.getSentRequestsCounter(LimitType.SPOTIFY_SEARCH);

@@ -74,25 +74,74 @@ public class DefaultAlbumServiceTest {
     }
 
     @Test
+    public void findCountByArtistId_WhenArtistDoesNotHaveAlbums_ReturnEmptyOptional() {
+        var artistId = "invalid-id";
+        when(albumRepository.findCountByArtistId(artistId)).thenReturn(null);
+        Optional<Integer> count = albumService.findCountByArtistId(artistId);
+        assertTrue(count.isEmpty());
+    }
+
+    @Test
+    public void findCountByArtistId_WhenArtistHasAlbums_ReturnArtistAlbumsCount() {
+        var artistId = "artist1";
+        var count = 10;
+        when(albumRepository.findCountByArtistId(artistId)).thenReturn(count);
+        Optional<Integer> albumCount = albumService.findCountByArtistId(artistId);
+        assertAll(
+                () -> assertFalse(albumCount.isEmpty()),
+                () -> assertEquals(count, albumCount.get())
+        );
+    }
+
+    @Test
     public void save_WhenAlbumIsNull_ThrowException() {
         assertThrows(NullPointerException.class, () -> {
-            albumService.save(null);
+            albumService.save("artist1", null);
+        });
+    }
+
+    @Test
+    public void save_WhenArtistIdIsNull_ThrowException() {
+        assertThrows(NullPointerException.class, () -> {
+            albumService.save(null, newAlbum(newAlbumRecord("id1")));
         });
     }
 
     @Test
     public void save_WhenAlbumIsValid_SaveSuccessfully() {
         var record = newAlbumRecord("id100");
-        var album = new Album(
-                record.getId(),
-                record.getName(),
-                AlbumType.valueOf(record.getType()),
-                record.getTotalTracks(),
-                record.getReleaseDate(),
-                record.getImageHref()
-        );
-        albumService.save(album);
-        verify(albumRepository, times(1)).save(record);
+        var artistId = "artist1";
+        var album = newAlbum(record);
+        albumService.save(artistId, album);
+        verify(albumRepository, times(1)).save(artistId, record);
+    }
+
+    @Test
+    public void saveAll_WhenAlbumsListIsNull_DoNothing() {
+        albumService.saveAll("artist1", null);
+        verify(albumRepository, times(0)).saveAll(any(), any());
+    }
+
+    @Test
+    public void saveAll_WhenAlbumsListIsEmpty_DoNothing() {
+        albumService.saveAll("artist1", List.of());
+        verify(albumRepository, times(0)).saveAll(any(), any());
+    }
+
+    @Test
+    public void saveAll_WhenArtistIdIsNull_ThrowException() {
+        assertThrows(NullPointerException.class, () -> {
+            albumService.saveAll(null, List.of(newAlbum(newAlbumRecord("id1"))));
+        });
+    }
+
+    @Test
+    public void saveAll_WhenAlbumsListIsFilled_SaveAlbumsSuccessfully() {
+        var artistId = "artist1";
+        var records = List.of(newAlbumRecord("id1"), newAlbumRecord("id2"));
+        var albums = records.stream().map(this::newAlbum).toList();
+        albumService.saveAll(artistId, albums);
+        verify(albumRepository, times(1)).saveAll(artistId, records);
     }
 
     @Test
@@ -120,5 +169,16 @@ public class DefaultAlbumServiceTest {
         album.setType("ALBUM");
         album.setTotalTracks(10);
         return album;
+    }
+
+    private Album newAlbum(AlbumRecord record) {
+        return new Album(
+                record.getId(),
+                record.getName(),
+                AlbumType.valueOf(record.getType()),
+                record.getTotalTracks(),
+                record.getReleaseDate(),
+                record.getImageHref()
+        );
     }
 }

@@ -7,6 +7,7 @@ CREATE TABLE artist
     image_href varchar(256),
     popularity integer      NOT NULL,
     sync_key   varchar(36),
+    status     varchar(16)  NOT NULL,
     created_at timestamp    NOT NULL DEFAULT NOW()
 );
 
@@ -29,7 +30,7 @@ CREATE TABLE album
 (
     id           varchar(32) PRIMARY KEY,
     name         varchar(512) NOT NULL,
-    total_tracks integer      NOT NULL,
+    total_tracks integer,
     image_href   varchar(256) NOT NULL,
     type         varchar(32)  NOT NULL,
     release_date varchar(64)  NOT NULL,

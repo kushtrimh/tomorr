@@ -52,7 +52,7 @@ public class ArtistSyncTaskManagerTest {
         when(template.opsForList()).thenReturn(listOperations);
         List<ArtistTaskData> artistTaskData = List.of(
                 ArtistTaskData.fromArtistId("artist01", TaskType.SYNC),
-                ArtistTaskData.fromNextNode("https://nextnode.node.next.tomorr/artist01", TaskType.CONTINUED_SYNC),
+                ArtistTaskData.fromNextNode("artist01", "https://nextnode.node.next.tomorr/artist01", TaskType.SYNC),
                 ArtistTaskData.fromArtistId("artist02", TaskType.INITIAL_SYNC)
         );
         manager.add(artistTaskData);

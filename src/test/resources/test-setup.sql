@@ -7,6 +7,7 @@ CREATE TABLE artist
     image_href varchar(256),
     popularity integer      NOT NULL,
     sync_key   varchar(36),
+    status     varchar(16)  NOT NULL,
     created_at timestamp    NOT NULL DEFAULT NOW()
 );
 
@@ -29,7 +30,7 @@ CREATE TABLE album
 (
     id           varchar(32) PRIMARY KEY,
     name         varchar(512) NOT NULL,
-    total_tracks integer      NOT NULL,
+    total_tracks integer,
     image_href   varchar(256) NOT NULL,
     type         varchar(32)  NOT NULL,
     release_date varchar(64)  NOT NULL,
@@ -45,12 +46,16 @@ CREATE TABLE artist_album
 
 -- Seed
 
-INSERT INTO artist (id, name, image_href, popularity)
-VALUES ('artist1', 'Artist One', 'artist-one-image', 50);
-INSERT INTO artist (id, name, image_href, popularity)
-VALUES ('artist2', 'Artist Two', 'artist-two-image', 95);
-INSERT INTO artist (id, name, image_href, popularity)
-VALUES ('artist3', 'Artist Three', 'artist-three-image', 100);
+INSERT INTO artist (id, name, image_href, popularity, status)
+VALUES ('artist1', 'Artist One', 'artist-one-image', 50, 'ACTIVE');
+INSERT INTO artist (id, name, image_href, popularity, status)
+VALUES ('artist2', 'Artist Two', 'artist-two-image', 95, 'ACTIVE');
+INSERT INTO artist (id, name, image_href, popularity, status)
+VALUES ('artist3', 'Artist Three', 'artist-three-image', 100, 'ACTIVE');
+INSERT INTO artist (id, name, image_href, popularity, status)
+VALUES ('artist4', 'Artist Four', 'artist-four-image', 75, 'INITIAL_SYNC');
+INSERT INTO artist (id, name, image_href, popularity, status)
+VALUES ('artist5', 'Artist Five', 'artist-five-image', 25, 'ACTIVE');
 
 INSERT INTO app_user (id, address, type)
 VALUES ('user1', 'user1@tomorr.com', 'EMAIL');

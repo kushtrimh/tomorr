@@ -120,8 +120,21 @@ public class DefaultArtistServiceTest {
                 record.getName(),
                 record.getImageHref(),
                 record.getPopularity());
+        record.setStatus(ArtistStatus.INITIAL_SYNC.name());
         artistService.save(artist);
         verify(artistRepository, times(1)).save(record);
+    }
+
+    @Test
+    public void activateArtist_WhenArtistIdIsNull_ThrowException() {
+        assertThrows(NullPointerException.class, () -> artistService.activateArtist(null));
+    }
+
+    @Test
+    public void activateArtist_WhenArtistIdIsValid_ActivateArtistSuccessfully() {
+        var artistId = "artist1";
+        artistService.activateArtist(artistId);
+        verify(artistRepository, times(1)).activateArtist(artistId);
     }
 
     @Test

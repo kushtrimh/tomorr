@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,6 +45,12 @@ public class DefaultUserService implements UserService {
     public Optional<User> findByAddress(String address) {
         AppUserRecord record = userRepository.findByAddress(address);
         return getUserOptional(record);
+    }
+
+    @Override
+    public List<User> findByFollowedArtist(String artistId) {
+        return userRepository.findByFollowedArtist(artistId)
+                .stream().map(this::toUser).toList();
     }
 
     @Transactional

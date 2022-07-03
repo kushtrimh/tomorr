@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.dal.tables.records.AppUserRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Objects;
 
 import static com.kushtrimh.tomorr.dal.Tables.*;
@@ -33,6 +34,14 @@ public class UserJooqRepository implements UserRepository<AppUserRecord> {
     @Override
     public AppUserRecord findByAddress(String address) {
         return create.fetchOne(APP_USER, APP_USER.ADDRESS.eq(address));
+    }
+
+    @Override
+    public List<AppUserRecord> findByFollowedArtist(String artistId) {
+        return create.select().from(APP_USER)
+                .innerJoin(ARTIST_APP_USER).on(ARTIST_APP_USER.APP_USER_ID.eq(APP_USER.ID))
+                .where(ARTIST_APP_USER.ARTIST_ID.eq(artistId))
+                .fetchInto(APP_USER);
     }
 
     @Override

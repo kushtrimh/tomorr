@@ -5,6 +5,9 @@ package com.kushtrimh.tomorr.spotify;
  */
 public class SpotifyApiException extends Exception {
 
+    public SpotifyApiException() {
+    }
+
     public SpotifyApiException(Throwable cause) {
         super(cause);
     }

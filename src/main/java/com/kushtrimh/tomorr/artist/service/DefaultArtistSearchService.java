@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class DefaultArtistSearchService implements ArtistSearchService {
-    // TODO: Add integration tests for this
 
     private final Logger logger = LoggerFactory.getLogger(DefaultArtistSearchService.class);
 

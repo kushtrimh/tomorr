@@ -13,9 +13,13 @@ public interface AlbumService {
 
     Optional<Album> findById(String id);
 
+    Optional<Integer> findCountByArtistId(String artistId);
+
     List<Album> findByArtist(String artistId);
 
-    void save(Album album);
+    void save(String artistId, Album album);
+
+    void saveAll(String artistId, List<Album> albums);
 
     void deleteById(String id);
 }
