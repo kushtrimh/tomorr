@@ -67,9 +67,7 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
         Objects.requireNonNull(task);
         ArtistTaskData artistData = task.getData();
         Objects.requireNonNull(artistData);
-
-        // TODO: Unit test for this class
-
+        
         SpotifyApiRequest<GetArtistAlbumsApiResponse> request = artistData.getNextNode() != null ?
                 new NextNodeRequest<>(artistData.getNextNode(), GetArtistAlbumsApiResponse.class) :
                 new GetArtistAlbumsApiRequest.Builder(artistData.getArtistId()).build();
