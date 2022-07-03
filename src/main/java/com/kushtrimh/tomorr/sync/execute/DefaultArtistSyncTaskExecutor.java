@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,7 +68,7 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
         Objects.requireNonNull(task);
         ArtistTaskData artistData = task.getData();
         Objects.requireNonNull(artistData);
-        
+
         SpotifyApiRequest<GetArtistAlbumsApiResponse> request = artistData.getNextNode() != null ?
                 new NextNodeRequest<>(artistData.getNextNode(), GetArtistAlbumsApiResponse.class) :
                 new GetArtistAlbumsApiRequest.Builder(artistData.getArtistId()).build();
@@ -110,8 +111,8 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
             List<User> users = userService.findByFollowedArtist(artistData.getArtistId());
             // TODO: Send email to all of them
         }
-        if (count > (responseCount + newAlbums.size()) && artistData.getNextNode() != null) {
-            artistSyncTaskManager.add(ArtistTaskData.fromNextNode(artistData.getArtistId(), artistData.getNextNode(), TaskType.SYNC));
+        if (responseCount > (count + newAlbums.size()) && response.getNext() != null) {
+            artistSyncTaskManager.add(ArtistTaskData.fromNextNode(artistData.getArtistId(), response.getNext(), TaskType.SYNC));
         }
     }
 
@@ -132,14 +133,16 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
                         item.getId(), item.getAlbumType(), AlbumType.ALBUM);
                 return AlbumType.ALBUM;
             });
+            var image = Optional.ofNullable(item.getImages())
+                    .filter(images -> !images.isEmpty())
+                    .map(images -> images.get(0).getUrl()).orElse(null);
             return new Album(
                     item.getId(),
                     item.getName(),
                     type,
                     null,
                     item.getReleaseDate(),
-                    item.getImages().get(0).getUrl()
-            );
+                    image);
         }).collect(Collectors.toList());
     }
 }
