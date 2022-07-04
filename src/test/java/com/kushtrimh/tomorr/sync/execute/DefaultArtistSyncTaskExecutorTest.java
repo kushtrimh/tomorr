@@ -2,6 +2,7 @@ package com.kushtrimh.tomorr.sync.execute;
 
 import com.kushtrimh.tomorr.album.Album;
 import com.kushtrimh.tomorr.album.AlbumType;
+import com.kushtrimh.tomorr.album.cache.AlbumCache;
 import com.kushtrimh.tomorr.album.service.AlbumService;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.limit.LimitType;
@@ -49,6 +50,8 @@ class DefaultArtistSyncTaskExecutorTest {
     @Mock
     private SpotifyApiClient spotifyApiClient;
     @Mock
+    private AlbumCache albumCache;
+    @Mock
     private SpotifyMailService spotifyMailService;
 
     private DefaultArtistSyncTaskExecutor taskExecutor;
@@ -63,6 +66,7 @@ class DefaultArtistSyncTaskExecutorTest {
                 albumService,
                 artistService,
                 spotifyApiClient,
+                albumCache,
                 spotifyMailService);
     }
 
@@ -143,7 +147,7 @@ class DefaultArtistSyncTaskExecutorTest {
     public void execute_WhenAlbumCountIsLessThanResponseAlbumCountOnSync_SaveAlbumsAndSendEmails() throws TooManyRequestsException, SpotifyApiException {
         var artistId = "artist1";
         var existingAlbumsCount = 10;
-        var responseAlbumsCount = 15;
+        var responseAlbumsCount = 12;
         var task = newSyncTask(artistId);
         var albums = newAlbums(10);
 
@@ -154,22 +158,43 @@ class DefaultArtistSyncTaskExecutorTest {
                 .thenReturn(newArtistAlbumsResponse(responseAlbumsCount));
         when(albumService.findCountByArtistId(artistId)).thenReturn(Optional.of(existingAlbumsCount));
         when(albumService.findByArtist(artistId)).thenReturn(albums);
+        when(albumCache.isNotificationSent("album-name10")).thenReturn(true);
+        when(albumCache.isNotificationSent("album-name11")).thenReturn(true);
 
         taskExecutor.execute(task);
 
         verify(artistSyncTaskManager, never()).add(any(ArtistTaskData.class));
         verify(albumService, times(1)).saveAll(eq(artistId), albumsCaptor.capture());
         verify(spotifyApiClient, times(1)).get(eq(LimitType.SPOTIFY_SYNC), requestCaptor.capture());
+        // TODO: Verify send emails is called
 
         var addedAlbums = albumsCaptor.getValue();
         var request = requestCaptor.getValue();
 
         assertAll(
-                () -> assertEquals(5, addedAlbums.size()),
+                () -> assertEquals(2, addedAlbums.size()),
                 () -> assertEquals("album10", addedAlbums.get(0).id()),
-                () -> assertEquals("album14", addedAlbums.get(4).id()),
+                () -> assertEquals("album11", addedAlbums.get(1).id()),
                 () -> assertEquals(artistId, request.getArtistId())
         );
+    }
+
+    @Test
+    public void execute_WhenNotificationHasAlreadyBeenSendForAlbums_DoNotSendEmails()
+            throws TooManyRequestsException, SpotifyApiException {
+        var artistId = "artist1";
+        var existingAlbumsCount = 10;
+        var responseAlbumsCount = 12;
+
+        when(spotifyApiClient.get(eq(LimitType.SPOTIFY_SYNC), any(GetArtistAlbumsApiRequest.class)))
+                .thenReturn(newArtistAlbumsResponse(responseAlbumsCount));
+        when(albumService.findCountByArtistId(artistId)).thenReturn(Optional.of(existingAlbumsCount));
+        when(albumService.findByArtist(artistId)).thenReturn(newAlbums(10));
+        when(albumCache.isNotificationSent("album-name10")).thenReturn(true);
+        when(albumCache.isNotificationSent("album-name11")).thenReturn(true);
+
+        taskExecutor.execute(newSyncTask(artistId));
+        // TODO: Verify send emails is not called
     }
 
     @Test
