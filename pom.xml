@@ -15,6 +15,7 @@
     <description>Notifier for new spotify songs</description>
     <properties>
         <java.version>17</java.version>
+        <testcontainers.version>1.17.3</testcontainers.version>
     </properties>
     <dependencies>
         <dependency>
@@ -138,19 +139,19 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.17.3</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>rabbitmq</artifactId>
-            <version>1.17.3</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.17.3</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
