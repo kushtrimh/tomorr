@@ -40,7 +40,7 @@ class DefaultSpotifyMailServiceTest {
         var from = "noreply@tomorrlocal.com";
         var subject = "some subject";
         var templateName = "test-template";
-        var content = "<html><body><p>content</p></body></html>";
+        var content = "<html><body><p th:text=\"${artistName}\"></p><p>content</p><p th:text=\"${albumName}\"></p></body></html>";
         var to1 = "to1@tomorrlocal.com";
         var to2 = "to2@tomorrlocal.com";
         Map<String, Object> additionalData = Map.of(
