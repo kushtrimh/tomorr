@@ -14,5 +14,5 @@ public interface NotificationMailService {
 
     void sendNewReleaseNotification(Album album, Artist artist, List<User> users);
 
-    void send(String from, String subject, String templateName, Map<String, Object> contextData, String... to);
+    void send(String from, String subject, String templateName, Map<String, Object> contextData, List<String> to);
 }

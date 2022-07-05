@@ -49,10 +49,10 @@ public class DefaultNotificationMailService implements NotificationMailService {
                 "type", album.albumType().name().toLowerCase());
         String subject = "New release: " + album.name();
         send(mailProperties.getFrom(), subject, "new-release-notification", contextData,
-                users.stream().map(User::address).toArray(String[]::new));
+                users.stream().map(User::address).toList());
     }
 
-    public void send(String from, String subject, String templateName, Map<String, Object> contextData, String... to) {
+    public void send(String from, String subject, String templateName, Map<String, Object> contextData, List<String> to) {
         // TODO: Unit testing for NotificationMailService and DefaultNotificationRetry class
         // TODO: Integration testing for emails
         var context = new Context(Locale.ENGLISH);
@@ -62,11 +62,11 @@ public class DefaultNotificationMailService implements NotificationMailService {
 
         String content = mailTemplateEngine.process(templateName, context);
         try {
-            mailService.send(from, subject, content, to);
+            mailService.send(from, subject, content, to.toArray(new String[]{}));
         } catch (MailException e) {
             logger.error("Could not send email", e);
             notificationRetryService.retryNotification(new NotificationRetryData(
-                    from, subject, templateName, contextData, List.of(to)));
+                    from, subject, templateName, contextData, to));
         }
     }
 }
