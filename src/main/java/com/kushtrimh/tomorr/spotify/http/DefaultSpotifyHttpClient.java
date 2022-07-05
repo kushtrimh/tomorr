@@ -115,7 +115,7 @@ public class DefaultSpotifyHttpClient implements SpotifyHttpClient {
                     traceId, method, url, entity.getBody());
             ResponseEntity<Res> responseEntity = restTemplate.exchange(url, method, entity, cls);
             Res response = responseEntity.getBody();
-            logger.info("{} Received response {}", traceId, response);
+            logger.info("{} Received response successfully", traceId);
             return response;
         } catch (HttpClientErrorException e) {
             HttpStatus statusCode = e.getStatusCode();

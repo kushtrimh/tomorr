@@ -23,6 +23,9 @@ public class DefaultNotificationRetryService implements NotificationRetryService
 
     @Override
     public void retryNotification(NotificationRetryData notificationRetryData) {
+        if (notificationRetryData == null) {
+            return;
+        }
         logger.info("Retrying notification: {}", notificationRetryData);
         var task = new Task<>(notificationRetryData);
         rabbitTemplate.convertAndSend(RabbitMQConfiguration.NOTIFICATION_RETRY_QUEUE, task);
