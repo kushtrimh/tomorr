@@ -5,16 +5,15 @@ package com.kushtrimh.tomorr.dal.tables.records;
 
 
 import com.kushtrimh.tomorr.dal.tables.QrtzPausedTriggerGrps;
+import org.jooq.Field;
+import org.jooq.Record2;
+import org.jooq.Row2;
+import org.jooq.impl.UpdatableRecordImpl;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.jooq.Field;
-import org.jooq.Record2;
-import org.jooq.Row2;
-import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**

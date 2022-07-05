@@ -20,13 +20,12 @@ import com.kushtrimh.tomorr.dal.tables.QrtzSchedulerState;
 import com.kushtrimh.tomorr.dal.tables.QrtzSimpleTriggers;
 import com.kushtrimh.tomorr.dal.tables.QrtzSimpropTriggers;
 import com.kushtrimh.tomorr.dal.tables.QrtzTriggers;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**

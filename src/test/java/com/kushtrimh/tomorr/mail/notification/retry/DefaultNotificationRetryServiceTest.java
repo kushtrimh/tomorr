@@ -37,7 +37,7 @@ class DefaultNotificationRetryServiceTest {
     }
 
     @Test
-    public void retryNotification_WhenNotificationRetryDataIsNull_SendNotificationDataToQueue() {
+    public void retryNotification_WhenNotificationRetryDataIsValid_SendNotificationDataToQueue() {
         var notificationRetryData = new NotificationRetryData(
                 "from", "subject", "templateName", new HashMap<>(), new ArrayList<>());
         service.retryNotification(notificationRetryData);

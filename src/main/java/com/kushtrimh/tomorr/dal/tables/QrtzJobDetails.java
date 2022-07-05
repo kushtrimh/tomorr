@@ -8,10 +8,6 @@ import com.kushtrimh.tomorr.dal.Indexes;
 import com.kushtrimh.tomorr.dal.Keys;
 import com.kushtrimh.tomorr.dal.Public;
 import com.kushtrimh.tomorr.dal.tables.records.QrtzJobDetailsRecord;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Index;
@@ -26,6 +22,9 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**

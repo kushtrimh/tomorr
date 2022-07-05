@@ -17,6 +17,7 @@ public class NotificationRetryData implements TaskData {
     private String templateName;
     private Map<String, Object> contextData = new HashMap<>();
     private List<String> to = new ArrayList<>();
+    private TaskType taskType = TaskType.NOTIFICATION_RETRY;
 
     public NotificationRetryData() {
     }
@@ -72,7 +73,11 @@ public class NotificationRetryData implements TaskData {
 
     @Override
     public TaskType getTaskType() {
-        return TaskType.NOTIFICATION_RETRY;
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     @Override
@@ -82,6 +87,7 @@ public class NotificationRetryData implements TaskData {
                 ", subject='" + subject + '\'' +
                 ", templateName='" + templateName + '\'' +
                 ", contextData=" + contextData +
+                ", taskType=" + taskType +
                 '}';
     }
 }

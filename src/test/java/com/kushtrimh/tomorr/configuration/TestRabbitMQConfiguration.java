@@ -1,6 +1,7 @@
 package com.kushtrimh.tomorr.configuration;
 
 import com.kushtrimh.tomorr.extension.TestRabbitMQExtension;
+import com.kushtrimh.tomorr.mail.notification.retry.NotificationRetryData;
 import com.kushtrimh.tomorr.properties.RabbitMQProperties;
 import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.data.ArtistTaskData;
@@ -45,8 +46,18 @@ public class TestRabbitMQConfiguration {
         return new Queue("artistSyncTest", true);
     }
 
+    @Bean
+    public Queue retryNotificationQueue() {
+        return new Queue("notificationRetryTest", true);
+    }
+
     @RabbitListener(queues = "artistSyncTest")
     public String artistSyncListener(Task<ArtistTaskData> artistTask) {
         return artistTask.getData().getArtistId();
+    }
+
+    @RabbitListener(queues = "notificationRetryTest")
+    public String retryNotificationListener(Task<NotificationRetryData> notificationRetryTask) {
+        return notificationRetryTask.getData().getSubject();
     }
 }

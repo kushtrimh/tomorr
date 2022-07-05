@@ -5,17 +5,16 @@ package com.kushtrimh.tomorr.dal.tables.records;
 
 
 import com.kushtrimh.tomorr.dal.tables.QrtzCronTriggers;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import org.jooq.Field;
 import org.jooq.Record3;
 import org.jooq.Record5;
 import org.jooq.Row5;
 import org.jooq.impl.UpdatableRecordImpl;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 
 /**
