@@ -4,10 +4,12 @@ import com.kushtrimh.tomorr.album.Album;
 import com.kushtrimh.tomorr.album.AlbumType;
 import com.kushtrimh.tomorr.album.cache.AlbumCache;
 import com.kushtrimh.tomorr.album.service.AlbumService;
+import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.configuration.RabbitMQConfiguration;
 import com.kushtrimh.tomorr.limit.LimitType;
-import com.kushtrimh.tomorr.mail.spotify.SpotifyMailService;
+import com.kushtrimh.tomorr.mail.MailException;
+import com.kushtrimh.tomorr.mail.spotify.NotificationMailService;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
@@ -47,7 +49,7 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     private final ArtistService artistService;
     private final SpotifyApiClient spotifyApiClient;
     private final AlbumCache albumCache;
-    private final SpotifyMailService spotifyMailService;
+    private final NotificationMailService notificationMailService;
 
     public DefaultArtistSyncTaskExecutor(
             UserService userService,
@@ -56,14 +58,14 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
             ArtistService artistService,
             SpotifyApiClient spotifyApiClient,
             AlbumCache albumCache,
-            SpotifyMailService spotifyMailService) {
+            NotificationMailService notificationMailService) {
         this.userService = userService;
         this.artistSyncTaskManager = artistSyncTaskManager;
         this.albumService = albumService;
         this.artistService = artistService;
         this.spotifyApiClient = spotifyApiClient;
         this.albumCache = albumCache;
-        this.spotifyMailService = spotifyMailService;
+        this.notificationMailService = notificationMailService;
     }
 
     @Override
@@ -108,18 +110,19 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
         }
         List<Album> artistAlbums = albumService.findByArtist(artistData.getArtistId());
         Set<String> artistAlbumIds = artistAlbums.stream().map(Album::id).collect(Collectors.toSet());
-        List<AlbumResponseData> newAlbums = response.getItems().stream()
+        List<AlbumResponseData> newAlbumsFromResponse = response.getItems().stream()
                 .filter(item -> !artistAlbumIds.contains(item.getId())).toList();
-        if (!newAlbums.isEmpty()) {
-            albumService.saveAll(artistData.getArtistId(), albumsFromResponse(newAlbums));
+        if (!newAlbumsFromResponse.isEmpty()) {
+            var newAlbums = albumsFromResponse(newAlbumsFromResponse);
+            albumService.saveAll(artistData.getArtistId(), newAlbums);
             List<User> users = userService.findByFollowedArtist(artistData.getArtistId());
-            for (var album: newAlbums) {
-                if (!albumCache.isNotificationSent(album.getName())) {
-                    // TODO: Send email to users
-                }
-            }
+            var artist = artistService.findById(artistData.getArtistId()).orElseGet(() -> {
+                logger.error("Artist with id {} not found at a critical part of the process", artistData.getArtistId());
+                return new Artist(artistData.getArtistId(), "Artist with ID (" + artistData.getArtistId() + ")", "", 0);
+            });
+            notify(newAlbums, artist, users);
         }
-        if (responseCount > (count + newAlbums.size()) && response.getNext() != null) {
+        if (responseCount > (count + newAlbumsFromResponse.size()) && response.getNext() != null) {
             artistSyncTaskManager.add(ArtistTaskData.fromNextNode(artistData.getArtistId(), response.getNext(), TaskType.SYNC));
         }
     }
@@ -152,5 +155,20 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
                     item.getReleaseDate(),
                     image);
         }).collect(Collectors.toList());
+    }
+
+    private void notify(List<Album> albums, Artist artist, List<User> users) {
+        for (var album : albums) {
+            if (!albumCache.isNotificationSent(album.name())) {
+                try {
+                    notificationMailService.sendNewReleaseNotification(album, artist, users);
+                } catch (MailException e) {
+                    // TODO: handle add to a queue, which will then be used by a job to try and send the emails again
+                    // TODO: Unit tests for this class
+                    // TODO: Unit testing for NotificationMailService class
+                    // TODO: Integration testing for emails
+                }
+            }
+        }
     }
 }

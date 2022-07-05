@@ -6,7 +6,7 @@ import com.kushtrimh.tomorr.album.cache.AlbumCache;
 import com.kushtrimh.tomorr.album.service.AlbumService;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.limit.LimitType;
-import com.kushtrimh.tomorr.mail.spotify.SpotifyMailService;
+import com.kushtrimh.tomorr.mail.spotify.NotificationMailService;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
@@ -52,7 +52,7 @@ class DefaultArtistSyncTaskExecutorTest {
     @Mock
     private AlbumCache albumCache;
     @Mock
-    private SpotifyMailService spotifyMailService;
+    private NotificationMailService notificationMailService;
 
     private DefaultArtistSyncTaskExecutor taskExecutor;
 
@@ -67,7 +67,7 @@ class DefaultArtistSyncTaskExecutorTest {
                 artistService,
                 spotifyApiClient,
                 albumCache,
-                spotifyMailService);
+                notificationMailService);
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.album.Album;
 import com.kushtrimh.tomorr.album.AlbumType;
 import com.kushtrimh.tomorr.album.repository.AlbumRepository;
 import com.kushtrimh.tomorr.dal.tables.records.AlbumRecord;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,7 @@ public class DefaultAlbumService implements AlbumService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "artistAlbumsCount", key = "'albumsCount:' + #artistId")
     public void save(String artistId, Album album) {
         Objects.requireNonNull(album);
         Objects.requireNonNull(artistId);
@@ -57,6 +59,7 @@ public class DefaultAlbumService implements AlbumService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "artistAlbumsCount", key = "'albumsCount:' + #artistId")
     public void saveAll(String artistId, List<Album> albums) {
         Objects.requireNonNull(artistId);
         if (albums == null || albums.isEmpty()) {

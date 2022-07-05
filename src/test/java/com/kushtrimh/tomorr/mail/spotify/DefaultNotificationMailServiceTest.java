@@ -21,18 +21,18 @@ import static org.mockito.Mockito.*;
  * @author Kushtrim Hajrizi
  */
 @ExtendWith(MockitoExtension.class)
-class DefaultSpotifyMailServiceTest {
+class DefaultNotificationMailServiceTest {
 
     @Mock
     private MailService mailService;
     @Mock
     private ITemplateEngine templateEngine;
 
-    private DefaultSpotifyMailService spotifyMailService;
+    private DefaultNotificationMailService spotifyMailService;
 
     @BeforeEach
     public void init() {
-        spotifyMailService = new DefaultSpotifyMailService(mailService, templateEngine);
+        spotifyMailService = new DefaultNotificationMailService(mailService, templateEngine, mailProperties);
     }
 
     @Test
