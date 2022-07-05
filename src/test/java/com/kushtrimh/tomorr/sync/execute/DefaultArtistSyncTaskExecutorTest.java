@@ -4,9 +4,10 @@ import com.kushtrimh.tomorr.album.Album;
 import com.kushtrimh.tomorr.album.AlbumType;
 import com.kushtrimh.tomorr.album.cache.AlbumCache;
 import com.kushtrimh.tomorr.album.service.AlbumService;
+import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.limit.LimitType;
-import com.kushtrimh.tomorr.mail.spotify.NotificationMailService;
+import com.kushtrimh.tomorr.mail.notification.NotificationMailService;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
@@ -19,6 +20,8 @@ import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.TaskType;
 import com.kushtrimh.tomorr.task.data.ArtistTaskData;
 import com.kushtrimh.tomorr.task.manager.ArtistSyncTaskManager;
+import com.kushtrimh.tomorr.user.User;
+import com.kushtrimh.tomorr.user.UserType;
 import com.kushtrimh.tomorr.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,8 +58,6 @@ class DefaultArtistSyncTaskExecutorTest {
     private NotificationMailService notificationMailService;
 
     private DefaultArtistSyncTaskExecutor taskExecutor;
-
-    // TODO: Verify email not send
 
     @BeforeEach
     public void init() {
@@ -141,7 +142,6 @@ class DefaultArtistSyncTaskExecutorTest {
         verify(albumService, never()).saveAll(any(), any());
     }
 
-    // TODO: Sent emails here
     @Test
     @MockitoSettings(strictness = Strictness.WARN)
     public void execute_WhenAlbumCountIsLessThanResponseAlbumCountOnSync_SaveAlbumsAndSendEmails() throws TooManyRequestsException, SpotifyApiException {
@@ -150,33 +150,73 @@ class DefaultArtistSyncTaskExecutorTest {
         var responseAlbumsCount = 12;
         var task = newSyncTask(artistId);
         var albums = newAlbums(10);
+        var artist = new Artist(artistId, "artist1-name", "artist1-image", 100);
+        var users = newUsers(3);
 
         ArgumentCaptor<List<Album>> albumsCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<GetArtistAlbumsApiRequest> requestCaptor = ArgumentCaptor.forClass(GetArtistAlbumsApiRequest.class);
+        ArgumentCaptor<Album> albumCaptor = ArgumentCaptor.forClass(Album.class);
 
         when(spotifyApiClient.get(eq(LimitType.SPOTIFY_SYNC), any(GetArtistAlbumsApiRequest.class)))
                 .thenReturn(newArtistAlbumsResponse(responseAlbumsCount));
         when(albumService.findCountByArtistId(artistId)).thenReturn(Optional.of(existingAlbumsCount));
         when(albumService.findByArtist(artistId)).thenReturn(albums);
-        when(albumCache.isNotificationSent("album-name10")).thenReturn(true);
-        when(albumCache.isNotificationSent("album-name11")).thenReturn(true);
+        when(albumCache.isNotificationSent(any())).thenReturn(true);
+        when(albumCache.isNotificationSent("album-name10")).thenReturn(false);
+        when(albumCache.isNotificationSent("album-name11")).thenReturn(false);
+        when(userService.findByFollowedArtist(artistId)).thenReturn(users);
+        when(artistService.findById(artistId)).thenReturn(Optional.of(artist));
 
         taskExecutor.execute(task);
 
         verify(artistSyncTaskManager, never()).add(any(ArtistTaskData.class));
         verify(albumService, times(1)).saveAll(eq(artistId), albumsCaptor.capture());
         verify(spotifyApiClient, times(1)).get(eq(LimitType.SPOTIFY_SYNC), requestCaptor.capture());
-        // TODO: Verify send emails is called
+        verify(notificationMailService, times(2))
+                .sendNewReleaseNotification(albumCaptor.capture(), eq(artist), eq(users));
 
         var addedAlbums = albumsCaptor.getValue();
         var request = requestCaptor.getValue();
+        var capturedNotifiedAlbums = albumCaptor.getAllValues();
 
         assertAll(
                 () -> assertEquals(2, addedAlbums.size()),
                 () -> assertEquals("album10", addedAlbums.get(0).id()),
                 () -> assertEquals("album11", addedAlbums.get(1).id()),
-                () -> assertEquals(artistId, request.getArtistId())
+                () -> assertEquals(artistId, request.getArtistId()),
+                () -> assertEquals(2, capturedNotifiedAlbums.size()),
+                () -> assertEquals("album10", capturedNotifiedAlbums.get(0).id()),
+                () -> assertEquals("album11", capturedNotifiedAlbums.get(1).id())
         );
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.WARN)
+    public void execute_WhenArtistIsNotFoundBeforeSendingEmail_UseIdInsteadOfArtistName() throws TooManyRequestsException, SpotifyApiException {
+        var artistId = "artist1";
+        var existingAlbumsCount = 1;
+        var responseAlbumsCount = 2;
+        var task = newSyncTask(artistId);
+        var users = newUsers(3);
+
+        ArgumentCaptor<Artist> artistCaptor = ArgumentCaptor.forClass(Artist.class);
+
+        when(spotifyApiClient.get(eq(LimitType.SPOTIFY_SYNC), any(GetArtistAlbumsApiRequest.class)))
+                .thenReturn(newArtistAlbumsResponse(responseAlbumsCount));
+        when(albumService.findCountByArtistId(artistId)).thenReturn(Optional.of(existingAlbumsCount));
+        when(albumService.findByArtist(artistId)).thenReturn(newAlbums(existingAlbumsCount));
+        when(albumCache.isNotificationSent(any())).thenReturn(false);
+        when(userService.findByFollowedArtist(artistId)).thenReturn(users);
+        when(artistService.findById(artistId)).thenReturn(Optional.empty());
+
+        taskExecutor.execute(task);
+
+        verify(notificationMailService, times(1))
+                .sendNewReleaseNotification(any(), artistCaptor.capture(), eq(users));
+
+        var artist = artistCaptor.getValue();
+
+        assertEquals("Artist with ID (" + artist.id() + ")", artist.name());
     }
 
     @Test
@@ -192,9 +232,11 @@ class DefaultArtistSyncTaskExecutorTest {
         when(albumService.findByArtist(artistId)).thenReturn(newAlbums(10));
         when(albumCache.isNotificationSent("album-name10")).thenReturn(true);
         when(albumCache.isNotificationSent("album-name11")).thenReturn(true);
+        when(userService.findByFollowedArtist(artistId)).thenReturn(newUsers(3));
 
         taskExecutor.execute(newSyncTask(artistId));
-        // TODO: Verify send emails is not called
+
+        verify(notificationMailService, never()).sendNewReleaseNotification(any(), any(), any());
     }
 
     @Test
@@ -328,6 +370,14 @@ class DefaultArtistSyncTaskExecutorTest {
                         null,
                         "2020-01-01",
                         "image-url-" + i))
+                .toList();
+    }
+
+    private List<User> newUsers(int usersCount) {
+        return IntStream.range(0, usersCount)
+                .mapToObj(i -> new User(
+                        "user" + i,
+                        UserType.EMAIL))
                 .toList();
     }
 }

@@ -31,6 +31,7 @@ import java.util.Map;
 public class RabbitMQConfiguration {
 
     public static final String ARTIST_SYNC_QUEUE = "artistSync";
+    public static final String NOTIFICATION_RETRY_QUEUE = "notificationRetry";
 
     @Bean
     public CachingConnectionFactory connectionFactory(RabbitMQProperties properties)
@@ -62,8 +63,22 @@ public class RabbitMQConfiguration {
     }
 
     @Bean
+    public RabbitTemplate rabbitTemplate(
+            ConnectionFactory connectionFactory,
+            Jackson2JsonMessageConverter rabbitJsonMessageConverter) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(rabbitJsonMessageConverter);
+        return rabbitTemplate;
+    }
+
+    @Bean
     public Queue queue() {
         return new Queue(ARTIST_SYNC_QUEUE, true);
+    }
+
+    @Bean
+    public Queue notificationRetryQueue() {
+        return new Queue(NOTIFICATION_RETRY_QUEUE, true);
     }
 
     @Bean

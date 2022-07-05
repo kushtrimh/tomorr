@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -44,7 +45,7 @@ class DefaultMailServiceTest {
     }
 
     @Test
-    public void send_WhenDataIsValid_SendSuccessfully() throws MessagingException {
+    public void send_WhenDataIsValid_SendSuccessfully() throws MailException, AddressException {
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
         ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
         var from = "noreploy@tomorrlocal.com";

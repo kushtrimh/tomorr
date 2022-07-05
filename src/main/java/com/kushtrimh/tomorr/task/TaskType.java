@@ -5,5 +5,6 @@ package com.kushtrimh.tomorr.task;
  */
 public enum TaskType {
     INITIAL_SYNC,
-    SYNC
+    SYNC,
+    NOTIFICATION_RETRY
 }

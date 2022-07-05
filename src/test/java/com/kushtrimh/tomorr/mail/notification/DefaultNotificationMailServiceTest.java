@@ -1,6 +1,9 @@
-package com.kushtrimh.tomorr.mail.spotify;
+package com.kushtrimh.tomorr.mail.notification;
 
+import com.kushtrimh.tomorr.mail.MailException;
 import com.kushtrimh.tomorr.mail.MailService;
+import com.kushtrimh.tomorr.mail.notification.retry.NotificationRetryService;
+import com.kushtrimh.tomorr.properties.MailProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
 import java.util.List;
 import java.util.Map;
 
@@ -27,16 +29,20 @@ class DefaultNotificationMailServiceTest {
     private MailService mailService;
     @Mock
     private ITemplateEngine templateEngine;
+    @Mock
+    private MailProperties mailProperties;
+    @Mock
+    private NotificationRetryService notificationRetryService;
 
     private DefaultNotificationMailService spotifyMailService;
 
     @BeforeEach
     public void init() {
-        spotifyMailService = new DefaultNotificationMailService(mailService, templateEngine, mailProperties);
+        spotifyMailService = new DefaultNotificationMailService(mailService, templateEngine, mailProperties, notificationRetryService);
     }
 
     @Test
-    public void send_WhenDataIsValid_ShouldSendEmailSuccessfully() throws MessagingException {
+    public void send_WhenDataIsValid_ShouldSendEmailSuccessfully() throws MailException {
         var from = "noreply@tomorrlocal.com";
         var subject = "some subject";
         var templateName = "test-template";

@@ -8,8 +8,7 @@ import com.kushtrimh.tomorr.artist.Artist;
 import com.kushtrimh.tomorr.artist.service.ArtistService;
 import com.kushtrimh.tomorr.configuration.RabbitMQConfiguration;
 import com.kushtrimh.tomorr.limit.LimitType;
-import com.kushtrimh.tomorr.mail.MailException;
-import com.kushtrimh.tomorr.mail.spotify.NotificationMailService;
+import com.kushtrimh.tomorr.mail.notification.NotificationMailService;
 import com.kushtrimh.tomorr.spotify.SpotifyApiException;
 import com.kushtrimh.tomorr.spotify.TooManyRequestsException;
 import com.kushtrimh.tomorr.spotify.api.SpotifyApiClient;
@@ -160,14 +159,7 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     private void notify(List<Album> albums, Artist artist, List<User> users) {
         for (var album : albums) {
             if (!albumCache.isNotificationSent(album.name())) {
-                try {
-                    notificationMailService.sendNewReleaseNotification(album, artist, users);
-                } catch (MailException e) {
-                    // TODO: handle add to a queue, which will then be used by a job to try and send the emails again
-                    // TODO: Unit tests for this class
-                    // TODO: Unit testing for NotificationMailService class
-                    // TODO: Integration testing for emails
-                }
+                notificationMailService.sendNewReleaseNotification(album, artist, users);
             }
         }
     }
