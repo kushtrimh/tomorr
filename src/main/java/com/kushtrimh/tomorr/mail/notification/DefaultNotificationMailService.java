@@ -53,8 +53,9 @@ public class DefaultNotificationMailService implements NotificationMailService {
     }
 
     public void send(String from, String subject, String templateName, Map<String, Object> contextData, List<String> to) {
-        // TODO: Integration testing for emails and retry mechanism
-        // TODO: Add the new job that will fetched notifications and try to resend them
+        // TODO: Integration testing for emails
+        logger.info("Sending notification email to with subject {}, using template {} and data {}",
+                subject, templateName, contextData);
         var context = new Context(Locale.ENGLISH);
         context.setVariable("subject", subject);
         context.setVariable("from", from);

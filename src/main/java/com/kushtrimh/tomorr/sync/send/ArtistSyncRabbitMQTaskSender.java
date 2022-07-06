@@ -11,11 +11,11 @@ import java.util.List;
  * @author Kushtrim Hajrizi
  */
 @Component
-public class ArtistSyncRabbitTaskSender implements ArtistSyncTaskSender {
+public class ArtistSyncRabbitMQTaskSender implements ArtistSyncTaskSender {
 
     private final RabbitTemplate artistTaskRabbitTemplate;
 
-    public ArtistSyncRabbitTaskSender(RabbitTemplate artistTaskRabbitTemplate) {
+    public ArtistSyncRabbitMQTaskSender(RabbitTemplate artistTaskRabbitTemplate) {
         this.artistTaskRabbitTemplate = artistTaskRabbitTemplate;
     }
 

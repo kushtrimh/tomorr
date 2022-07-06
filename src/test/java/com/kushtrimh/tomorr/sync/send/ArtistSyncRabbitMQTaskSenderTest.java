@@ -22,21 +22,21 @@ import static org.mockito.Mockito.*;
  * @author Kushtrim Hajrizi
  */
 @ExtendWith({MockitoExtension.class})
-class ArtistSyncRabbitTaskSenderTest {
+class ArtistSyncRabbitMQTaskSenderTest {
 
     @Mock
     private RabbitTemplate rabbitTemplate;
 
-    private ArtistSyncRabbitTaskSender artistSyncRabbitTaskSender;
+    private ArtistSyncRabbitMQTaskSender artistSyncRabbitMQTaskSender;
 
     @BeforeEach
     public void init() {
-        artistSyncRabbitTaskSender = new ArtistSyncRabbitTaskSender(rabbitTemplate);
+        artistSyncRabbitMQTaskSender = new ArtistSyncRabbitMQTaskSender(rabbitTemplate);
     }
 
     @Test
     public void send_WhenThereAreNoTasks_DoNotSendAnythingToRabbitMQ() {
-        artistSyncRabbitTaskSender.send(Collections.emptyList());
+        artistSyncRabbitMQTaskSender.send(Collections.emptyList());
         verify(rabbitTemplate, never()).convertAndSend(any(Object.class), any(MessagePostProcessor.class));
     }
 
@@ -64,7 +64,7 @@ class ArtistSyncRabbitTaskSenderTest {
             }).when(rabbitTemplate).convertAndSend(eq(task), any(MessagePostProcessor.class));
         }
 
-        artistSyncRabbitTaskSender.send(tasks);
+        artistSyncRabbitMQTaskSender.send(tasks);
 
         var tasksPerTime = (int) Math.ceil(count / 60.0);
         for (int i = 0; i < count; i++) {

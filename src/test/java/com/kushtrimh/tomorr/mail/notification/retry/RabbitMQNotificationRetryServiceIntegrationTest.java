@@ -23,16 +23,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tags(value = {@Tag("rabbitmq"), @Tag("integration")})
 @ContextConfiguration(classes = {TestRabbitMQConfiguration.class})
 @ExtendWith({SpringExtension.class, TestRabbitMQExtension.class})
-class DefaultNotificationRetryServiceIntegrationTest {
+class RabbitMQNotificationRetryServiceIntegrationTest {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    private DefaultNotificationRetryService service;
+    private RabbitMQNotificationRetryService service;
 
     @BeforeEach
     public void init() {
-        service = new DefaultNotificationRetryService(rabbitTemplate);
+        service = new RabbitMQNotificationRetryService(rabbitTemplate);
     }
 
     @Test

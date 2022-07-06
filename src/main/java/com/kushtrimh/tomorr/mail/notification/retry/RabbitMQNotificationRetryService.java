@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
  * @author Kushtrim Hajrizi
  */
 @Service
-public class DefaultNotificationRetryService implements NotificationRetryService {
+public class RabbitMQNotificationRetryService implements NotificationRetryService {
 
-    private final Logger logger = LoggerFactory.getLogger(DefaultNotificationRetryService.class);
+    private final Logger logger = LoggerFactory.getLogger(RabbitMQNotificationRetryService.class);
 
     private final RabbitTemplate rabbitTemplate;
 
-    public DefaultNotificationRetryService(RabbitTemplate rabbitTemplate) {
+    public RabbitMQNotificationRetryService(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -28,6 +28,9 @@ public class DefaultNotificationRetryService implements NotificationRetryService
         }
         logger.info("Retrying notification: {}", notificationRetryData);
         var task = new Task<>(notificationRetryData);
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.NOTIFICATION_RETRY_QUEUE, task);
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.NOTIFICATION_RETRY_QUEUE, task, message -> {
+            message.getMessageProperties().setDelay(300000);
+            return message;
+        });
     }
 }
