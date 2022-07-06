@@ -64,8 +64,11 @@ class DefaultNotificationMailServiceTest {
 
         notificationMailService.sendNewReleaseNotification(album, artist, users);
 
+        String sentSubject = "New release: " + album.name();
         verify(mailService, times(1)).send(
-                from, "New release: " + album.name(), content, users.get(0).address(), users.get(1).address());
+                from, sentSubject, content, users.get(0).address());
+        verify(mailService, times(1)).send(
+                from, sentSubject, content, users.get(1).address());
 
         var context = contextCaptor.getValue();
         assertAll(
@@ -98,7 +101,7 @@ class DefaultNotificationMailServiceTest {
 
         notificationMailService.send(from, subject, templateName, additionalData, List.of(to1, to2));
 
-        verify(mailService, times(1)).send(
+        verify(mailService, times(2)).send(
                 fromCaptor.capture(),
                 subjectCaptor.capture(),
                 contentCaptor.capture(),
@@ -121,7 +124,6 @@ class DefaultNotificationMailServiceTest {
         var content = "body";
         var templateName = "test-template";
         var to1 = "to1@tomorrlocal.com";
-        var to2 = "to2@tomorrlocal.com";
         Map<String, Object> additionalData = Map.of(
                 "artistName", "some-artist-name",
                 "albumName", "some-album-name"
@@ -131,9 +133,9 @@ class DefaultNotificationMailServiceTest {
 
         when(templateEngine.process(eq(templateName), any(Context.class)))
                 .thenReturn(content);
-        doThrow(new MailException()).when(mailService).send(from, subject, content, to1, to2);
+        doThrow(new MailException()).when(mailService).send(from, subject, content, to1);
 
-        notificationMailService.send(from, subject, templateName, additionalData, List.of(to1, to2));
+        notificationMailService.send(from, subject, templateName, additionalData, List.of(to1));
 
         verify(notificationRetryService, times(1))
                 .retryNotification(notificationRetryDataCaptor.capture());
@@ -144,7 +146,6 @@ class DefaultNotificationMailServiceTest {
                 () -> assertEquals(subject, notificationData.getSubject()),
                 () -> assertEquals(templateName, notificationData.getTemplateName()),
                 () -> assertEquals(to1, notificationData.getTo().get(0)),
-                () -> assertEquals(to2, notificationData.getTo().get(1)),
                 () -> assertEquals(additionalData, notificationData.getContextData())
         );
     }

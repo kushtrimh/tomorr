@@ -62,12 +62,14 @@ public class DefaultNotificationMailService implements NotificationMailService {
         context.setVariables(contextData);
 
         String content = mailTemplateEngine.process(templateName, context);
-        try {
-            mailService.send(from, subject, content, to.toArray(new String[]{}));
-        } catch (MailException e) {
-            logger.error("Could not send email", e);
-            notificationRetryService.retryNotification(new NotificationRetryData(
-                    from, subject, templateName, contextData, to));
+        for (String toAddress : to) {
+            try {
+                mailService.send(from, subject, content, toAddress);
+            } catch (MailException e) {
+                logger.error("Failed to send notification email {}", content, e);
+                notificationRetryService.retryNotification(
+                        new NotificationRetryData(from, subject, templateName, contextData, List.of(toAddress)));
+            }
         }
     }
 }

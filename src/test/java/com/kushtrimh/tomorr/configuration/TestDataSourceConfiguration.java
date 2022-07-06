@@ -12,8 +12,8 @@ import com.kushtrimh.tomorr.properties.DataSourceProperties;
 import com.kushtrimh.tomorr.user.repository.UserJooqRepository;
 import com.kushtrimh.tomorr.user.repository.UserRepository;
 import org.jooq.DSLContext;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -21,7 +21,7 @@ import org.testcontainers.containers.GenericContainer;
 /**
  * @author Kushtrim Hajrizi
  */
-@Configuration
+@TestConfiguration
 @TestPropertySource(inheritProperties = false, inheritLocations = false)
 @Import({DataAccessConfiguration.class})
 public class TestDataSourceConfiguration {

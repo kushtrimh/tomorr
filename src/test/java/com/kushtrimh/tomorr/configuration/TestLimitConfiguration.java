@@ -3,15 +3,15 @@ package com.kushtrimh.tomorr.configuration;
 import com.kushtrimh.tomorr.limit.DefaultRequestLimitService;
 import com.kushtrimh.tomorr.limit.RequestLimitService;
 import com.kushtrimh.tomorr.properties.LimitProperties;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @author Kushtrim Hajrizi
  */
-@Configuration
+@TestConfiguration
 @Import({TestRedisConfiguration.class})
 public class TestLimitConfiguration {
 
