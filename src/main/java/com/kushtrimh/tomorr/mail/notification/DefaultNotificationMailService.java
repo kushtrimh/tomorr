@@ -53,7 +53,6 @@ public class DefaultNotificationMailService implements NotificationMailService {
     }
 
     public void send(String from, String subject, String templateName, Map<String, Object> contextData, List<String> to) {
-        // TODO: Integration testing for emails
         logger.info("Sending notification email to with subject {}, using template {} and data {}",
                 subject, templateName, contextData);
         var context = new Context(Locale.ENGLISH);
