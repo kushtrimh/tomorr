@@ -34,7 +34,6 @@ import com.kushtrimh.tomorr.dal.tables.records.QrtzSchedulerStateRecord;
 import com.kushtrimh.tomorr.dal.tables.records.QrtzSimpleTriggersRecord;
 import com.kushtrimh.tomorr.dal.tables.records.QrtzSimpropTriggersRecord;
 import com.kushtrimh.tomorr.dal.tables.records.QrtzTriggersRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;

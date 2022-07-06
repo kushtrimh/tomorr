@@ -27,22 +27,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tags(value = {@Tag("rabbitmq"), @Tag("integration")})
 @ContextConfiguration(classes = {TestRabbitMQConfiguration.class})
 @ExtendWith({SpringExtension.class, TestRabbitMQExtension.class})
-class ArtistSyncRabbitTaskSenderIntegrationTest {
+class ArtistSyncRabbitMQTaskSenderIntegrationTest {
 
     @Autowired
     private RabbitTemplate artistTaskRabbitTemplate;
 
-    private ArtistSyncRabbitTaskSender artistSyncRabbitTaskSender;
+    private ArtistSyncRabbitMQTaskSender artistSyncRabbitMQTaskSender;
 
     @BeforeEach
     public void init() {
-        artistSyncRabbitTaskSender = new ArtistSyncRabbitTaskSender(artistTaskRabbitTemplate);
+        artistSyncRabbitMQTaskSender = new ArtistSyncRabbitMQTaskSender(artistTaskRabbitTemplate);
     }
 
     @Test
     public void send_WhenTasksAreProvided_SendToRabbitMQ() {
         List<Task<ArtistTaskData>> tasks = generateTasks(10);
-        assertDoesNotThrow(() -> artistSyncRabbitTaskSender.send(tasks));
+        assertDoesNotThrow(() -> artistSyncRabbitMQTaskSender.send(tasks));
     }
 
     private List<Task<ArtistTaskData>> generateTasks(int count) {

@@ -7,7 +7,6 @@ package com.kushtrimh.tomorr.dal;
 import com.kushtrimh.tomorr.dal.tables.QrtzFiredTriggers;
 import com.kushtrimh.tomorr.dal.tables.QrtzJobDetails;
 import com.kushtrimh.tomorr.dal.tables.QrtzTriggers;
-
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;

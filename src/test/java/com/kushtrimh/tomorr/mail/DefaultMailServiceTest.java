@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.mail.Address;
-import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -44,14 +44,15 @@ class DefaultMailServiceTest {
     }
 
     @Test
-    public void send_WhenDataIsValid_SendSuccessfully() throws MessagingException {
-        when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
-        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+    public void send_WhenDataIsValid_SendSuccessfully() throws MailException, AddressException {
         var from = "noreploy@tomorrlocal.com";
         var subject = "Tomorr subject";
         var content = "<html><body><p>Some email</p></body></html>";
         var to1 = "to1@tomorrlocal.com";
         var to2 = "to2@tomorrlocal.com";
+
+        when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
 
         Address[] recipients = new InternetAddress[]{new InternetAddress(to1), new InternetAddress(to2)};
 

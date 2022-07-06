@@ -41,6 +41,8 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+mail:
+  from: noreply@tomorr.com
 datasource:
   url: ${TOMORR_DB_URL}
   username: ${TOMORR_DB_USERNAME}
