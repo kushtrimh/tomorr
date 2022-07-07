@@ -29,7 +29,7 @@ public class ThymeleafConfiguration {
     public ITemplateResolver htmlTemplateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver ();
         templateResolver.setOrder(0);
-        templateResolver.setPrefix("mail/");
+        templateResolver.setPrefix("templates/mail/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode(TemplateMode.HTML);
         templateResolver.setCharacterEncoding(StandardCharsets.UTF_8.name());
