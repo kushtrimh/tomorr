@@ -42,7 +42,7 @@ spring:
           timeout: 5000
           writetimeout: 5000
 mail:
-  from: noreply@daulle.com
+  from: ${TOMORR_MAIL_FROM:"noreply@localhost.com"}
 datasource:
   url: ${TOMORR_DB_URL}
   username: ${TOMORR_DB_USERNAME}
