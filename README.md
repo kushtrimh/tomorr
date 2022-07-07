@@ -42,28 +42,28 @@ file for this case.
 If you do not plan on using an external `application.yml` file, 
 then you can use environment variables to configure the application.
 
-| Environment variable           | Description                          | Type    |
-|--------------------------------|--------------------------------------|---------|
-| `TOMORR_PID_FILE`              | PID file location.                   | string  |
-| `TOMORR_MAIL_HOST`             | Mail host.                           | string  |
-| `TOMORR_MAIL_USERNAME`         | Mail username.                       | string  |
-| `TOMORR_MAIL_PASSWORD`         | Mail password.                       | string  |
-| `TOMORR_MAIL_AUTH`             | Enable authentication for mail.      | boolean |
-| `TOMORR_MAIL_TLS`              | Enable TLS for mail.                 | boolean |
-| `TOMORR_MAIL_PORT`             | Mail port.                           | integer |
-| `TOMORR_MAIL_FROM`             | Address where the email is sent from | string  |
-| `TOMORR_DB_URL`                | Database URL.                        | string  |
-| `TOMORR_DB_USERNAME`           | Database username.                   | string  |
-| `TOMORR_DB_PASSWORD`           | Database password.                   | string  |
-| `TOMORR_SPOTIFY_CLIENT_ID`     | Spotify client id.                   | string  |
-| `TOMORR_SPOTIFY_CLIENT_SECRET` | Spotify client secret.               | string  |
-| `TOMORR_REDIS_HOST`            | Redis host.                          | string  |
-| `TOMORR_REDIS_PORT`            | Redis port.                          | integer |
-| `TOMORR_RABBITMQ_HOST`         | RabbitMQ host.                       | string  |
-| `TOMORR_RABBITMQ_PORT`         | RabbitMQ port.                       | integer |
-| `TOMORR_RABBITMQ_USERNAME`     | RabbitMQ username.                   | string  |
-| `TOMORR_RABBITMQ_PASSWORD`     | RabbitMQ password.                   | string  |
-| `TOMORR_RABBITMQ_SSL`          | RabbitMQ SSL status.                 | boolean |
+| Environment variable           | Description                           | Type    |
+|--------------------------------|---------------------------------------|---------|
+| `TOMORR_PID_FILE`              | PID file location.                    | string  |
+| `TOMORR_MAIL_HOST`             | Mail host.                            | string  |
+| `TOMORR_MAIL_USERNAME`         | Mail username.                        | string  |
+| `TOMORR_MAIL_PASSWORD`         | Mail password.                        | string  |
+| `TOMORR_MAIL_AUTH`             | Enable authentication for mail.       | boolean |
+| `TOMORR_MAIL_TLS`              | Enable TLS for mail.                  | boolean |
+| `TOMORR_MAIL_PORT`             | Mail port.                            | integer |
+| `TOMORR_MAIL_FROM`             | Address where the email is sent from. | string  |
+| `TOMORR_DB_URL`                | Database URL.                         | string  |
+| `TOMORR_DB_USERNAME`           | Database username.                    | string  |
+| `TOMORR_DB_PASSWORD`           | Database password.                    | string  |
+| `TOMORR_SPOTIFY_CLIENT_ID`     | Spotify client id.                    | string  |
+| `TOMORR_SPOTIFY_CLIENT_SECRET` | Spotify client secret.                | string  |
+| `TOMORR_REDIS_HOST`            | Redis host.                           | string  |
+| `TOMORR_REDIS_PORT`            | Redis port.                           | integer |
+| `TOMORR_RABBITMQ_HOST`         | RabbitMQ host.                        | string  |
+| `TOMORR_RABBITMQ_PORT`         | RabbitMQ port.                        | integer |
+| `TOMORR_RABBITMQ_USERNAME`     | RabbitMQ username.                    | string  |
+| `TOMORR_RABBITMQ_PASSWORD`     | RabbitMQ password.                    | string  |
+| `TOMORR_RABBITMQ_SSL`          | RabbitMQ SSL status.                  | boolean |
 
 ## External configuration
 
