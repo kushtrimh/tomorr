@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.exceptions.TemplateEngineException;
 
 import java.util.List;
 import java.util.Locale;
@@ -60,11 +61,12 @@ public class DefaultNotificationMailService implements NotificationMailService {
         context.setVariable("from", from);
         context.setVariables(contextData);
 
-        String content = mailTemplateEngine.process(templateName, context);
         for (String toAddress : to) {
+            String content = "";
             try {
+                content = mailTemplateEngine.process(templateName, context);
                 mailService.send(from, subject, content, toAddress);
-            } catch (MailException e) {
+            } catch (MailException | TemplateEngineException e) {
                 logger.error("Failed to send notification email {}", content, e);
                 notificationRetryService.retryNotification(
                         new NotificationRetryData(from, subject, templateName, contextData, List.of(toAddress)));
