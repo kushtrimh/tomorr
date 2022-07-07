@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -26,7 +27,7 @@ public class ThymeleafConfiguration {
 
     @Bean
     public ITemplateResolver htmlTemplateResolver() {
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver ();
         templateResolver.setOrder(0);
         templateResolver.setPrefix("mail/");
         templateResolver.setSuffix(".html");
