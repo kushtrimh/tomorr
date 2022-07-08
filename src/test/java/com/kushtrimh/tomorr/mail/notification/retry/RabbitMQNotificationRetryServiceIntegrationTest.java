@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +39,7 @@ class RabbitMQNotificationRetryServiceIntegrationTest {
     @Test
     public void retryNotification_WhenNotificationRetryDataIsValid_SendNotificationDataToQueue() {
         var notificationRetryData = new NotificationRetryData(
-                "from", "subject", "templateName", Map.of("param", "paramValue"), List.of("to1", "to2"));
+                "from", "subject", "templateName", Map.of("param", "paramValue"), List.of("to1", "to2"), 2, TimeUnit.SECONDS);
         assertDoesNotThrow(() -> service.retryNotification(notificationRetryData));
     }
 }

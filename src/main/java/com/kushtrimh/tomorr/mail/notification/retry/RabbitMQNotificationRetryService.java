@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * @author Kushtrim Hajrizi
  */
@@ -22,15 +24,13 @@ public class RabbitMQNotificationRetryService implements NotificationRetryServic
     }
 
     @Override
-    public void retryNotification(NotificationRetryData notificationRetryData) {
+    public CompletableFuture<Void> retryNotification(NotificationRetryData notificationRetryData) {
         if (notificationRetryData == null) {
-            return;
+            return CompletableFuture.completedFuture(null);
         }
         logger.info("Retrying notification: {}", notificationRetryData);
         var task = new Task<>(notificationRetryData);
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.NOTIFICATION_RETRY_QUEUE, task, message -> {
-            message.getMessageProperties().setDelay(300000);
-            return message;
-        });
+        return CompletableFuture.runAsync(() -> rabbitTemplate.convertAndSend(RabbitMQConfiguration.NOTIFICATION_RETRY_QUEUE, task),
+                CompletableFuture.delayedExecutor(notificationRetryData.getDelay(), notificationRetryData.getDelayTimeUnit()));
     }
 }

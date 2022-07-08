@@ -55,13 +55,12 @@ public class Task<T extends TaskData> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task<?> task = (Task<?>) o;
-        return Objects.equals(createdAt, task.createdAt) &&
-                Objects.equals(reinsertedAt, task.reinsertedAt) && Objects.equals(data, task.data);
+        return Objects.equals(reinsertedAt, task.reinsertedAt) && Objects.equals(data, task.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(createdAt, reinsertedAt, data);
+        return Objects.hash(reinsertedAt, data);
     }
 
     @Override

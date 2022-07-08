@@ -5,7 +5,10 @@ import com.kushtrimh.tomorr.task.data.ArtistTaskData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Kushtrim Hajrizi
@@ -20,7 +23,8 @@ public class ArtistSyncRabbitMQTaskSender implements ArtistSyncTaskSender {
     }
 
     @Override
-    public void send(List<Task<ArtistTaskData>> tasks) {
+    public List<CompletableFuture<Void>> send(List<Task<ArtistTaskData>> tasks) {
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         var numberOfTasks = tasks.size();
         var tasksPerSecond = Math.ceil(numberOfTasks / 60.0);
         var delay = 0;
@@ -30,10 +34,9 @@ public class ArtistSyncRabbitMQTaskSender implements ArtistSyncTaskSender {
                 delay += 1000;
             }
             var messageDelay = delay;
-            artistTaskRabbitTemplate.convertAndSend(task, message -> {
-                message.getMessageProperties().setDelay(messageDelay);
-                return message;
-            });
+            futures.add(CompletableFuture.runAsync(() -> artistTaskRabbitTemplate.convertAndSend(task),
+                    CompletableFuture.delayedExecutor(messageDelay, TimeUnit.MILLISECONDS)));
         }
+        return futures;
     }
 }

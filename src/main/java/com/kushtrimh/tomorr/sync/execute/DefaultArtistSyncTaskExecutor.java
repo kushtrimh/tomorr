@@ -113,7 +113,9 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
                 .filter(item -> !artistAlbumIds.contains(item.getId())).toList();
         if (!newAlbumsFromResponse.isEmpty()) {
             var newAlbums = albumsFromResponse(newAlbumsFromResponse);
-            albumService.saveAll(artistData.getArtistId(), newAlbums);
+            for (var newAlbum : newAlbums) {
+                albumService.save(artistData.getArtistId(), newAlbum);
+            }
             List<User> users = userService.findByFollowedArtist(artistData.getArtistId());
             var artist = artistService.findById(artistData.getArtistId()).orElseGet(() -> {
                 logger.error("Artist with id {} not found at a critical part of the process", artistData.getArtistId());
@@ -127,7 +129,9 @@ public class DefaultArtistSyncTaskExecutor implements ArtistSyncTaskExecutor {
     }
 
     private void initialSync(ArtistTaskData artistData, GetArtistAlbumsApiResponse response) {
-        albumService.saveAll(artistData.getArtistId(), albumsFromResponse(response.getItems()));
+        for (var newAlbum : albumsFromResponse(response.getItems())) {
+            albumService.save(artistData.getArtistId(), newAlbum);
+        }
         var next = response.getNext();
         if (next == null || next.isBlank()) {
             artistService.activateArtist(artistData.getArtistId());

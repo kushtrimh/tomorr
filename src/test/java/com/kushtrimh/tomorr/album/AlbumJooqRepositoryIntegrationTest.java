@@ -160,6 +160,17 @@ public class AlbumJooqRepositoryIntegrationTest {
     }
 
     @Test
+    public void save_WhenTryingToSaveExistingAlbum_SaveSuccessfully() {
+        var id = "new-al634263";
+        var artistId = "artist1";
+        var album = newAlbumRecord(id);
+
+        // Save twice
+        albumRepository.save(artistId, album);
+        assertDoesNotThrow(() -> albumRepository.save(artistId, album));
+    }
+
+    @Test
     public void saveAll_WhenAlbumsListIsEmpty_DoNothing() {
         var artistId = "artist1";
         var initialCount = albumRepository.count();

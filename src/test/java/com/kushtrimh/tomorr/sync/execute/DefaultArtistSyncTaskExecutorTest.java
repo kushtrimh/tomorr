@@ -153,9 +153,11 @@ class DefaultArtistSyncTaskExecutorTest {
         var artist = new Artist(artistId, "artist1-name", "artist1-image", 100);
         var users = newUsers(3);
 
-        ArgumentCaptor<List<Album>> albumsCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Album> newAlbumCaptor = ArgumentCaptor.forClass(Album.class);
+
         ArgumentCaptor<GetArtistAlbumsApiRequest> requestCaptor = ArgumentCaptor.forClass(GetArtistAlbumsApiRequest.class);
         ArgumentCaptor<Album> albumCaptor = ArgumentCaptor.forClass(Album.class);
+
 
         when(spotifyApiClient.get(eq(LimitType.SPOTIFY_SYNC), any(GetArtistAlbumsApiRequest.class)))
                 .thenReturn(newArtistAlbumsResponse(responseAlbumsCount));
@@ -170,19 +172,18 @@ class DefaultArtistSyncTaskExecutorTest {
         taskExecutor.execute(task);
 
         verify(artistSyncTaskManager, never()).add(any(ArtistTaskData.class));
-        verify(albumService, times(1)).saveAll(eq(artistId), albumsCaptor.capture());
+        verify(albumService, times(2)).save(eq(artistId), newAlbumCaptor.capture());
         verify(spotifyApiClient, times(1)).get(eq(LimitType.SPOTIFY_SYNC), requestCaptor.capture());
         verify(notificationMailService, times(2))
                 .sendNewReleaseNotification(albumCaptor.capture(), eq(artist), eq(users));
 
-        var addedAlbums = albumsCaptor.getValue();
+        var newAlbums = newAlbumCaptor.getAllValues();
         var request = requestCaptor.getValue();
         var capturedNotifiedAlbums = albumCaptor.getAllValues();
 
         assertAll(
-                () -> assertEquals(2, addedAlbums.size()),
-                () -> assertEquals("album10", addedAlbums.get(0).id()),
-                () -> assertEquals("album11", addedAlbums.get(1).id()),
+                () -> assertEquals("album10", newAlbums.get(0).id()),
+                () -> assertEquals("album11", newAlbums.get(1).id()),
                 () -> assertEquals(artistId, request.getArtistId()),
                 () -> assertEquals(2, capturedNotifiedAlbums.size()),
                 () -> assertEquals("album10", capturedNotifiedAlbums.get(0).id()),
@@ -289,7 +290,7 @@ class DefaultArtistSyncTaskExecutorTest {
         var task = newInitialSyncTask(artistId);
         task.getData().setNextNode(nextUri);
 
-        var albumsCaptor = ArgumentCaptor.forClass(List.class);
+        var albumsCaptor = ArgumentCaptor.forClass(Album.class);
         var nextArtistTaskCaptor = ArgumentCaptor.forClass(ArtistTaskData.class);
 
         var response = newArtistAlbumsResponse(albumsCount);
@@ -300,10 +301,10 @@ class DefaultArtistSyncTaskExecutorTest {
         taskExecutor.execute(task);
 
         verify(artistSyncTaskManager, times(1)).add(nextArtistTaskCaptor.capture());
-        verify(albumService, times(1)).saveAll(eq(artistId), albumsCaptor.capture());
+        verify(albumService, times(20)).save(eq(artistId), albumsCaptor.capture());
         verify(artistService, never()).activateArtist(any());
 
-        var albums = albumsCaptor.getValue();
+        var albums = albumsCaptor.getAllValues();
         var nextArtistTask = nextArtistTaskCaptor.getValue();
 
         assertAll(
@@ -319,7 +320,7 @@ class DefaultArtistSyncTaskExecutorTest {
         var albumsCount = 20;
         var task = newInitialSyncTask(artistId);
 
-        var albumsCaptor = ArgumentCaptor.forClass(List.class);
+        var albumsCaptor = ArgumentCaptor.forClass(Album.class);
 
         when(spotifyApiClient.get(eq(LimitType.SPOTIFY_SYNC), any()))
                 .thenReturn(newArtistAlbumsResponse(albumsCount));
@@ -327,10 +328,10 @@ class DefaultArtistSyncTaskExecutorTest {
         taskExecutor.execute(task);
 
         verify(artistSyncTaskManager, never()).add(any(ArtistTaskData.class));
-        verify(albumService, times(1)).saveAll(eq(artistId), albumsCaptor.capture());
+        verify(albumService, times(20)).save(eq(artistId), albumsCaptor.capture());
         verify(artistService, times(1)).activateArtist(artistId);
 
-        var albums = albumsCaptor.getValue();
+        var albums = albumsCaptor.getAllValues();
 
         assertEquals(albumsCount, albums.size());
     }

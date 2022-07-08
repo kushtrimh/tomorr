@@ -54,10 +54,14 @@ public class AlbumJooqRepository implements AlbumRepository<AlbumRecord> {
     public AlbumRecord save(String artistId, AlbumRecord album) {
         Objects.requireNonNull(album);
         var albumRecord = create.newRecord(ALBUM, album);
-        albumRecord.store();
+        create.insertInto(ALBUM)
+                .set(albumRecord)
+                .onDuplicateKeyIgnore()
+                .execute();
 
         create.insertInto(ARTIST_ALBUM)
                 .set(newArtistAlbumRecord(artistId, albumRecord))
+                .onDuplicateKeyIgnore()
                 .execute();
         return albumRecord;
     }

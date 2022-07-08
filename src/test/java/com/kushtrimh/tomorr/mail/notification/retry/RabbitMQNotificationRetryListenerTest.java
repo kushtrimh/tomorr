@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.*;
 
@@ -37,7 +38,7 @@ class RabbitMQNotificationRetryListenerTest {
         Map<String, Object> contextData = Map.of("param", "paramValue");
         var to = List.of("to1", "to2");
         var task = new Task<>(new NotificationRetryData(
-                from, subject, templateName, contextData, to));
+                from, subject, templateName, contextData, to, 2, TimeUnit.SECONDS));
         service.handleNotificationRetry(task);
 
         verify(notificationMailService, times(1)).send(

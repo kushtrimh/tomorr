@@ -4,6 +4,7 @@ import com.kushtrimh.tomorr.task.Task;
 import com.kushtrimh.tomorr.task.data.ArtistTaskData;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Kushtrim Hajrizi
@@ -11,5 +12,5 @@ import java.util.List;
 @FunctionalInterface
 public interface ArtistSyncTaskSender {
 
-    void send(List<Task<ArtistTaskData>> tasks);
+    List<CompletableFuture<Void>> send(List<Task<ArtistTaskData>> tasks);
 }

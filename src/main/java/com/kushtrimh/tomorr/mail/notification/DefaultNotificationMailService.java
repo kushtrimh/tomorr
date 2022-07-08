@@ -18,6 +18,7 @@ import org.thymeleaf.exceptions.TemplateEngineException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Kushtrim Hajrizi
@@ -69,7 +70,7 @@ public class DefaultNotificationMailService implements NotificationMailService {
             } catch (MailException | TemplateEngineException e) {
                 logger.error("Failed to send notification email {}", content, e);
                 notificationRetryService.retryNotification(
-                        new NotificationRetryData(from, subject, templateName, contextData, List.of(toAddress)));
+                        new NotificationRetryData(from, subject, templateName, contextData, List.of(toAddress), 2, TimeUnit.MINUTES));
             }
         }
     }

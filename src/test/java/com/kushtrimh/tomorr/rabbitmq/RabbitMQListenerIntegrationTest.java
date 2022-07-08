@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,7 +42,7 @@ public class RabbitMQListenerIntegrationTest {
     @Test
     public void convertSendAndReceive_WhenSendingNotificationRetryUsingRabbitMQ_SendAndReceiveSuccessfully() {
         var notificationRetryData = new NotificationRetryData(
-                "no-reply@tomorrlocal.com", "subject-tomorr", "template-name", Map.of("param", "paramValue"), List.of("to1", "to2"));
+                "no-reply@tomorrlocal.com", "subject-tomorr", "template-name", Map.of("param", "paramValue"), List.of("to1", "to2"), 1, TimeUnit.SECONDS);
         Task<NotificationRetryData> notificationRetryTask = new Task<>(notificationRetryData);
         Object response = testRabbitTemplate.convertSendAndReceive("notificationRetryTest", notificationRetryTask);
         assertEquals(notificationRetryData.getSubject(), response);
