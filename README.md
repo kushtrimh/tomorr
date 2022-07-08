@@ -4,6 +4,55 @@
 
 *Tomorr Terraform (_for provisioning the resources on AWS_)* - https://github.com/kushtrimh/tomorr-terraform
 
+## The project
+
+Tomorr is a service that will notify you by email when an artist you follow on _tomorr_ has a new release.
+It uses Spotify behind the scenes to get the artist's data and its releases.
+
+This project is mostly done for the purpose of learning different technologies,
+and will be updated with different technologies in the future. I will not be deploying this project for other people to
+use.
+
+## API
+
+### Searching for artists
+
+    GET /api/v1/artist/search
+
+    Parameters:
+        name: The artist's name
+        external: true/false flag that defines whether only the local database should be used or not
+
+    Response:
+        {
+            "artists": [
+                {
+                    "id": "1Xyo4u8u745435MpatF05PJ",
+                    "name": "Artist Name 1"
+                },
+                {
+                    "id": "0Y5tJX7345656lOH1tJY",
+                    "name": "Artist Name 2"
+                }
+            ]
+        }
+
+### Following an artist
+
+    POST /api/v1/artist/follow
+
+    Request:
+        {
+            "user": "youremail@example.com",
+            "artistId": "0Y5tJX7345656lOH1tJY"
+        }
+
+    Response status code:
+        200 - Success
+        400 - Bad request
+        404 - Artist not found
+        409 - Artist already followed
+
 ## Running the project
 
 ### Using Docker
@@ -39,7 +88,7 @@ file for this case.
 
 ### Environment variables
 
-If you do not plan on using an external `application.yml` file, 
+If you do not plan on using an external `application.yml` file,
 then you can use environment variables to configure the application.
 
 | Environment variable           | Description                           | Type    |
@@ -77,8 +126,8 @@ spring:
   mail:
     host: mail
     port: 1025
-    username: 
-    password: 
+    username:
+    password:
     properties:
       mail:
         auth: false
