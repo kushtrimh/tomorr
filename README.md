@@ -13,6 +13,9 @@ This project is mostly done for the purpose of learning different technologies,
 and will be updated with different technologies in the future. I will not be deploying this project for other people to
 use.
 
+You need to generate a _client id_ and _client secret_ from Spotify in order to use the service.
+For more information about that, please check https://developer.spotify.com/dashboard/applications.
+
 ## API
 
 ### Searching for artists
