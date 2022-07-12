@@ -48,7 +48,8 @@ public class DefaultNotificationMailService implements NotificationMailService {
         Map<String, Object> contextData = Map.of(
                 "artistName", artist.name(),
                 "albumName", album.name(),
-                "type", album.albumType().name().toLowerCase());
+                "type", album.albumType().name().toLowerCase(),
+                "albumCover", album.imageHref());
         String subject = "New release: " + album.name();
         send(mailProperties.getFrom(), subject, "new-release-notification", contextData,
                 users.stream().map(User::address).toList());

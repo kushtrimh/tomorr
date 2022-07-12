@@ -1,34 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>tomorr</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        sea_green: '#23f0c7',
-                        light_coral: '#ef767a',
-                        middle_blue_purple: '#7d7abc',
-                        liberty: '#6457a6',
-                        minion_yellow: '#ffe347'
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 <body>
-<div class="container mx-auto min-h-screen bg-middle_blue_purple text-sea_green text-center">
-    <h1 class="pt-10 text-2xl text-center">Notification from <span class="font-bold">tomorr</span></h1>
+<div>
+    <h1>Notification from <span>tomorr</span></h1>
 
-    <div class="text-3xl m-11 block">
-        <p class="block"><span class="font-bold" th:text="${artistName}">ArtistName</span> just released a new <span
+    <div>
+        <p><span th:text="${artistName}"><b>ArtistName</b></span> just released a new <span
                 th:text="${type}">Type</span></p>
-        <p class="text-5xl pt-1.5" th:text="${albumName}">AlbumName</p>
+        <h2 th:text="${albumName}">AlbumName</h2>
     </div>
     <img src="https://cdn.pixabay.com/photo/2022/06/19/04/25/cat-7271017_960_720.jpg" th:src="${albumCover}" class="w-full h-auto" />
 </div>
