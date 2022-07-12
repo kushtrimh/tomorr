@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.kushtrimh</groupId>
     <artifactId>tomorr</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>tomorr</name>
     <description>Notifier for new spotify songs</description>
     <properties>
