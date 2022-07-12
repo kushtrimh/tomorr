@@ -9,11 +9,11 @@
 Tomorr is a service that will notify you by email when an artist you follow on _tomorr_ has a new release.
 It uses Spotify behind the scenes to get the artist's data and its releases.
 
-This project is mostly done for the purpose of learning different technologies,
+This project is mostly done for the purpose of learning new technologies,
 and will be updated with different technologies in the future. I will not be deploying this project for other people to
 use.
 
-You need to generate a _client id_ and _client secret_ from Spotify in order to use the service.
+You need to generate a _client id_ and _client secret_ from Spotify in order to start the service.
 For more information about that, please check https://developer.spotify.com/dashboard/applications.
 
 ## API
