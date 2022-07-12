@@ -27,6 +27,6 @@ public class ThymeleafResolverTest {
     public void resolve_WhenCalledWithValidTemplateName_ReturnsTemplateContent() {
         Context context = new Context();
         String templateContent = iTemplateEngine.process("new-release-notification", context);
-        Assertions.assertThat(templateContent).contains("Notification from <span class=\"font-bold\">tomorr</span>");
+        Assertions.assertThat(templateContent).contains("<h1>Notification from <span>tomorr</span></h1>");
     }
 }
